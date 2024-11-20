@@ -27,14 +27,50 @@ flutter:
   assets:
     - assets/logo/
 
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+  fonts:
+    - family: Ubuntu Sans
+      fonts:
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-ThinItalic.ttf
+          style: italic
+          weight: 100
+
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-ExtraLightItalic.ttf
+          style: italic
+          weight: 200
+
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-LightItalic.ttf
+          style: italic
+          weight: 300
+
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-Italic.ttf
+          style: italic
+          weight: 400
+
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-MediumItalic.ttf
+          style: italic
+          weight: 500
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-SemiBoldItalic.ttf
+          style: italic
+          weight: 600
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-BoldItalic.ttf
+          style: italic
+          weight: 700
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Ubuntu Sans/UbuntuSans-ExtraBoldItalic.ttf
+          style: italic
+          weight: 800
