@@ -75,7 +75,7 @@ ThemeData get darkTheme => ThemeData.dark(
       checkboxTheme: CheckboxThemeData(
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(8),
         ),
       ),
     );

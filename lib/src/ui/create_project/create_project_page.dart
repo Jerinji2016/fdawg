@@ -35,7 +35,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                 const SizedBox(height: 48),
                 ConstrainedBox(
                   constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.3,
+                    maxWidth: MediaQuery.of(context).size.width * 0.35,
                   ),
                   child: _buildPages(context),
                 ),

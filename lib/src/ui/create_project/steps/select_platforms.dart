@@ -5,16 +5,22 @@ import '../../../widgets/primary_button.dart';
 import '../create_project.vm.dart';
 
 enum PlatformOptions {
-  android('Android'),
-  ios('iOS'),
-  linux('Linux'),
-  macos('MacOS'),
-  web('Web'),
-  windows('Windows');
+  android(label: 'Android', placeholder: 'Android Bundle ID'),
+  ios(label: 'iOS', placeholder: 'iOS Bundle ID'),
+  linux(label: 'Linux', placeholder: 'Linux Package Name'),
+  macos(label: 'MacOS', placeholder: 'MacOS Bundle ID'),
+  web(label: 'Web', placeholder: '', hasBundleId: false),
+  windows(label: 'Windows', placeholder: 'Windows Package ID');
 
-  const PlatformOptions(this.label);
+  const PlatformOptions({
+    required this.label,
+    required this.placeholder,
+    this.hasBundleId = true,
+  });
 
   final String label;
+  final String placeholder;
+  final bool hasBundleId;
 }
 
 class SelectPlatforms extends StatelessWidget {
@@ -38,12 +44,13 @@ class SelectPlatforms extends StatelessWidget {
         ConstrainedBox(
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.3,
-            maxWidth: MediaQuery.of(context).size.width * 0.4,
+            // maxWidth: MediaQuery.of(context).size.width * 0.4,
           ),
           child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+            child: Wrap(
+              direction: Axis.horizontal,
+              // crossAxisAlignment: CrossAxisAlignment.start,
+              // mainAxisSize: MainAxisSize.min,
               children: List.generate(
                 PlatformOptions.values.length,
                 (index) => _buildPlatformOptions(context, index),
@@ -83,39 +90,47 @@ class SelectPlatforms extends StatelessWidget {
     final isSelected = viewModel.platformOptions[option] ?? false;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Checkbox(
             value: isSelected,
             onChanged: (value) => viewModel.onPlatformSelected(option, isSelected: value),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    option.label,
-                    style: TextStyle(
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    ),
+          const SizedBox(width: 2),
+          Container(
+            constraints: BoxConstraints(
+              // maxHeight: MediaQuery.of(context).size.height * 0.3,
+              maxWidth: MediaQuery.of(context).size.width * 0.28,
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  option.label,
+                  style: TextStyle(
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
-                  AnimatedSize(
-                    duration: const Duration(milliseconds: 100),
-                    child: isSelected
-                        ? const Padding(
-                            padding: EdgeInsets.only(top: 8),
-                            child: TextField(),
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                ],
-              ),
+                ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.fastLinearToSlowEaseIn,
+                  child: isSelected && option.hasBundleId
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: option.placeholder,
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
             ),
           ),
         ],
