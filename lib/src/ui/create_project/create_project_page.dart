@@ -8,8 +8,8 @@ import '../../widgets/page_index_indicator.dart';
 import '../../widgets/primary_button.dart';
 import 'create_project.vm.dart';
 import 'steps/name_your_project.dart';
-import 'steps/set_app_identity.dart';
 import 'steps/select_platforms.dart';
+import 'steps/set_app_identity.dart';
 
 class CreateProjectPage extends StatefulWidget {
   const CreateProjectPage({super.key});
@@ -54,7 +54,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                   ),
                   textColor: Theme.of(context).textTheme.bodySmall?.color,
                   onTap: () => context.pop(),
-                )
+                ),
               ],
             );
           },

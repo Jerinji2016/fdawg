@@ -24,12 +24,12 @@ ThemeData get lightTheme => ThemeData.light(
           borderSide: const BorderSide(
             color: Colors.grey,
             width: 2,
-          )
+          ),
         ),
         hintStyle: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.normal,
-        )
+        ),
       ),
       colorScheme: ColorScheme.fromSeed(
         seedColor: seedColor,

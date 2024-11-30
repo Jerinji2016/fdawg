@@ -108,13 +108,14 @@ class _FadeTransitionSwitcherState extends State<FadeTransitionSwitcher> with Ti
   @override
   void didUpdateWidget(covariant FadeTransitionSwitcher oldWidget) {
     if (oldWidget.item.key != widget.item.key) {
-      transitionToNewChild(oldWidget.item.index > widget.item.index);
+      transitionToNewChild(
+        isReverse: oldWidget.item.index > widget.item.index,
+      );
     }
     super.didUpdateWidget(oldWidget);
   }
 
-  Future<void> transitionToNewChild(bool isReverse) async {
-    debugPrint('_FadeTransitionSwitcherState.transitionToNewChild: 🐞$isReverse');
+  Future<void> transitionToNewChild({required bool isReverse}) async {
     this.isReverse = isReverse;
     await _exitAnimationController.forward();
     item = widget.item;

@@ -66,9 +66,7 @@ class SetAppIdentity extends StatelessWidget {
       width: 120,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          style: BorderStyle.solid
-        ),
+        border: Border.all(),
       ),
     );
   }

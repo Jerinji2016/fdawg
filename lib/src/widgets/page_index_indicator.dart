@@ -49,7 +49,7 @@ class _PageIndexIndicatorState extends State<PageIndexIndicator> {
       value: widget.controller,
       builder: (context, child) {
         final controller = Provider.of<PageIndexController>(context);
-        debugPrint('_PageIndexIndicatorState.build: 🐞');
+
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: List.generate(
