@@ -26,6 +26,10 @@ ThemeData get lightTheme => ThemeData.light(
             width: 2,
           )
         ),
+        hintStyle: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+        )
       ),
       colorScheme: ColorScheme.fromSeed(
         seedColor: seedColor,
