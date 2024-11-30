@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../config/route_config.dart';
-
-bool get isDarkTheme {
-  final context = globalNavigatorKey.currentState?.context;
-  if(context == null) return false;
+bool isDarkTheme(BuildContext context) {
   return Theme.of(context).brightness == Brightness.dark;
 }
