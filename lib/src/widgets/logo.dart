@@ -19,7 +19,7 @@ class Logo extends StatelessWidget {
       tag: noHero ? DateTime.now() : 'logo',
       child: Image.asset(
         Assets.logo,
-        color: isDarkTheme ? Colors.white : Colors.black,
+        color: isDarkTheme(context) ? Colors.white : const Color(0xFF0D0D0C),
         height: size ?? 200,
       ),
     );
