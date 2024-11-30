@@ -89,7 +89,7 @@ class SetAppIdentity extends StatelessWidget {
                 style: TextStyle(
                   color: Theme.of(context).disabledColor,
                 ),
-              )
+              ),
             ],
           ),
         ),
