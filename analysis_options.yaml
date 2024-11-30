@@ -6,3 +6,4 @@ linter:
     always_use_package_imports: false
     prefer_single_quotes: true
     public_member_api_docs: false
+    lines_longer_than_80_chars: false
