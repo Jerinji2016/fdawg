@@ -12,6 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
   go_router: ^14.6.0
+  hive: ^2.2.3
+  path_provider: ^2.1.5
   provider: ^6.1.2
 
 dev_dependencies:
