@@ -40,6 +40,12 @@ ThemeData get lightTheme => ThemeData.light(
       colorScheme: ColorScheme.fromSeed(
         seedColor: seedColor,
       ),
+      checkboxTheme: CheckboxThemeData(
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6),
+        ),
+      ),
     );
 
 ThemeData get darkTheme => ThemeData.dark(
@@ -65,5 +71,11 @@ ThemeData get darkTheme => ThemeData.dark(
       cardColor: Colors.black26,
       colorScheme: const ColorScheme.dark(
         primary: Colors.purple,
+      ),
+      checkboxTheme: CheckboxThemeData(
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6),
+        ),
       ),
     );
