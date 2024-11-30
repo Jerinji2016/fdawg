@@ -54,26 +54,28 @@ class _PageIndexIndicatorState extends State<PageIndexIndicator> {
           mainAxisSize: MainAxisSize.min,
           children: List.generate(
             controller.total,
-            (index) {
-              final isSelected = index <= controller.currentIndex;
-              return _buildIndicatorDot(isSelected);
-            },
+            (index) => _buildIndicatorDot(context, index),
           ),
         );
       },
     );
   }
 
-  Widget _buildIndicatorDot(bool isSelected) {
+  Widget _buildIndicatorDot(BuildContext context, int index) {
+    final controller = Provider.of<PageIndexController>(context);
+
+    final isSelected = index <= controller.currentIndex;
     final size = (isSelected ? 10 : 6).toDouble();
+    final color = Theme.of(context).colorScheme.primary;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: isSelected ? Theme.of(context).primaryColor : Colors.transparent,
+        color: isSelected ? color : Colors.transparent,
         borderRadius: BorderRadius.circular(size),
         border: Border.all(
-          color: Theme.of(context).primaryColor,
+          color: color,
         ),
       ),
       width: size,

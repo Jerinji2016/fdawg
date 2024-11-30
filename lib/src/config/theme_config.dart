@@ -26,6 +26,12 @@ ThemeData get lightTheme => ThemeData.light(
             width: 2,
           ),
         ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(
+            color: Colors.grey,
+          ),
+        ),
         hintStyle: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.normal,
@@ -36,21 +42,28 @@ ThemeData get lightTheme => ThemeData.light(
       ),
     );
 
-final darkTheme = ThemeData.dark(
-  useMaterial3: true,
-).copyWith(
-  splashFactory: InkSparkle.splashFactory,
-  scaffoldBackgroundColor: Colors.transparent,
-  textTheme: ThemeData.dark(useMaterial3: true).textTheme.apply(
-        fontFamily: 'Ubuntu Sans',
+ThemeData get darkTheme => ThemeData.dark(
+      useMaterial3: true,
+    ).copyWith(
+      splashFactory: InkSparkle.splashFactory,
+      scaffoldBackgroundColor: Colors.transparent,
+      dividerColor: Colors.grey,
+      textTheme: ThemeData.dark(useMaterial3: true).textTheme.apply(
+            fontFamily: 'Ubuntu Sans',
+          ),
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(
+            color: Colors.grey,
+          ),
+        ),
       ),
-  inputDecorationTheme: InputDecorationTheme(
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(16),
-    ),
-  ),
-  cardColor: Colors.black26,
-  colorScheme: const ColorScheme.dark(
-    primary: Colors.purple,
-  ),
-);
+      cardColor: Colors.black26,
+      colorScheme: const ColorScheme.dark(
+        primary: Colors.purple,
+      ),
+    );
