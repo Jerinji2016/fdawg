@@ -1,3 +1,4 @@
+import 'package:fdawg_namer/fdawg_namer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,14 @@ class NameYourProject extends StatefulWidget {
 }
 
 class _NameYourProjectState extends State<NameYourProject> {
+  String? _projectNameError;
+
+  void _onProjectNameChanged(String text) {
+    if (_projectNameError != null) {
+      setState(() => _projectNameError = null);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<CreateProjectViewModel>(context);
@@ -29,7 +38,9 @@ class _NameYourProjectState extends State<NameYourProject> {
         const SizedBox(height: 24),
         TextField(
           controller: viewModel.projectNameController,
+          onChanged: _onProjectNameChanged,
           decoration: InputDecoration(
+            errorText: _projectNameError,
             label: const Text('Project Name'),
             hintText: 'My Awesome Project',
             floatingLabelStyle: TextStyle(
@@ -39,7 +50,7 @@ class _NameYourProjectState extends State<NameYourProject> {
         ),
         const SizedBox(height: 16),
         TextField(
-          controller: TextEditingController(),
+          controller: viewModel.projectDescriptionController,
           maxLines: 2,
           decoration: InputDecoration(
             label: const Text('Description'),
@@ -54,7 +65,7 @@ class _NameYourProjectState extends State<NameYourProject> {
           alignment: Alignment.centerRight,
           child: PrimaryButton(
             text: 'Next',
-            onTap: viewModel.onNextTapped,
+            onTap: _onNextTapped,
             suffix: const Icon(
               Icons.arrow_forward,
               color: Colors.white,
@@ -63,5 +74,20 @@ class _NameYourProjectState extends State<NameYourProject> {
         ),
       ],
     );
+  }
+
+  void _onNextTapped() {
+    final viewModel = Provider.of<CreateProjectViewModel>(context, listen: false);
+    final name = viewModel.projectNameController.text;
+    try {
+      FdawgNamer.isValidName(name);
+    } catch (e) {
+      debugPrint('_NameYourProjectState._onNextTapped: ❌ERROR: $e');
+      return setState(
+        () => _projectNameError = e.toString(),
+      );
+    }
+
+    viewModel.onNextTapped();
   }
 }
