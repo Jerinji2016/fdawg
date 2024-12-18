@@ -1,7 +1,9 @@
 library fdawg_namer;
 
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
+part 'helpers/validate_name.dart';
+
+class FdawgNamer {
+  FdawgNamer._();
+
+  static void isValidName(String name) => _validateName(name);
 }
