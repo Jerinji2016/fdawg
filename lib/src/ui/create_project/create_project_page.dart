@@ -9,6 +9,7 @@ import '../../widgets/primary_button.dart';
 import 'create_project.vm.dart';
 import 'steps/name_your_project.dart';
 import 'steps/select_platforms.dart';
+import 'steps/select_project_path.dart';
 import 'steps/set_app_identity.dart';
 
 class CreateProjectPage extends StatefulWidget {
@@ -65,9 +66,10 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
 
   Widget _buildPages(BuildContext context) {
     final pages = [
-      FadeTransitionChild(child: const NameYourProject(), index: 0),
-      FadeTransitionChild(child: const SetAppIdentity(), index: 1),
-      FadeTransitionChild(child: const SelectPlatforms(), index: 2),
+      FadeTransitionChild(child: const SelectProjectPath(), index: 0),
+      FadeTransitionChild(child: const NameYourProject(), index: 1),
+      FadeTransitionChild(child: const SetAppIdentity(), index: 2),
+      FadeTransitionChild(child: const SelectPlatforms(), index: 3),
     ];
 
     final viewModel = Provider.of<CreateProjectViewModel>(context);

@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../widgets/page_index_indicator.dart';
@@ -10,6 +11,10 @@ class CreateProjectViewModel extends ChangeNotifier {
   final projectDescriptionController = TextEditingController();
 
   final appNameController = TextEditingController();
+
+  String? _directoryPath;
+
+  String? get directoryPath => _directoryPath;
 
   final platformOptions = Map<PlatformOptions, bool>.fromEntries(
     PlatformOptions.values.map(
@@ -30,6 +35,13 @@ class CreateProjectViewModel extends ChangeNotifier {
   void onPreviousTapped() {
     _currentPageIndex--;
     pageIndexController.previousIndex();
+    notifyListeners();
+  }
+
+  Future<void> pickDirectory() async {
+    _directoryPath = await FilePicker.platform.getDirectoryPath();
+    if(_directoryPath == null) return;
+
     notifyListeners();
   }
 
