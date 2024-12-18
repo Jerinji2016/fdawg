@@ -1,6 +1,6 @@
 library fdawg_namer;
 
-part 'helpers/validate_name.dart';
+part 'helpers/validate_project_name.dart';
 
 class FdawgNamer {
   FdawgNamer._();
