@@ -9,6 +9,9 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+  fdawg_core:
+    path: ../fdawg_core
+
   flutter:
     sdk: flutter
 

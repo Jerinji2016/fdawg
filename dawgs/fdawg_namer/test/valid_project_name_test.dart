@@ -3,61 +3,61 @@ import 'package:fdawg_namer/fdawg_namer.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('FdawgNamer.isValidName', () {
+  group('FdawgNamer.isValidProjectName', () {
     test('Valid names do not throw errors', () {
-      expect(() => FdawgNamer.isValidName('valid_name'), returnsNormally);
-      expect(() => FdawgNamer.isValidName('validname123'), returnsNormally);
-      expect(() => FdawgNamer.isValidName('flutter_app'), returnsNormally);
+      expect(() => FdawgNamer.isValidProjectName('valid_name'), returnsNormally);
+      expect(() => FdawgNamer.isValidProjectName('validname123'), returnsNormally);
+      expect(() => FdawgNamer.isValidProjectName('flutter_app'), returnsNormally);
     });
 
     test('Throws error for empty name', () {
       expect(
-            () => FdawgNamer.isValidName(''),
+            () => FdawgNamer.isValidProjectName(''),
         throwsA(equals(errorNameEmpty)),
       );
     });
 
     test('Throws error for name starting or ending with underscore', () {
       expect(
-            () => FdawgNamer.isValidName('_name'),
+            () => FdawgNamer.isValidProjectName('_name'),
         throwsA(equals(errorStartEndsWithUnderscore)),
       );
       expect(
-            () => FdawgNamer.isValidName('name_'),
+            () => FdawgNamer.isValidProjectName('name_'),
         throwsA(equals(errorStartEndsWithUnderscore)),
       );
     });
 
     test('Throws error for invalid format', () {
       expect(
-            () => FdawgNamer.isValidName('InvalidName'),
+            () => FdawgNamer.isValidProjectName('InvalidName'),
         throwsA(equals(errorInvalidFormat)),
       );
       expect(
-            () => FdawgNamer.isValidName('name-with-dash'),
+            () => FdawgNamer.isValidProjectName('name-with-dash'),
         throwsA(equals(errorInvalidFormat)),
       );
       expect(
-            () => FdawgNamer.isValidName('123name'),
+            () => FdawgNamer.isValidProjectName('123name'),
         throwsA(equals(errorInvalidFormat)),
       );
       expect(
-            () => FdawgNamer.isValidName('name\$special'),
+            () => FdawgNamer.isValidProjectName('name\$special'),
         throwsA(equals(errorInvalidFormat)),
       );
     });
 
     test('Throws error for reserved Dart keywords', () {
       expect(
-            () => FdawgNamer.isValidName('class'),
+            () => FdawgNamer.isValidProjectName('class'),
         throwsA(equals(errorReservedKeyword)),
       );
       expect(
-            () => FdawgNamer.isValidName('import'),
+            () => FdawgNamer.isValidProjectName('import'),
         throwsA(equals(errorReservedKeyword)),
       );
       expect(
-            () => FdawgNamer.isValidName('void'),
+            () => FdawgNamer.isValidProjectName('void'),
         throwsA(equals(errorReservedKeyword)),
       );
     });
