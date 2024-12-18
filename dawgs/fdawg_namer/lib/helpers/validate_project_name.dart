@@ -1,10 +1,5 @@
 part of '../fdawg_namer.dart';
 
-const errorNameEmpty = 'Name cannot be empty';
-const errorStartEndsWithUnderscore = 'Name cannot start or end with underscore(_)';
-const errorReservedKeyword = 'Name cannot be a dart reserved keyword';
-const errorInvalidFormat = 'Name is not a valid format';
-
 void _validateName(String name) {
   if (name.isEmpty) {
     throw errorNameEmpty;
@@ -72,8 +67,8 @@ const _kDartReservedKeywords = {
   'set',
   'rethrow',
   'show',
-  'static'
-      'super',
+  'static',
+  'super',
   'switch',
   'sync',
   'this',

@@ -1,5 +1,7 @@
 library fdawg_namer;
 
+import 'common/errors.dart';
+
 part 'helpers/validate_project_name.dart';
 
 class FdawgNamer {

@@ -1,3 +1,4 @@
+import 'package:fdawg_namer/common/errors.dart';
 import 'package:fdawg_namer/fdawg_namer.dart';
 import 'package:flutter_test/flutter_test.dart';
 
