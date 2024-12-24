@@ -80,7 +80,7 @@ class _NameYourProjectState extends State<NameYourProject> {
     final viewModel = Provider.of<CreateProjectViewModel>(context, listen: false);
     final name = viewModel.projectNameController.text;
     try {
-      FdawgNamer.isValidName(name);
+      FdawgNamer.isValidProjectName(name);
     } catch (e) {
       debugPrint('_NameYourProjectState._onNextTapped: ❌ERROR: $e');
       return setState(

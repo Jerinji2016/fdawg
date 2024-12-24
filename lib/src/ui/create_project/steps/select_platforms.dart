@@ -1,26 +1,29 @@
+import 'package:fdawg_core/fdawg_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../widgets/primary_button.dart';
 import '../create_project.vm.dart';
 
-enum PlatformOptions {
-  android(label: 'Android', placeholder: 'Android Bundle ID'),
-  ios(label: 'iOS', placeholder: 'iOS Bundle ID'),
-  linux(label: 'Linux', placeholder: 'Linux Package Name'),
-  macos(label: 'MacOS', placeholder: 'MacOS Bundle ID'),
-  web(label: 'Web', placeholder: '', hasBundleId: false),
-  windows(label: 'Windows', placeholder: 'Windows Package ID');
+extension PlatformOptionsExtension on PlatformOptions {
+  String get placeholder {
+    switch (this) {
+      case PlatformOptions.android:
+        return 'Android Bundle ID';
+      case PlatformOptions.ios:
+        return 'iOS Bundle ID';
+      case PlatformOptions.web:
+        return 'Linux Package Name';
+      case PlatformOptions.linux:
+        return 'MacOS Bundle ID';
+      case PlatformOptions.macos:
+        return '';
+      case PlatformOptions.windows:
+        return 'Windows Package ID';
+    }
+  }
 
-  const PlatformOptions({
-    required this.label,
-    required this.placeholder,
-    this.hasBundleId = true,
-  });
-
-  final String label;
-  final String placeholder;
-  final bool hasBundleId;
+  bool get hasBundleId => this != PlatformOptions.web;
 }
 
 class SelectPlatforms extends StatelessWidget {
@@ -48,7 +51,6 @@ class SelectPlatforms extends StatelessWidget {
           ),
           child: SingleChildScrollView(
             child: Wrap(
-              direction: Axis.horizontal,
               // crossAxisAlignment: CrossAxisAlignment.start,
               // mainAxisSize: MainAxisSize.min,
               children: List.generate(

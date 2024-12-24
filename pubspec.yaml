@@ -9,6 +9,8 @@ environment:
   sdk: ^3.5.3
 
 dependencies:
+  fdawg_core:
+    path: dawgs/fdawg_core
   fdawg_namer:
     path: dawgs/fdawg_namer
 

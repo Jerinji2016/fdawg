@@ -1,8 +1,8 @@
+import 'package:fdawg_core/fdawg_core.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../widgets/page_index_indicator.dart';
-import 'steps/select_platforms.dart';
 
 class CreateProjectViewModel extends ChangeNotifier {
   final pageIndexController = PageIndexController(total: 3);
@@ -40,7 +40,7 @@ class CreateProjectViewModel extends ChangeNotifier {
 
   Future<void> pickDirectory() async {
     _directoryPath = await FilePicker.platform.getDirectoryPath();
-    if(_directoryPath == null) return;
+    if (_directoryPath == null) return;
 
     notifyListeners();
   }

@@ -1,10 +1,9 @@
-library fdawg_namer;
-
 import 'package:fdawg_core/fdawg_core.dart';
 
 import 'common/errors.dart';
 
 part 'helpers/validate_app_name.dart';
+
 part 'helpers/validate_project_name.dart';
 
 class FdawgNamer {
