@@ -7,10 +7,6 @@ import '../../widgets/logo.dart';
 import '../../widgets/page_index_indicator.dart';
 import '../../widgets/primary_button.dart';
 import 'create_project.vm.dart';
-import 'steps/name_your_project.dart';
-import 'steps/select_platforms.dart';
-import 'steps/select_project_path.dart';
-import 'steps/set_app_identity.dart';
 
 class CreateProjectPage extends StatefulWidget {
   const CreateProjectPage({super.key});
@@ -65,19 +61,13 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
   }
 
   Widget _buildPages(BuildContext context) {
-    final pages = [
-      FadeTransitionChild(child: const SelectProjectPath(), index: 0),
-      FadeTransitionChild(child: const NameYourProject(), index: 1),
-      FadeTransitionChild(child: const SetAppIdentity(), index: 2),
-      FadeTransitionChild(child: const SelectPlatforms(), index: 3),
-    ];
-
     final viewModel = Provider.of<CreateProjectViewModel>(context);
 
     return AnimatedSize(
       duration: const Duration(milliseconds: 100),
+      curve: Curves.fastLinearToSlowEaseIn,
       child: FadeTransitionSwitcher(
-        item: pages.elementAt(viewModel.currentPage),
+        item: viewModel.pages.elementAt(viewModel.currentPage),
       ),
     );
   }

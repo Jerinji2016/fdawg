@@ -3,7 +3,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../widgets/fade_transition_switcher.dart';
 import '../../widgets/page_index_indicator.dart';
+import 'steps/name_your_project.dart';
+import 'steps/select_platforms.dart';
+import 'steps/select_project_path.dart';
+import 'steps/set_app_identity.dart';
 
 class CreateProjectViewModel extends ChangeNotifier {
   CreateProjectViewModel() {
@@ -14,6 +19,13 @@ class CreateProjectViewModel extends ChangeNotifier {
       _directoryPath = '/Volumes/Macintosh HD/Users/jerin/Documents/Projects/dwag_tests';
     }
   }
+
+  final pages = [
+    FadeTransitionChild(child: const SelectProjectPath(), index: 0),
+    FadeTransitionChild(child: const NameYourProject(), index: 1),
+    FadeTransitionChild(child: const SetAppIdentity(), index: 2),
+    FadeTransitionChild(child: const SelectPlatforms(), index: 3),
+  ];
 
   final pageIndexController = PageIndexController(total: 4);
 

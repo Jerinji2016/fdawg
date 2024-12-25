@@ -74,7 +74,7 @@ class _NameYourProjectState extends State<NameYourProject> {
             const Spacer(),
             PrimaryButton(
               text: 'Next',
-              onTap: viewModel.onNextTapped,
+              onTap: _onNextTapped,
               suffix: const Icon(
                 Icons.arrow_forward,
                 color: Colors.white,
