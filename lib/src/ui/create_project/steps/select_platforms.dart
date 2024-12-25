@@ -47,16 +47,14 @@ class SelectPlatforms extends StatelessWidget {
         ConstrainedBox(
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.3,
-            // maxWidth: MediaQuery.of(context).size.width * 0.4,
           ),
           child: SingleChildScrollView(
             child: Wrap(
-              // crossAxisAlignment: CrossAxisAlignment.start,
-              // mainAxisSize: MainAxisSize.min,
-              children: List.generate(
-                PlatformOptions.values.length,
-                (index) => _buildPlatformOptions(context, index),
-              ),
+              children: PlatformOptions.values
+                  .map(
+                    (e) => _buildPlatformOptions(context, e),
+                  )
+                  .toList(),
             ),
           ),
         ),
@@ -86,10 +84,24 @@ class SelectPlatforms extends StatelessWidget {
     );
   }
 
-  Widget _buildPlatformOptions(BuildContext context, int index) {
+  Widget _buildPlatformOptions(BuildContext context, PlatformOptions option) {
     final viewModel = Provider.of<CreateProjectViewModel>(context);
-    final option = PlatformOptions.values.elementAt(index);
     final isSelected = viewModel.platformOptions[option] ?? false;
+    TextEditingController? controller;
+
+    switch(option) {
+      case PlatformOptions.android:
+        controller = viewModel.androidBundleIdController;
+      case PlatformOptions.ios:
+        controller = viewModel.iosBundleIdController;
+      case PlatformOptions.linux:
+        controller = viewModel.linuxBundleIdController;
+      case PlatformOptions.macos:
+        controller = viewModel.macBundleIdController;
+      case PlatformOptions.windows:
+        controller = viewModel.windowsBundleIdController;
+      case PlatformOptions.web:
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
@@ -104,7 +116,6 @@ class SelectPlatforms extends StatelessWidget {
           const SizedBox(width: 2),
           Container(
             constraints: BoxConstraints(
-              // maxHeight: MediaQuery.of(context).size.height * 0.3,
               maxWidth: MediaQuery.of(context).size.width * 0.28,
             ),
             padding: const EdgeInsets.symmetric(vertical: 6),
@@ -125,6 +136,7 @@ class SelectPlatforms extends StatelessWidget {
                       ? Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: TextField(
+                            controller: controller,
                             decoration: InputDecoration(
                               hintText: option.placeholder,
                             ),

@@ -58,6 +58,10 @@ ThemeData get darkTheme => ThemeData.dark(
             fontFamily: 'Ubuntu Sans',
           ),
       inputDecorationTheme: InputDecorationTheme(
+        hintStyle: const TextStyle(
+          fontSize: 14,
+          color: Colors.grey,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
         ),

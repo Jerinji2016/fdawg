@@ -22,6 +22,12 @@ class CreateProjectViewModel extends ChangeNotifier {
 
   final appNameController = TextEditingController();
 
+  final androidBundleIdController = TextEditingController();
+  final iosBundleIdController = TextEditingController();
+  final macBundleIdController = TextEditingController();
+  final windowsBundleIdController = TextEditingController();
+  final linuxBundleIdController = TextEditingController();
+
   String? _directoryPath;
 
   String? get directoryPath => _directoryPath;
@@ -32,7 +38,7 @@ class CreateProjectViewModel extends ChangeNotifier {
 
   final platformOptions = Map<PlatformOptions, bool>.fromEntries(
     PlatformOptions.values.map(
-      (e) => MapEntry(e, false),
+      (e) => MapEntry(e, true),
     ),
   );
 
@@ -85,6 +91,12 @@ class CreateProjectViewModel extends ChangeNotifier {
     projectNameController.dispose();
     projectDescriptionController.dispose();
     appNameController.dispose();
+
+    androidBundleIdController.dispose();
+    iosBundleIdController.dispose();
+    windowsBundleIdController.dispose();
+    linuxBundleIdController.dispose();
+    macBundleIdController.dispose();
 
     super.dispose();
   }

@@ -61,16 +61,26 @@ class _NameYourProjectState extends State<NameYourProject> {
           ),
         ),
         const SizedBox(height: 24),
-        Align(
-          alignment: Alignment.centerRight,
-          child: PrimaryButton(
-            text: 'Next',
-            onTap: _onNextTapped,
-            suffix: const Icon(
-              Icons.arrow_forward,
-              color: Colors.white,
+        Row(
+          children: [
+            PrimaryButton(
+              text: 'Back',
+              onTap: viewModel.onPreviousTapped,
+              prefix: const Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              ),
             ),
-          ),
+            const Spacer(),
+            PrimaryButton(
+              text: 'Next',
+              onTap: viewModel.onNextTapped,
+              suffix: const Icon(
+                Icons.arrow_forward,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
       ],
     );
