@@ -1,11 +1,21 @@
 import 'package:fdawg_core/fdawg_core.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../widgets/page_index_indicator.dart';
 
 class CreateProjectViewModel extends ChangeNotifier {
-  final pageIndexController = PageIndexController(total: 3);
+  CreateProjectViewModel() {
+    if (kDebugMode) {
+      projectNameController.text = 'test_project';
+      projectDescriptionController.text = 'This is a project description';
+      appNameController.text = 'Test Project 1';
+      _directoryPath = '/Volumes/Macintosh HD/Users/jerin/Documents/Projects/dwag_tests';
+    }
+  }
+
+  final pageIndexController = PageIndexController(total: 4);
 
   final projectNameController = TextEditingController();
   final projectDescriptionController = TextEditingController();
@@ -15,6 +25,10 @@ class CreateProjectViewModel extends ChangeNotifier {
   String? _directoryPath;
 
   String? get directoryPath => _directoryPath;
+
+  Uint8List? _appIconAsBytes;
+
+  Uint8List? get appIconAsBytes => _appIconAsBytes;
 
   final platformOptions = Map<PlatformOptions, bool>.fromEntries(
     PlatformOptions.values.map(
@@ -41,7 +55,16 @@ class CreateProjectViewModel extends ChangeNotifier {
   Future<void> pickDirectory() async {
     _directoryPath = await FilePicker.platform.getDirectoryPath();
     if (_directoryPath == null) return;
+    notifyListeners();
+  }
 
+  void setAppIcon(Uint8List iconAsBytes) {
+    _appIconAsBytes = iconAsBytes;
+    notifyListeners();
+  }
+
+  void clearSelectedAppIcon() {
+    _appIconAsBytes = null;
     notifyListeners();
   }
 

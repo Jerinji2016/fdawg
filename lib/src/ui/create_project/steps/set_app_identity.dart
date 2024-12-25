@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../config/theme_config.dart';
 import '../../../widgets/primary_button.dart';
 import '../create_project.vm.dart';
+import '../widgets/app_icon_avatar.dart';
 
 class SetAppIdentity extends StatelessWidget {
   const SetAppIdentity({super.key});
@@ -23,10 +23,14 @@ class SetAppIdentity extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        _buildImagePicker(context),
+        AppIconAvatar(
+          initialIconAsBytes: viewModel.appIconAsBytes,
+          onRemove: viewModel.clearSelectedAppIcon,
+          onImagePicked: viewModel.setAppIcon,
+        ),
         const SizedBox(height: 16),
         TextField(
-          controller: viewModel.projectNameController,
+          controller: viewModel.appNameController,
           decoration: InputDecoration(
             label: const Text('App Name'),
             hintText: 'Cool App',
@@ -58,42 +62,6 @@ class SetAppIdentity extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildImagePicker(BuildContext context) {
-    return InkWell(
-      onTap: () {},
-      hoverDuration: hoverDuration,
-      borderRadius: BorderRadius.circular(24),
-      child: Container(
-        height: 120,
-        width: 120,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: Theme.of(context).dividerColor,
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.add_a_photo_outlined,
-                color: Theme.of(context).disabledColor,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Add App Icon',
-                style: TextStyle(
-                  color: Theme.of(context).disabledColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
