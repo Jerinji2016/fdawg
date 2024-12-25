@@ -13,11 +13,11 @@ extension PlatformOptionsExtension on PlatformOptions {
       case PlatformOptions.ios:
         return 'iOS Bundle ID';
       case PlatformOptions.web:
-        return 'Linux Package Name';
-      case PlatformOptions.linux:
-        return 'MacOS Bundle ID';
-      case PlatformOptions.macos:
         return '';
+      case PlatformOptions.linux:
+        return 'Linux Package Name';
+      case PlatformOptions.macos:
+        return 'MacOS Bundle ID';
       case PlatformOptions.windows:
         return 'Windows Package ID';
     }
