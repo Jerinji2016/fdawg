@@ -11,50 +11,90 @@ class SelectProjectPath extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<CreateProjectViewModel>(context);
     final directoryPath = viewModel.directoryPath;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isCompactHeight = screenHeight < 600;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Text(
-          'Select Project Path',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 24),
-        if (directoryPath != null)
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white12,
-              borderRadius: BorderRadius.circular(12),
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Select Project Path',
+            style: TextStyle(
+              fontSize: isCompactHeight ? 18 : 24,
+              fontWeight: FontWeight.bold,
             ),
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            margin: const EdgeInsets.only(bottom: 16),
-            child: Text(
-              directoryPath,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
+          ),
+          SizedBox(height: isCompactHeight ? 12 : 24),
+          if (directoryPath != null)
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white12,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: EdgeInsets.symmetric(
+                vertical: isCompactHeight ? 4 : 8, 
+                horizontal: 12
+              ),
+              margin: EdgeInsets.only(bottom: isCompactHeight ? 8 : 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      directoryPath,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: isCompactHeight ? 1 : 2,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit, size: 16),
+                    onPressed: viewModel.pickDirectory,
+                    tooltip: 'Change directory',
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        PrimaryButton(
-          text: directoryPath == null ? 'Choose' : 'Change',
-          onTap: viewModel.pickDirectory,
-        ),
-        if (directoryPath != null)
-          Align(
-            alignment: Alignment.centerRight,
-            child: PrimaryButton(
-              text: 'Next',
-              onTap: viewModel.onNextTapped,
-              suffix: const Icon(
-                Icons.arrow_forward,
+          if (directoryPath == null)
+            PrimaryButton(
+              text: isCompactHeight ? '' : 'Choose Directory',
+              onTap: viewModel.pickDirectory,
+              prefix: const Icon(
+                Icons.folder_open,
                 color: Colors.white,
               ),
+              padding: isCompactHeight
+                  ? const EdgeInsets.all(10)
+                  : const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
-          ),
-      ],
+          SizedBox(height: isCompactHeight ? 8 : 16),
+          if (directoryPath != null)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                PrimaryButton(
+                  text: isCompactHeight ? '' : 'Next',
+                  onTap: viewModel.onNextTapped,
+                  suffix: Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                    size: isCompactHeight ? 18 : 24,
+                  ),
+                  padding: isCompactHeight
+                      ? const EdgeInsets.all(10)
+                      : const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 }

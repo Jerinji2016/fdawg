@@ -19,6 +19,15 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.home),
+          onPressed: () => context.pop(),
+          tooltip: 'Back to Home',
+        ),
+      ),
       body: Center(
         child: ChangeNotifierProvider(
           create: (context) => CreateProjectViewModel(),
@@ -28,8 +37,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Logo(),
-                const SizedBox(height: 48),
+                const Logo(size: 120),
+                const SizedBox(height: 32),
                 ConstrainedBox(
                   constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width * 0.35,
@@ -39,18 +48,6 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                 const SizedBox(height: 24),
                 PageIndexIndicator(
                   controller: viewModel.pageIndexController,
-                ),
-                const SizedBox(height: 80),
-                PrimaryButton(
-                  text: 'Home',
-                  color: Colors.transparent,
-                  prefix: const Icon(Icons.arrow_back),
-                  side: BorderSide(
-                    color: Theme.of(context).dividerColor,
-                    width: 1.5,
-                  ),
-                  textColor: Theme.of(context).textTheme.bodySmall?.color,
-                  onTap: () => context.pop(),
                 ),
               ],
             );

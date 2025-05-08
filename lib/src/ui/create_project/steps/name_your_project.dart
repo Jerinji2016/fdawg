@@ -24,65 +24,77 @@ class _NameYourProjectState extends State<NameYourProject> {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<CreateProjectViewModel>(context);
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isCompactHeight = screenHeight < 600;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Text(
-          'Name your project',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 24),
-        TextField(
-          controller: viewModel.projectNameController,
-          onChanged: _onProjectNameChanged,
-          decoration: InputDecoration(
-            errorText: _projectNameError,
-            label: const Text('Project Name'),
-            hintText: 'My Awesome Project',
-            floatingLabelStyle: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Name your project',
+            style: TextStyle(
+              fontSize: isCompactHeight ? 18 : 24,
+              fontWeight: FontWeight.bold,
             ),
           ),
-        ),
-        const SizedBox(height: 16),
-        TextField(
-          controller: viewModel.projectDescriptionController,
-          maxLines: 2,
-          decoration: InputDecoration(
-            label: const Text('Description'),
-            hintText: 'My awesome project is going to ...',
-            floatingLabelStyle: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        Row(
-          children: [
-            PrimaryButton(
-              text: 'Back',
-              onTap: viewModel.onPreviousTapped,
-              prefix: const Icon(
-                Icons.arrow_back,
-                color: Colors.white,
+          SizedBox(height: isCompactHeight ? 12 : 24),
+          TextField(
+            controller: viewModel.projectNameController,
+            onChanged: _onProjectNameChanged,
+            decoration: InputDecoration(
+              errorText: _projectNameError,
+              label: const Text('Project Name'),
+              hintText: 'My Awesome Project',
+              floatingLabelStyle: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
-            const Spacer(),
-            PrimaryButton(
-              text: 'Next',
-              onTap: _onNextTapped,
-              suffix: const Icon(
-                Icons.arrow_forward,
-                color: Colors.white,
+          ),
+          SizedBox(height: isCompactHeight ? 8 : 16),
+          TextField(
+            controller: viewModel.projectDescriptionController,
+            maxLines: isCompactHeight ? 1 : 2,
+            decoration: InputDecoration(
+              label: const Text('Description'),
+              hintText: 'My awesome project is going to ...',
+              floatingLabelStyle: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
-          ],
-        ),
-      ],
+          ),
+          SizedBox(height: isCompactHeight ? 12 : 24),
+          Row(
+            children: [
+              PrimaryButton(
+                text: isCompactHeight ? '' : 'Back',
+                onTap: viewModel.onPreviousTapped,
+                prefix: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                  size: isCompactHeight ? 18 : 24,
+                ),
+                padding: isCompactHeight
+                    ? const EdgeInsets.all(10)
+                    : const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+              const Spacer(),
+              PrimaryButton(
+                text: isCompactHeight ? '' : 'Next',
+                onTap: _onNextTapped,
+                suffix: Icon(
+                  Icons.arrow_forward,
+                  color: Colors.white,
+                  size: isCompactHeight ? 18 : 24,
+                ),
+                padding: isCompactHeight
+                    ? const EdgeInsets.all(10)
+                    : const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
