@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../../widgets/fade_transition_switcher.dart';
 import '../../widgets/logo.dart';
 import '../../widgets/page_index_indicator.dart';
-import '../../widgets/primary_button.dart';
 import 'create_project.vm.dart';
 
 class CreateProjectPage extends StatefulWidget {

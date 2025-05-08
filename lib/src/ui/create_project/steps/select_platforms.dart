@@ -127,13 +127,12 @@ class SelectPlatforms extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : Colors.grey.withOpacity(0.1),
+                    : Colors.grey.withValues(alpha: .1),
                 borderRadius: BorderRadius.circular(isCompact ? 20 : 24),
                 border: Border.all(
                   color: isSelected
                       ? Theme.of(context).colorScheme.primary
-                      : Colors.grey.withOpacity(0.3),
-                  width: 1,
+                      : Colors.grey.withValues(alpha: .3),
                 ),
               ),
               child: Stack(
@@ -152,7 +151,7 @@ class SelectPlatforms extends StatelessWidget {
                       child: Container(
                         width: isCompact ? 14 : 16,
                         height: isCompact ? 14 : 16,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
                         ),
@@ -230,7 +229,7 @@ class SelectPlatforms extends StatelessWidget {
               ),
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
