@@ -1,0 +1,226 @@
+:root {
+    --primary-color: #0175C2;
+    --secondary-color: #01579B;
+    --background-color: #f8f9fa;
+    --card-background: white;
+    --text-color: #333;
+    --text-light: #666;
+    --border-color: #eaeaea;
+    --hover-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    --dependency-bg: #f0f7ff;
+    --dependency-border: #e0eeff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+h1 {
+    color: var(--primary-color);
+    text-align: center;
+    margin: 0 0 30px 0;
+    font-weight: 500;
+    font-size: 2.2rem;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: var(--primary-color);
+    border-radius: 3px;
+}
+
+.project-info {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    max-width: 1200px;
+    width: 90%;
+    margin: 30px auto;
+    flex-grow: 1;
+}
+
+h3 {
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    font-weight: 500;
+    font-size: 1.3rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+h3 i {
+    margin-right: 10px;
+    font-size: 1.1rem;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.info-card {
+    background-color: var(--background-color);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--hover-shadow);
+}
+
+.card-label {
+    font-weight: 500;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.card-value {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    word-break: break-word;
+}
+
+.info-section {
+    margin-bottom: 35px;
+}
+
+.dependency-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+}
+
+.dependency-item {
+    background-color: var(--dependency-bg);
+    padding: 12px 16px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--dependency-border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: var(--card-shadow);
+}
+
+.dependency-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--hover-shadow);
+}
+
+.dep-name {
+    font-weight: 500;
+}
+
+.dep-version {
+    color: var(--primary-color);
+    font-weight: 400;
+    padding: 3px 8px;
+    background-color: rgba(1, 117, 194, 0.1);
+    border-radius: 4px;
+}
+
+.asset-list {
+    list-style-type: none;
+    padding-left: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 10px;
+}
+
+.asset-list li {
+    padding: 10px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    background-color: var(--background-color);
+}
+
+.asset-list li:hover {
+    background-color: var(--dependency-bg);
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow);
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-top: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .project-info {
+        padding: 20px;
+        width: 95%;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .card-grid, 
+    .dependency-list,
+    .asset-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .project-info {
+        padding: 15px;
+        border-radius: 8px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+    
+    h3 {
+        font-size: 1.1rem;
+    }
+    
+    .info-card,
+    .dependency-item {
+        padding: 12px;
+    }
+}

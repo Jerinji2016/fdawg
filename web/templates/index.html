@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{.Project.PubspecInfo.Name}} - Flutter Project</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="project-info">
+        <h1>{{.Project.PubspecInfo.Name}}</h1>
+        
+        <div class="info-section">
+            <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
+            <div class="card-grid">
+                <div class="info-card">
+                    <span class="card-label">Name</span>
+                    <span class="card-value">{{.Project.PubspecInfo.Name}}</span>
+                </div>
+                <div class="info-card">
+                    <span class="card-label">Description</span>
+                    <span class="card-value">{{.Project.PubspecInfo.Description}}</span>
+                </div>
+                <div class="info-card">
+                    <span class="card-label">Version</span>
+                    <span class="card-value">{{.Project.PubspecInfo.Version}}</span>
+                </div>
+                <div class="info-card">
+                    <span class="card-label">Path</span>
+                    <span class="card-value">{{.Project.ProjectPath}}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3><i class="fas fa-cogs"></i> SDK Environment</h3>
+            <div class="card-grid">
+                {{range $key, $value := .Project.PubspecInfo.Environment}}
+                <div class="info-card">
+                    <span class="card-label">{{$key}}</span>
+                    <span class="card-value">{{$value}}</span>
+                </div>
+                {{end}}
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3><i class="fas fa-puzzle-piece"></i> Dependencies</h3>
+            <div class="dependency-list">
+                {{range $key, $value := .Project.PubspecInfo.Dependencies}}
+                <div class="dependency-item">
+                    <span class="dep-name">{{$key}}</span>
+                    <span class="dep-version">{{$value}}</span>
+                </div>
+                {{end}}
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3><i class="fas fa-tools"></i> Dev Dependencies</h3>
+            <div class="dependency-list">
+                {{range $key, $value := .Project.PubspecInfo.DevDependencies}}
+                <div class="dependency-item">
+                    <span class="dep-name">{{$key}}</span>
+                    <span class="dep-version">{{$value}}</span>
+                </div>
+                {{end}}
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3><i class="fas fa-images"></i> Assets</h3>
+            <ul class="asset-list">
+                {{range .Project.PubspecInfo.Flutter.Assets}}
+                <li>{{.}}</li>
+                {{end}}
+            </ul>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Powered by FDAWG - Flutter Development Assistant with Go</p>
+    </footer>
+    
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
