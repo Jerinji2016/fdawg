@@ -1,1 +1,5 @@
+# Ignore build artifacts
 /build
+
+# Ignore test artifacts
+/dwag_tests
