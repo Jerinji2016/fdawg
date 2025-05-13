@@ -4,10 +4,26 @@ import (
     "fmt"
     "os"
     "path/filepath"
+    "strings"
 
     "github.com/Jerinji2016/fdawg/pkg/utils"
     "github.com/urfave/cli/v2"
+    "gopkg.in/yaml.v3"
 )
+
+// PubspecInfo represents the structure of a pubspec.yaml file
+type PubspecInfo struct {
+    Name        string                 `yaml:"name"`
+    Description string                 `yaml:"description"`
+    Version     string                 `yaml:"version"`
+    Environment map[string]string      `yaml:"environment"`
+    Dependencies map[string]interface{} `yaml:"dependencies"`
+    DevDependencies map[string]interface{} `yaml:"dev_dependencies"`
+    Flutter     struct {
+        Assets []string               `yaml:"assets"`
+        Fonts  []map[string]interface{} `yaml:"fonts"`
+    } `yaml:"flutter"`
+}
 
 // InitCommand returns the CLI command for initializing or checking a Flutter project
 func InitCommand() *cli.Command {
@@ -78,22 +94,118 @@ func checkFlutterProject(dir string) error {
         utils.Warning("This might be a partial or incomplete Flutter project.")
     } else {
         utils.Success("✓ Valid Flutter project detected!")
-        
-        // Print some project info
-        if pubspecData, err := os.ReadFile(pubspecPath); err == nil {
-            utils.Info("Project information:")
-            // Safely print a portion of the pubspec
-            dataLen := len(pubspecData)
-            previewLen := 100
-            if dataLen < previewLen {
-                previewLen = dataLen
-            }
-            fmt.Printf("%s\n", string(pubspecData[:previewLen]))
-            if dataLen > previewLen {
-                fmt.Println("...")
+    }
+    
+    // Parse and display pubspec information
+    pubspecData, err := os.ReadFile(pubspecPath)
+    if err != nil {
+        utils.Error("Failed to read pubspec.yaml: %v", err)
+        return err
+    }
+    
+    var pubspec PubspecInfo
+    if err := yaml.Unmarshal(pubspecData, &pubspec); err != nil {
+        utils.Error("Failed to parse pubspec.yaml: %v", err)
+        return err
+    }
+    
+    displayPubspecInfo(pubspec)
+    
+    return nil
+}
+
+// displayPubspecInfo formats and displays the pubspec information
+func displayPubspecInfo(pubspec PubspecInfo) {
+    fmt.Println("\n" + strings.Repeat("=", 50))
+    utils.Success("Flutter Project Details")
+    fmt.Println(strings.Repeat("=", 50))
+    
+    // Basic info
+    fmt.Printf("%-15s: %s\n", "Name", pubspec.Name)
+    fmt.Printf("%-15s: %s\n", "Description", pubspec.Description)
+    fmt.Printf("%-15s: %s\n", "Version", pubspec.Version)
+    
+    // SDK environment
+    fmt.Println(strings.Repeat("-", 50))
+    utils.Info("SDK Environment")
+    for env, version := range pubspec.Environment {
+        fmt.Printf("%-15s: %s\n", env, version)
+    }
+    
+    // Dependencies
+    fmt.Println(strings.Repeat("-", 50))
+    utils.Info("Dependencies")
+    if len(pubspec.Dependencies) == 0 {
+        fmt.Println("No dependencies found")
+    } else {
+        for dep, version := range pubspec.Dependencies {
+            switch v := version.(type) {
+            case string:
+                fmt.Printf("%-20s: %s\n", dep, v)
+            case map[string]interface{}:
+                fmt.Printf("%-20s: (complex dependency)\n", dep)
+            default:
+                fmt.Printf("%-20s: %v\n", dep, v)
             }
         }
     }
-
-    return nil
+    
+    // Dev Dependencies
+    fmt.Println(strings.Repeat("-", 50))
+    utils.Info("Dev Dependencies")
+    if len(pubspec.DevDependencies) == 0 {
+        fmt.Println("No dev dependencies found")
+    } else {
+        for dep, version := range pubspec.DevDependencies {
+            switch v := version.(type) {
+            case string:
+                fmt.Printf("%-20s: %s\n", dep, v)
+            case map[string]interface{}:
+                fmt.Printf("%-20s: (complex dependency)\n", dep)
+            default:
+                fmt.Printf("%-20s: %v\n", dep, v)
+            }
+        }
+    }
+    
+    // Assets
+    fmt.Println(strings.Repeat("-", 50))
+    utils.Info("Assets")
+    if len(pubspec.Flutter.Assets) == 0 {
+        fmt.Println("No assets defined")
+    } else {
+        for _, asset := range pubspec.Flutter.Assets {
+            fmt.Printf("- %s\n", asset)
+        }
+    }
+    
+    // Fonts
+    fmt.Println(strings.Repeat("-", 50))
+    utils.Info("Fonts")
+    if len(pubspec.Flutter.Fonts) == 0 {
+        fmt.Println("No custom fonts defined")
+    } else {
+        for _, font := range pubspec.Flutter.Fonts {
+            family, _ := font["family"].(string)
+            fmt.Printf("Family: %s\n", family)
+            
+            if fonts, ok := font["fonts"].([]interface{}); ok {
+                for _, f := range fonts {
+                    if fontMap, ok := f.(map[string]interface{}); ok {
+                        if asset, ok := fontMap["asset"].(string); ok {
+                            fmt.Printf("  - Asset: %s\n", asset)
+                        }
+                        if style, ok := fontMap["style"].(string); ok {
+                            fmt.Printf("    Style: %s\n", style)
+                        }
+                        if weight, ok := fontMap["weight"].(int); ok {
+                            fmt.Printf("    Weight: %d\n", weight)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    fmt.Println(strings.Repeat("=", 50))
 }
