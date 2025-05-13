@@ -14,6 +14,7 @@ func main() {
         Usage: "CLI tool to manage Flutter projects",
         Commands: []*cli.Command{
             commands.ServeCommand(),
+            commands.InitCommand(),
             // More commands will be added here
         },
     }

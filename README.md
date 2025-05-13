@@ -27,6 +27,7 @@ fdawg [command] [options]
 | Command | Description | Options |
 |---------|-------------|---------|
 | `serve` | Start a web server for project management | `--port` - Port to run the server on (default: 8080) |
+| `init`  | Check if the current directory is a Flutter project | None |
 
 ## Examples
 
@@ -40,6 +41,12 @@ Start the web server on a custom port:
 
 ```bash
 fdawg serve --port 3000
+```
+
+Check if the current directory is a Flutter project:
+
+```bash
+fdawg init
 ```
 
 ## Project Structure
