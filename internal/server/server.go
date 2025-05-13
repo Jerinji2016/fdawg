@@ -17,7 +17,7 @@ func Start(port string) error {
     fs := http.FileServer(http.Dir(filepath.Join(utils.ProjectRoot(), "web/static")))
     http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-    fmt.Printf("Server starting on port %s...\n", port)
+    utils.Info("Server starting on port %s...", port)
     return http.ListenAndServe(":"+port, nil)
 }
 

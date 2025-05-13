@@ -4,6 +4,7 @@ import (
     "fmt"
     "os"
 
+    "github.com/Jerinji2016/fdawg/pkg/utils"
     "github.com/urfave/cli/v2"
 )
 
@@ -22,6 +23,7 @@ func InitCommand() *cli.Command {
 func checkFlutterProject() error {
     // Check for pubspec.yaml (required)
     if _, err := os.Stat("pubspec.yaml"); os.IsNotExist(err) {
+        utils.Error("Not a Flutter project: pubspec.yaml not found")
         return fmt.Errorf("not a Flutter project: pubspec.yaml not found")
     }
 
@@ -36,17 +38,17 @@ func checkFlutterProject() error {
     }
 
     if len(missingDirs) > 0 {
-        fmt.Println("Warning: Some Flutter directories are missing:")
+        utils.Warning("Some Flutter directories are missing:")
         for _, dir := range missingDirs {
             fmt.Printf("  - %s\n", dir)
         }
-        fmt.Println("This might be a partial or incomplete Flutter project.")
+        utils.Warning("This might be a partial or incomplete Flutter project.")
     } else {
-        fmt.Println("✓ Valid Flutter project detected!")
+        utils.Success("✓ Valid Flutter project detected!")
         
         // Print some project info
         if pubspecData, err := os.ReadFile("pubspec.yaml"); err == nil {
-            fmt.Println("\nProject information:")
+            utils.Info("Project information:")
             fmt.Printf("%s\n", string(pubspecData[:100])) // Print first 100 chars of pubspec
             fmt.Println("...")
         }
