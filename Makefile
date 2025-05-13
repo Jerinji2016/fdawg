@@ -1,0 +1,57 @@
+# Variables
+BINARY_NAME=fdawg
+BUILD_DIR=build
+GO_FILES=$(shell find . -name "*.go" -type f)
+LDFLAGS=-ldflags "-s -w"
+
+# Default target
+.PHONY: all
+all: clean build
+
+# Build the binary
+.PHONY: build
+build:
+	@echo "Building $(BINARY_NAME)..."
+	@mkdir -p $(BUILD_DIR)
+	@go build $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/flutter-manager
+
+# Clean build artifacts
+.PHONY: clean
+clean:
+	@echo "Cleaning..."
+	@rm -rf $(BUILD_DIR)
+
+# Run the application
+.PHONY: run
+run: build
+	@echo "Running $(BINARY_NAME)..."
+	@./$(BUILD_DIR)/$(BINARY_NAME)
+
+# Install the binary to $GOPATH/bin
+.PHONY: install
+install: build
+	@echo "Installing $(BINARY_NAME)..."
+	@cp $(BUILD_DIR)/$(BINARY_NAME) $(GOPATH)/bin/
+
+# Build for multiple platforms
+.PHONY: cross-build
+cross-build: clean
+	@echo "Building for multiple platforms..."
+	@mkdir -p $(BUILD_DIR)
+	
+	@echo "Building for Linux..."
+	@GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 ./cmd/flutter-manager
+	
+	@echo "Building for macOS..."
+	@GOOS=darwin GOARCH=amd64 go build $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 ./cmd/flutter-manager
+	@GOOS=darwin GOARCH=arm64 go build $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64 ./cmd/flutter-manager
+	
+	@echo "Building for Windows..."
+	@GOOS=windows GOARCH=amd64 go build $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe ./cmd/flutter-manager
+
+# Run tests
+.PHONY: test
+test:
+	@echo "Running tests..."
+	@go test -v ./...
+
