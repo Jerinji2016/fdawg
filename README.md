@@ -27,7 +27,7 @@ fdawg [command] [options]
 | Command | Description | Options |
 |---------|-------------|---------|
 | `serve` | Start a web server for project management | `--port` - Port to run the server on (default: 8080) |
-| `init`  | Check if the current directory is a Flutter project | None |
+| `init [directory]`  | Check if the specified directory is a Flutter project | Optional directory path (defaults to current directory) |
 
 ## Examples
 
@@ -47,6 +47,12 @@ Check if the current directory is a Flutter project:
 
 ```bash
 fdawg init
+```
+
+Check if a specific directory is a Flutter project:
+
+```bash
+fdawg init /path/to/my/flutter/project
 ```
 
 ## Project Structure
