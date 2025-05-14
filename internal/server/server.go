@@ -1,13 +1,13 @@
 package server
 
 import (
-    "fmt"
-    "html/template"
-    "net/http"
-    "path/filepath"
+	"fmt"
+	"html/template"
+	"io/fs"
+	"net/http"
 
-    "github.com/Jerinji2016/fdawg/pkg/flutter"
-    "github.com/Jerinji2016/fdawg/pkg/utils"
+	"github.com/Jerinji2016/fdawg/pkg/flutter"
+	"github.com/Jerinji2016/fdawg/pkg/utils"
 )
 
 // ServerData contains data to be passed to templates
@@ -27,9 +27,8 @@ func Start(port string, project *flutter.ValidationResult) error {
         handleIndex(w, r, data)
     })
 
-    // Serve static files
-    fs := http.FileServer(http.Dir(filepath.Join(utils.ProjectRoot(), "web/static")))
-    http.Handle("/static/", http.StripPrefix("/static/", fs))
+    // Serve static files from embedded filesystem
+    http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(GetStaticFS())))
 
     // Format the address with the port
     addr := fmt.Sprintf(":%s", port)
@@ -48,11 +47,16 @@ func handleIndex(w http.ResponseWriter, r *http.Request, data *ServerData) {
         return
     }
 
-    // Get the template path
-    templatePath := filepath.Join(utils.ProjectRoot(), "web/templates/index.html")
+    // Parse and execute the template from embedded filesystem
+    tmplFS := GetTemplateFS()
+    tmplData, err := fs.ReadFile(tmplFS, "index.html")
+    if err != nil {
+        utils.Error("Failed to read template: %v", err)
+        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+        return
+    }
 
-    // Parse and execute the template
-    tmpl, err := template.ParseFiles(templatePath)
+    tmpl, err := template.New("index").Parse(string(tmplData))
     if err != nil {
         utils.Error("Failed to parse template: %v", err)
         http.Error(w, "Internal Server Error", http.StatusInternalServerError)
