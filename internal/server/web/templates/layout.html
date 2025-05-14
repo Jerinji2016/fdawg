@@ -27,42 +27,42 @@
     <div class="main-container">
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2>Navigation</h2>
+                <h2 class="nav-title">Navigation</h2>
             </div>
             <nav class="sidebar-nav">
                 <ul>
                     <li class="nav-item {{if eq .ActivePage "overview"}}active{{end}}">
-                        <a href="/">
+                        <a href="/" title="Overview">
                             <i class="fas fa-home"></i>
                             <span>Overview</span>
                         </a>
                     </li>
                     <li class="nav-item {{if eq .ActivePage "environment"}}active{{end}}">
-                        <a href="/environment">
+                        <a href="/environment" title="Environment">
                             <i class="fas fa-cogs"></i>
                             <span>Environment</span>
                         </a>
                     </li>
                     <li class="nav-item {{if eq .ActivePage "assets"}}active{{end}}">
-                        <a href="/assets">
+                        <a href="/assets" title="Assets">
                             <i class="fas fa-images"></i>
                             <span>Assets</span>
                         </a>
                     </li>
                     <li class="nav-item {{if eq .ActivePage "localizations"}}active{{end}}">
-                        <a href="/localizations">
+                        <a href="/localizations" title="Localizations">
                             <i class="fas fa-language"></i>
                             <span>Localizations</span>
                         </a>
                     </li>
                     <li class="nav-item {{if eq .ActivePage "fastlane"}}active{{end}}">
-                        <a href="/fastlane">
+                        <a href="/fastlane" title="Fastlane">
                             <i class="fas fa-rocket"></i>
                             <span>Fastlane</span>
                         </a>
                     </li>
                     <li class="nav-item {{if eq .ActivePage "run-configs"}}active{{end}}">
-                        <a href="/run-configs">
+                        <a href="/run-configs" title="Run Configurations">
                             <i class="fas fa-play-circle"></i>
                             <span>Run Configs</span>
                         </a>
@@ -75,11 +75,11 @@
             {{template "content" .}}
         </div>
     </div>
-    
+
     <footer>
         <p class="section-title">Powered by FDAWG - Flutter Development Assistant with Go</p>
     </footer>
-    
+
     <script src="/static/js/main.js"></script>
 </body>
 </html>

@@ -75,6 +75,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Run on resize
         window.addEventListener('resize', checkScreenSize);
+
+        // Enhance tooltip behavior for better UX
+        const navItems = document.querySelectorAll('.nav-item a');
+        navItems.forEach(item => {
+            // Add a small delay before showing tooltip to prevent accidental triggers
+            item.addEventListener('mouseenter', function() {
+                if (sidebar.classList.contains('collapsed')) {
+                    this.setAttribute('data-tooltip-active', 'true');
+                }
+            });
+
+            item.addEventListener('mouseleave', function() {
+                this.removeAttribute('data-tooltip-active');
+            });
+        });
     }
 
     // Tab functionality
