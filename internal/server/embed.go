@@ -7,7 +7,13 @@ import (
 	"net/http"
 )
 
-//go:embed web/templates/index.html
+//go:embed web/templates/layout.html
+//go:embed web/templates/overview.html
+//go:embed web/templates/environment.html
+//go:embed web/templates/assets.html
+//go:embed web/templates/localizations.html
+//go:embed web/templates/fastlane.html
+//go:embed web/templates/run_configs.html
 //go:embed web/static/css/style.css
 //go:embed web/static/js/main.js
 var webFS embed.FS

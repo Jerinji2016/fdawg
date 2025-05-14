@@ -1,0 +1,141 @@
+{{define "content"}}
+<div class="project-info">
+    <div class="info-section">
+        <h3>
+            <span><i class="fas fa-language"></i> Localizations</span>
+            <i class="fas fa-ellipsis-h"></i>
+        </h3>
+        <div class="localizations-management">
+            <p class="section-description">Manage localizations for your Flutter project using easy_localizations. Add, edit, and organize translations for different languages.</p>
+            
+            <div class="localization-stats">
+                <div class="card-grid">
+                    <div class="info-card">
+                        <span class="card-label">Supported Languages</span>
+                        <span class="card-value">3</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="card-label">Translation Keys</span>
+                        <span class="card-value">124</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="card-label">Missing Translations</span>
+                        <span class="card-value">12</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="language-management">
+                <h4>Supported Languages</h4>
+                <div class="language-list">
+                    <div class="language-item active">
+                        <div class="language-flag">🇺🇸</div>
+                        <div class="language-info">
+                            <span class="language-name">English (US)</span>
+                            <span class="language-code">en_US</span>
+                        </div>
+                        <div class="language-status">
+                            <span class="status-badge complete">Complete</span>
+                        </div>
+                        <div class="language-actions">
+                            <button class="table-btn"><i class="fas fa-edit"></i></button>
+                            <button class="table-btn"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="language-item">
+                        <div class="language-flag">🇪🇸</div>
+                        <div class="language-info">
+                            <span class="language-name">Spanish</span>
+                            <span class="language-code">es</span>
+                        </div>
+                        <div class="language-status">
+                            <span class="status-badge incomplete">Missing 8 keys</span>
+                        </div>
+                        <div class="language-actions">
+                            <button class="table-btn"><i class="fas fa-edit"></i></button>
+                            <button class="table-btn"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="language-item">
+                        <div class="language-flag">🇫🇷</div>
+                        <div class="language-info">
+                            <span class="language-name">French</span>
+                            <span class="language-code">fr</span>
+                        </div>
+                        <div class="language-status">
+                            <span class="status-badge incomplete">Missing 4 keys</span>
+                        </div>
+                        <div class="language-actions">
+                            <button class="table-btn"><i class="fas fa-edit"></i></button>
+                            <button class="table-btn"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="language-item add-language">
+                        <div class="add-language-btn">
+                            <i class="fas fa-plus"></i>
+                            <span>Add Language</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="translation-management">
+                <h4>Translation Keys</h4>
+                <div class="translation-tools">
+                    <div class="search-group">
+                        <input type="text" placeholder="Search keys...">
+                        <button><i class="fas fa-search"></i></button>
+                    </div>
+                    <button class="primary-btn"><i class="fas fa-plus"></i> Add Key</button>
+                </div>
+                
+                <div class="translation-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Key</th>
+                                <th>English (US)</th>
+                                <th>Spanish</th>
+                                <th>French</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>app.title</td>
+                                <td>Flutter App</td>
+                                <td>Aplicación Flutter</td>
+                                <td>Application Flutter</td>
+                                <td>
+                                    <button class="table-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="table-btn"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>auth.login</td>
+                                <td>Login</td>
+                                <td>Iniciar sesión</td>
+                                <td>Connexion</td>
+                                <td>
+                                    <button class="table-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="table-btn"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>auth.register</td>
+                                <td>Register</td>
+                                <td>Registrarse</td>
+                                <td>S'inscrire</td>
+                                <td>
+                                    <button class="table-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="table-btn"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

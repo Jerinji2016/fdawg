@@ -1,0 +1,128 @@
+{{define "content"}}
+<div class="project-info">
+    <div class="info-section">
+        <h3>
+            <span><i class="fas fa-rocket"></i> Fastlane CI/CD</span>
+            <i class="fas fa-ellipsis-h"></i>
+        </h3>
+        <div class="fastlane-management">
+            <p class="section-description">Manage Fastlane configuration for your Flutter project. Set up automated build, test, and deployment workflows.</p>
+            
+            <div class="fastlane-status">
+                <div class="card-grid">
+                    <div class="info-card">
+                        <span class="card-label">Fastlane Status</span>
+                        <span class="card-value status-badge">
+                            <i class="fas fa-check-circle"></i> Configured
+                        </span>
+                    </div>
+                    <div class="info-card">
+                        <span class="card-label">Last Build</span>
+                        <span class="card-value">2 hours ago</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="card-label">Build Status</span>
+                        <span class="card-value status-badge success">
+                            <i class="fas fa-check-circle"></i> Success
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fastlane-lanes">
+                <h4>Available Lanes</h4>
+                <div class="lanes-list">
+                    <div class="lane-item">
+                        <div class="lane-info">
+                            <span class="lane-name">beta</span>
+                            <span class="lane-description">Deploy a new beta build to TestFlight</span>
+                        </div>
+                        <div class="lane-actions">
+                            <button class="primary-btn"><i class="fas fa-play"></i> Run</button>
+                            <button class="secondary-btn"><i class="fas fa-edit"></i> Edit</button>
+                        </div>
+                    </div>
+                    <div class="lane-item">
+                        <div class="lane-info">
+                            <span class="lane-name">release</span>
+                            <span class="lane-description">Deploy a new release build to App Store</span>
+                        </div>
+                        <div class="lane-actions">
+                            <button class="primary-btn"><i class="fas fa-play"></i> Run</button>
+                            <button class="secondary-btn"><i class="fas fa-edit"></i> Edit</button>
+                        </div>
+                    </div>
+                    <div class="lane-item">
+                        <div class="lane-info">
+                            <span class="lane-name">screenshots</span>
+                            <span class="lane-description">Generate screenshots for App Store</span>
+                        </div>
+                        <div class="lane-actions">
+                            <button class="primary-btn"><i class="fas fa-play"></i> Run</button>
+                            <button class="secondary-btn"><i class="fas fa-edit"></i> Edit</button>
+                        </div>
+                    </div>
+                    <div class="lane-item">
+                        <div class="lane-info">
+                            <span class="lane-name">test</span>
+                            <span class="lane-description">Run tests for the app</span>
+                        </div>
+                        <div class="lane-actions">
+                            <button class="primary-btn"><i class="fas fa-play"></i> Run</button>
+                            <button class="secondary-btn"><i class="fas fa-edit"></i> Edit</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="add-lane">
+                    <button class="primary-btn"><i class="fas fa-plus"></i> Add Lane</button>
+                </div>
+            </div>
+            
+            <div class="fastlane-config">
+                <h4>Configuration Files</h4>
+                <div class="config-files">
+                    <div class="config-file-item">
+                        <div class="file-icon">
+                            <i class="fas fa-file-code"></i>
+                        </div>
+                        <div class="file-info">
+                            <span class="file-name">Appfile</span>
+                            <span class="file-path">fastlane/Appfile</span>
+                        </div>
+                        <div class="file-actions">
+                            <button class="table-btn"><i class="fas fa-edit"></i></button>
+                            <button class="table-btn"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                    <div class="config-file-item">
+                        <div class="file-icon">
+                            <i class="fas fa-file-code"></i>
+                        </div>
+                        <div class="file-info">
+                            <span class="file-name">Fastfile</span>
+                            <span class="file-path">fastlane/Fastfile</span>
+                        </div>
+                        <div class="file-actions">
+                            <button class="table-btn"><i class="fas fa-edit"></i></button>
+                            <button class="table-btn"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                    <div class="config-file-item">
+                        <div class="file-icon">
+                            <i class="fas fa-file-code"></i>
+                        </div>
+                        <div class="file-info">
+                            <span class="file-name">Deliverfile</span>
+                            <span class="file-path">fastlane/Deliverfile</span>
+                        </div>
+                        <div class="file-actions">
+                            <button class="table-btn"><i class="fas fa-edit"></i></button>
+                            <button class="table-btn"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{.Project.PubspecInfo.Name}} - Flutter Project</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <button id="sidebar-toggle" class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1>FDAWG</h1>
+        </div>
+        <div class="header-controls">
+            <div class="header-control">
+                <i class="fas fa-user"></i>
+                <span>Profile: {{.Project.PubspecInfo.Name}}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Navigation</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item {{if eq .ActivePage "overview"}}active{{end}}">
+                        <a href="/">
+                            <i class="fas fa-home"></i>
+                            <span>Overview</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {{if eq .ActivePage "environment"}}active{{end}}">
+                        <a href="/environment">
+                            <i class="fas fa-cogs"></i>
+                            <span>Environment</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {{if eq .ActivePage "assets"}}active{{end}}">
+                        <a href="/assets">
+                            <i class="fas fa-images"></i>
+                            <span>Assets</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {{if eq .ActivePage "localizations"}}active{{end}}">
+                        <a href="/localizations">
+                            <i class="fas fa-language"></i>
+                            <span>Localizations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {{if eq .ActivePage "fastlane"}}active{{end}}">
+                        <a href="/fastlane">
+                            <i class="fas fa-rocket"></i>
+                            <span>Fastlane</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {{if eq .ActivePage "run-configs"}}active{{end}}">
+                        <a href="/run-configs">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Run Configs</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="content-container">
+            {{template "content" .}}
+        </div>
+    </div>
+    
+    <footer>
+        <p class="section-title">Powered by FDAWG - Flutter Development Assistant with Go</p>
+    </footer>
+    
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

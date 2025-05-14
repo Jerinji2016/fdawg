@@ -1,0 +1,148 @@
+{{define "content"}}
+<div class="project-info">
+    <div class="info-section">
+        <h3>
+            <span><i class="fas fa-play-circle"></i> Run Configurations</span>
+            <i class="fas fa-ellipsis-h"></i>
+        </h3>
+        <div class="run-configs-management">
+            <p class="section-description">Manage run configurations for Android Studio and VS Code. Create, edit, and organize different run configurations for your Flutter project.</p>
+            
+            <div class="ide-tabs">
+                <div class="tab-header">
+                    <button class="tab-btn active" data-tab="android-studio">Android Studio</button>
+                    <button class="tab-btn" data-tab="vscode">VS Code</button>
+                </div>
+                
+                <div class="tab-content">
+                    <div class="tab-pane active" id="android-studio">
+                        <div class="run-configs-list">
+                            <div class="run-config-item">
+                                <div class="config-info">
+                                    <span class="config-name">Development</span>
+                                    <span class="config-details">Flutter Run | flavor: dev | debug mode</span>
+                                </div>
+                                <div class="config-actions">
+                                    <button class="primary-btn"><i class="fas fa-play"></i> Run</button>
+                                    <button class="secondary-btn"><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="table-btn"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="run-config-item">
+                                <div class="config-info">
+                                    <span class="config-name">Production</span>
+                                    <span class="config-details">Flutter Run | flavor: prod | release mode</span>
+                                </div>
+                                <div class="config-actions">
+                                    <button class="primary-btn"><i class="fas fa-play"></i> Run</button>
+                                    <button class="secondary-btn"><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="table-btn"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="run-config-item">
+                                <div class="config-info">
+                                    <span class="config-name">Staging</span>
+                                    <span class="config-details">Flutter Run | flavor: staging | debug mode</span>
+                                </div>
+                                <div class="config-actions">
+                                    <button class="primary-btn"><i class="fas fa-play"></i> Run</button>
+                                    <button class="secondary-btn"><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="table-btn"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="run-config-item">
+                                <div class="config-info">
+                                    <span class="config-name">Profile Mode</span>
+                                    <span class="config-details">Flutter Run | profile mode</span>
+                                </div>
+                                <div class="config-actions">
+                                    <button class="primary-btn"><i class="fas fa-play"></i> Run</button>
+                                    <button class="secondary-btn"><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="table-btn"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="add-config">
+                            <button class="primary-btn"><i class="fas fa-plus"></i> Add Configuration</button>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="vscode">
+                        <div class="run-configs-list">
+                            <div class="run-config-item">
+                                <div class="config-info">
+                                    <span class="config-name">Debug</span>
+                                    <span class="config-details">Flutter: Debug | device: chrome</span>
+                                </div>
+                                <div class="config-actions">
+                                    <button class="primary-btn"><i class="fas fa-play"></i> Run</button>
+                                    <button class="secondary-btn"><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="table-btn"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="run-config-item">
+                                <div class="config-info">
+                                    <span class="config-name">Profile</span>
+                                    <span class="config-details">Flutter: Profile | device: android</span>
+                                </div>
+                                <div class="config-actions">
+                                    <button class="primary-btn"><i class="fas fa-play"></i> Run</button>
+                                    <button class="secondary-btn"><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="table-btn"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="run-config-item">
+                                <div class="config-info">
+                                    <span class="config-name">Release</span>
+                                    <span class="config-details">Flutter: Release | device: android</span>
+                                </div>
+                                <div class="config-actions">
+                                    <button class="primary-btn"><i class="fas fa-play"></i> Run</button>
+                                    <button class="secondary-btn"><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="table-btn"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="add-config">
+                            <button class="primary-btn"><i class="fas fa-plus"></i> Add Configuration</button>
+                        </div>
+                        
+                        <div class="config-file">
+                            <h4>launch.json</h4>
+                            <div class="code-preview">
+                                <pre><code>{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter: Debug",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug"
+    },
+    {
+      "name": "Flutter: Profile",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "Flutter: Release",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release"
+    }
+  ]
+}</code></pre>
+                            </div>
+                            <div class="file-actions">
+                                <button class="secondary-btn"><i class="fas fa-edit"></i> Edit File</button>
+                                <button class="secondary-btn"><i class="fas fa-download"></i> Download</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

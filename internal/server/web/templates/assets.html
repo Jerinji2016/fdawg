@@ -1,0 +1,79 @@
+{{define "content"}}
+<div class="project-info">
+    <div class="info-section">
+        <h3>
+            <span><i class="fas fa-images"></i> Assets Management</span>
+            <i class="fas fa-ellipsis-h"></i>
+        </h3>
+        <div class="assets-management">
+            <p class="section-description">Manage assets used in your Flutter project. Upload, organize, and optimize your images, fonts, and other assets.</p>
+            
+            <div class="assets-stats">
+                <div class="card-grid">
+                    <div class="info-card">
+                        <span class="card-label">Total Assets</span>
+                        <span class="card-value">{{len .Project.PubspecInfo.Flutter.Assets}}</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="card-label">Images</span>
+                        <span class="card-value">{{len .Project.PubspecInfo.Flutter.Assets}}</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="card-label">Fonts</span>
+                        <span class="card-value">{{len .Project.PubspecInfo.Flutter.Fonts}}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="assets-upload">
+                <h4>Upload New Assets</h4>
+                <div class="upload-area">
+                    <div class="upload-dropzone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag and drop files here or click to browse</p>
+                        <input type="file" id="asset-upload" multiple style="display: none;">
+                        <button class="primary-btn" onclick="document.getElementById('asset-upload').click()">Browse Files</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="assets-list">
+                <h4>Project Assets</h4>
+                <div class="assets-filter">
+                    <div class="filter-group">
+                        <label>Filter by type:</label>
+                        <select>
+                            <option value="all">All Assets</option>
+                            <option value="images">Images</option>
+                            <option value="fonts">Fonts</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <input type="text" placeholder="Search assets...">
+                        <button><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+                
+                <div class="assets-grid">
+                    {{range .Project.PubspecInfo.Flutter.Assets}}
+                    <div class="asset-item">
+                        <div class="asset-preview">
+                            <i class="fas fa-file-image"></i>
+                        </div>
+                        <div class="asset-info">
+                            <span class="asset-name">{{.}}</span>
+                            <div class="asset-actions">
+                                <button class="table-btn"><i class="fas fa-eye"></i></button>
+                                <button class="table-btn"><i class="fas fa-download"></i></button>
+                                <button class="table-btn"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

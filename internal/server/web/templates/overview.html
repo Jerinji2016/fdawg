@@ -1,0 +1,73 @@
+{{define "content"}}
+<div class="project-info">
+    <div class="info-section">
+        <h3>
+            <span><i class="fas fa-info-circle"></i> Basic Information</span>
+            <i class="fas fa-ellipsis-h"></i>
+        </h3>
+        <div class="card-grid">
+            <div class="info-card">
+                <span class="card-label">Name</span>
+                <span class="card-value">{{.Project.PubspecInfo.Name}}</span>
+            </div>
+            <div class="info-card">
+                <span class="card-label">Description</span>
+                <span class="card-value">{{.Project.PubspecInfo.Description}}</span>
+            </div>
+            <div class="info-card">
+                <span class="card-label">Version</span>
+                <span class="card-value">{{.Project.PubspecInfo.Version}}</span>
+            </div>
+            <div class="info-card">
+                <span class="card-label">Path</span>
+                <span class="card-value">{{.Project.ProjectPath}}</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="info-section">
+        <h3>
+            <span><i class="fas fa-cogs"></i> SDK Environment</span>
+            <i class="fas fa-ellipsis-h"></i>
+        </h3>
+        <div class="card-grid">
+            {{range $key, $value := .Project.PubspecInfo.Environment}}
+            <div class="info-card">
+                <span class="card-label">{{$key}}</span>
+                <span class="card-value">{{$value}}</span>
+            </div>
+            {{end}}
+        </div>
+    </div>
+    
+    <div class="info-section">
+        <h3>
+            <span><i class="fas fa-puzzle-piece"></i> Dependencies</span>
+            <i class="fas fa-ellipsis-h"></i>
+        </h3>
+        <div class="dependency-list">
+            {{range $key, $value := .Project.PubspecInfo.Dependencies}}
+            <div class="dependency-item">
+                <span class="dep-name">{{$key}}</span>
+                <span class="dep-version">{{$value}}</span>
+            </div>
+            {{end}}
+        </div>
+    </div>
+    
+    <div class="info-section">
+        <h3>
+            <span><i class="fas fa-tools"></i> Dev Dependencies</span>
+            <i class="fas fa-ellipsis-h"></i>
+        </h3>
+        <div class="dependency-list">
+            {{range $key, $value := .Project.PubspecInfo.DevDependencies}}
+            <div class="dependency-item">
+                <span class="dep-name">{{$key}}</span>
+                <span class="dep-version">{{$value}}</span>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</div>
+{{end}}
