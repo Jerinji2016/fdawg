@@ -32,37 +32,37 @@
             <nav class="sidebar-nav">
                 <ul>
                     <li class="nav-item {{if eq .ActivePage "overview"}}active{{end}}">
-                        <a href="/" title="Overview">
+                        <a href="/" title="Overview" data-tooltip="Overview">
                             <i class="fas fa-home"></i>
                             <span>Overview</span>
                         </a>
                     </li>
                     <li class="nav-item {{if eq .ActivePage "environment"}}active{{end}}">
-                        <a href="/environment" title="Environment">
+                        <a href="/environment" title="Environment" data-tooltip="Environment">
                             <i class="fas fa-cogs"></i>
                             <span>Environment</span>
                         </a>
                     </li>
                     <li class="nav-item {{if eq .ActivePage "assets"}}active{{end}}">
-                        <a href="/assets" title="Assets">
+                        <a href="/assets" title="Assets" data-tooltip="Assets">
                             <i class="fas fa-images"></i>
                             <span>Assets</span>
                         </a>
                     </li>
                     <li class="nav-item {{if eq .ActivePage "localizations"}}active{{end}}">
-                        <a href="/localizations" title="Localizations">
+                        <a href="/localizations" title="Localizations" data-tooltip="Localizations">
                             <i class="fas fa-language"></i>
                             <span>Localizations</span>
                         </a>
                     </li>
                     <li class="nav-item {{if eq .ActivePage "fastlane"}}active{{end}}">
-                        <a href="/fastlane" title="Fastlane">
+                        <a href="/fastlane" title="Fastlane" data-tooltip="Fastlane">
                             <i class="fas fa-rocket"></i>
                             <span>Fastlane</span>
                         </a>
                     </li>
                     <li class="nav-item {{if eq .ActivePage "run-configs"}}active{{end}}">
-                        <a href="/run-configs" title="Run Configurations">
+                        <a href="/run-configs" title="Run Configurations" data-tooltip="Run Configurations">
                             <i class="fas fa-play-circle"></i>
                             <span>Run Configs</span>
                         </a>

@@ -130,6 +130,7 @@ body {
 .sidebar.collapsed .sidebar-header {
     padding: 10px;
     text-align: center;
+    display: none;
 }
 
 .sidebar.collapsed .nav-title {
@@ -183,13 +184,9 @@ body {
     display: none;
 }
 
-.sidebar.collapsed .nav-item {
-    text-align: center;
-}
-
 .sidebar.collapsed .nav-item a {
     justify-content: center;
-    padding: 15px 0;
+    padding: 15px 10px;
 }
 
 .sidebar.collapsed .nav-item a i {
@@ -197,9 +194,7 @@ body {
 }
 
 /* Tooltip styles */
-.sidebar.collapsed .nav-item a:hover::after,
-.sidebar.collapsed .nav-item a[data-tooltip-active="true"]::after {
-    content: attr(title);
+.nav-item a .tooltip {
     position: absolute;
     left: 100%;
     top: 50%;
@@ -213,7 +208,24 @@ body {
     z-index: 100;
     margin-left: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    pointer-events: none; /* Prevent tooltip from blocking mouse events */
+}
+
+/* Only show tooltips when sidebar is collapsed */
+.sidebar.collapsed .nav-item a:hover .tooltip,
+.sidebar.collapsed .nav-item a:focus .tooltip,
+.sidebar.collapsed .nav-item a.tooltip-active .tooltip {
+    opacity: 1;
+    visibility: visible;
     animation: fadeIn 0.2s ease-in-out;
+}
+
+/* Hide tooltips when sidebar is expanded */
+.sidebar:not(.collapsed) .nav-item a .tooltip {
+    display: none;
 }
 
 @keyframes fadeIn {
@@ -598,13 +610,13 @@ footer {
     }
 
     .sidebar.expanded .nav-title {
-        display: block;
+        display: none;
     }
 
     /* Show tooltips on hover in collapsed state */
-    .sidebar:not(.expanded) .nav-item a:hover::after,
-    .sidebar:not(.expanded) .nav-item a[data-tooltip-active="true"]::after {
-        content: attr(title);
+    .sidebar:not(.expanded) .nav-item a:hover::before,
+    .sidebar:not(.expanded) .nav-item a[data-tooltip-active="true"]::before {
+        content: attr(data-tooltip);
         position: absolute;
         left: 100%;
         top: 50%;
@@ -619,6 +631,7 @@ footer {
         margin-left: 10px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         animation: fadeIn 0.2s ease-in-out;
+        pointer-events: none; /* Prevent tooltip from blocking mouse events */
     }
 }
 
@@ -638,6 +651,8 @@ footer {
     .sidebar {
         transform: translateX(-100%);
         width: var(--sidebar-width);
+        z-index: 1000; /* Ensure sidebar appears above content */
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Add shadow when expanded */
     }
 
     .sidebar.expanded {
@@ -650,22 +665,23 @@ footer {
 
     .sidebar-nav span {
         display: inline;
+        padding-left: 10px;
     }
 
-    /* Adjust tooltip position for mobile */
-    .sidebar .nav-item a:hover::after,
-    .sidebar .nav-item a[data-tooltip-active="true"]::after {
-        left: auto;
-        right: 10px;
-        top: 0;
-        transform: translateY(-100%);
-        margin-left: 0;
-        margin-top: -5px;
-        animation: fadeInMobile 0.2s ease-in-out;
+    /* Ensure proper alignment in mobile view */
+    .sidebar .nav-item a {
+        justify-content: flex-start;
+        padding: 15px 20px;
     }
 
-    @keyframes fadeInMobile {
-        from { opacity: 0; transform: translateY(-90%) translateX(0); }
-        to { opacity: 1; transform: translateY(-100%) translateX(0); }
+    .sidebar .nav-item a i {
+        margin-right: 15px;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Hide tooltips on mobile as they're not needed */
+    .sidebar .nav-item a .tooltip {
+        display: none;
     }
 }

@@ -47,26 +47,83 @@ document.addEventListener('DOMContentLoaded', function() {
     const contentContainer = document.querySelector('.content-container');
 
     if (sidebarToggle && sidebar) {
+        // Function to save sidebar state to localStorage
+        function saveSidebarState(isCollapsed) {
+            localStorage.setItem('sidebarCollapsed', isCollapsed);
+        }
+
+        // Function to load sidebar state from localStorage
+        function loadSidebarState() {
+            return localStorage.getItem('sidebarCollapsed') === 'true';
+        }
+
+        // Function to apply sidebar state
+        function applySidebarState(isCollapsed) {
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                contentContainer.classList.add('expanded');
+            } else {
+                sidebar.classList.remove('collapsed');
+                contentContainer.classList.remove('expanded');
+            }
+            sidebar.classList.remove('expanded');
+        }
+
+        // Toggle sidebar on button click
         sidebarToggle.addEventListener('click', function() {
+            const isCurrentlyCollapsed = sidebar.classList.contains('collapsed');
+            const willBeCollapsed = !isCurrentlyCollapsed;
+
             sidebar.classList.toggle('expanded');
             sidebar.classList.toggle('collapsed');
             contentContainer.classList.toggle('expanded');
+
+            // Save the new state
+            saveSidebarState(willBeCollapsed);
         });
 
         // Check screen size and set initial state
         function checkScreenSize() {
+            const savedState = loadSidebarState();
+
             if (window.innerWidth <= 768) {
+                // On mobile, always start with sidebar hidden
                 sidebar.classList.remove('collapsed');
                 sidebar.classList.remove('expanded');
                 contentContainer.classList.remove('expanded');
+
+                // Add a click handler to close sidebar when clicking outside on mobile
+                if (!window.sidebarClickOutsideHandler) {
+                    window.sidebarClickOutsideHandler = true;
+                    document.addEventListener('click', function(e) {
+                        // Only apply this on mobile
+                        if (window.innerWidth <= 768) {
+                            // If sidebar is expanded and click is outside sidebar
+                            if (sidebar.classList.contains('expanded') &&
+                                !sidebar.contains(e.target) &&
+                                e.target !== sidebarToggle &&
+                                !sidebarToggle.contains(e.target)) {
+                                sidebar.classList.remove('expanded');
+                            }
+                        }
+                    });
+                }
             } else if (window.innerWidth <= 992) {
-                sidebar.classList.add('collapsed');
-                sidebar.classList.remove('expanded');
-                contentContainer.classList.add('expanded');
+                // On tablet, use saved state or default to collapsed
+                if (savedState !== null) {
+                    applySidebarState(savedState);
+                } else {
+                    sidebar.classList.add('collapsed');
+                    contentContainer.classList.add('expanded');
+                }
             } else {
-                sidebar.classList.remove('collapsed');
-                sidebar.classList.remove('expanded');
-                contentContainer.classList.remove('expanded');
+                // On desktop, use saved state or default to expanded
+                if (savedState !== null) {
+                    applySidebarState(savedState);
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    contentContainer.classList.remove('expanded');
+                }
             }
         }
 
@@ -80,14 +137,41 @@ document.addEventListener('DOMContentLoaded', function() {
         const navItems = document.querySelectorAll('.nav-item a');
         navItems.forEach(item => {
             // Add a small delay before showing tooltip to prevent accidental triggers
+            let tooltipTimer;
+
             item.addEventListener('mouseenter', function() {
                 if (sidebar.classList.contains('collapsed')) {
-                    this.setAttribute('data-tooltip-active', 'true');
+                    // Add a small delay before showing tooltip
+                    tooltipTimer = setTimeout(() => {
+                        this.classList.add('tooltip-active');
+                    }, 200);
                 }
             });
 
             item.addEventListener('mouseleave', function() {
-                this.removeAttribute('data-tooltip-active');
+                // Clear the timer if mouse leaves before tooltip is shown
+                clearTimeout(tooltipTimer);
+                this.classList.remove('tooltip-active');
+            });
+
+            // Modify navigation links to preserve sidebar state
+            item.addEventListener('click', function(e) {
+                // Only intercept if it's a navigation link (not an external link)
+                if (this.getAttribute('href').startsWith('/') || this.getAttribute('href') === '#') {
+                    e.preventDefault();
+
+                    // On mobile, close the sidebar when a link is clicked
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('expanded');
+                    }
+
+                    // Save current sidebar state before navigation
+                    const isCollapsed = sidebar.classList.contains('collapsed');
+                    saveSidebarState(isCollapsed);
+
+                    // Navigate to the link
+                    window.location.href = this.getAttribute('href');
+                }
             });
         });
     }
