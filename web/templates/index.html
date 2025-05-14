@@ -3,16 +3,36 @@
 <head>
     <title>{{.Project.PubspecInfo.Name}} - Flutter Project</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+    <div class="header">
+        <h1>FDAWG</h1>
+        <div class="header-controls">
+            {{/*  <div class="header-control">
+                <i class="fas fa-calendar"></i>
+                <span>Date: Now</span>
+            </div>
+            <div class="header-control">
+                <i class="fas fa-box"></i>
+                <span>Product: All</span>
+            </div>  */}}
+            <div class="header-control">
+                <i class="fas fa-user"></i>
+                <span>Profile: {{.Project.PubspecInfo.Name}}</span>
+            </div>
+        </div>
+    </div>
+
     <div class="project-info">
-        <h1>{{.Project.PubspecInfo.Name}}</h1>
-        
         <div class="info-section">
-            <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
+            <h3>
+                <span><i class="fas fa-info-circle"></i> Basic Information</span>
+                <i class="fas fa-ellipsis-h"></i>
+            </h3>
             <div class="card-grid">
                 <div class="info-card">
                     <span class="card-label">Name</span>
@@ -34,7 +54,10 @@
         </div>
         
         <div class="info-section">
-            <h3><i class="fas fa-cogs"></i> SDK Environment</h3>
+            <h3>
+                <span><i class="fas fa-cogs"></i> SDK Environment</span>
+                <i class="fas fa-ellipsis-h"></i>
+            </h3>
             <div class="card-grid">
                 {{range $key, $value := .Project.PubspecInfo.Environment}}
                 <div class="info-card">
@@ -46,7 +69,10 @@
         </div>
         
         <div class="info-section">
-            <h3><i class="fas fa-puzzle-piece"></i> Dependencies</h3>
+            <h3>
+                <span><i class="fas fa-puzzle-piece"></i> Dependencies</span>
+                <i class="fas fa-ellipsis-h"></i>
+            </h3>
             <div class="dependency-list">
                 {{range $key, $value := .Project.PubspecInfo.Dependencies}}
                 <div class="dependency-item">
@@ -58,7 +84,10 @@
         </div>
         
         <div class="info-section">
-            <h3><i class="fas fa-tools"></i> Dev Dependencies</h3>
+            <h3>
+                <span><i class="fas fa-tools"></i> Dev Dependencies</span>
+                <i class="fas fa-ellipsis-h"></i>
+            </h3>
             <div class="dependency-list">
                 {{range $key, $value := .Project.PubspecInfo.DevDependencies}}
                 <div class="dependency-item">
@@ -70,7 +99,10 @@
         </div>
         
         <div class="info-section">
-            <h3><i class="fas fa-images"></i> Assets</h3>
+            <h3>
+                <span><i class="fas fa-images"></i> Assets</span>
+                <i class="fas fa-ellipsis-h"></i>
+            </h3>
             <ul class="asset-list">
                 {{range .Project.PubspecInfo.Flutter.Assets}}
                 <li>{{.}}</li>
@@ -80,7 +112,7 @@
     </div>
     
     <footer>
-        <p>Powered by FDAWG - Flutter Development Assistant with Go</p>
+        <p class="section-title">Powered by FDAWG - Flutter Development Assistant with Go</p>
     </footer>
     
     <script src="/static/js/main.js"></script>

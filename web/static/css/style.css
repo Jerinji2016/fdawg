@@ -1,105 +1,108 @@
 :root {
     --primary-color: #0175C2;
     --secondary-color: #01579B;
-    --background-color: #f8f9fa;
-    --card-background: white;
-    --text-color: #333;
-    --text-light: #666;
-    --border-color: #eaeaea;
-    --hover-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    --dependency-bg: #f0f7ff;
-    --dependency-border: #e0eeff;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+    --background-color: #1a1a1a;
+    --card-background: #242424;
+    --text-color: #f0f0f0;
+    --text-light: #b0b0b0;
+    --border-color: #333333;
+    --hover-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    --dependency-bg: #2a3a4a;
+    --dependency-border: #345678;
+    --accent-green: #4caf50;
+    --accent-orange: #ff9800;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Outfit', sans-serif;
     margin: 0;
     padding: 0;
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--background-color);
-    font-weight: 300;
-    min-height: 100vh;
+}
+
+.header {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-h1 {
-    color: var(--primary-color);
-    text-align: center;
-    margin: 0 0 30px 0;
-    font-weight: 500;
-    font-size: 2.2rem;
-    position: relative;
-    padding-bottom: 15px;
+.header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: white;
+    font-family: 'Audiowide', cursive;
+    letter-spacing: 1px;
 }
 
-h1::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background-color: var(--primary-color);
-    border-radius: 3px;
+.header-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.header-control {
+    background-color: #333;
+    border-radius: 20px;
+    padding: 8px 15px;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .project-info {
+    background-color: var(--background-color);
+    padding: 20px;
+    max-width: 1200px;
+    width: 95%;
+    margin: 20px auto;
+}
+
+.info-section {
     background-color: var(--card-background);
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    padding: 30px;
-    max-width: 1200px;
-    width: 90%;
-    margin: 30px auto;
-    flex-grow: 1;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: var(--card-shadow);
 }
 
 h3 {
-    color: var(--secondary-color);
+    color: white;
     margin-bottom: 20px;
     font-weight: 500;
-    font-size: 1.3rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
+    font-size: 1.2rem;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    font-family: 'Audiowide', cursive;
 }
 
 h3 i {
     margin-right: 10px;
-    font-size: 1.1rem;
 }
 
 .card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
+    gap: 15px;
 }
 
 .info-card {
-    background-color: var(--background-color);
-    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
     padding: 16px;
     display: flex;
     flex-direction: column;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--card-shadow);
 }
 
 .info-card:hover {
     transform: translateY(-5px);
     box-shadow: var(--hover-shadow);
+    background-color: rgba(255, 255, 255, 0.08);
 }
 
 .card-label {
@@ -117,10 +120,6 @@ h3 i {
     word-break: break-word;
 }
 
-.info-section {
-    margin-bottom: 35px;
-}
-
 .dependency-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -130,13 +129,21 @@ h3 i {
 .dependency-item {
     background-color: var(--dependency-bg);
     padding: 12px 16px;
-    border-radius: 6px;
+    border-radius: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid var(--dependency-border);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: var(--card-shadow);
+}
+
+.dependency-item:nth-child(odd) {
+    background-color: var(--accent-green);
+    color: #000;
+}
+
+.dependency-item:nth-child(even) {
+    background-color: var(--accent-orange);
+    color: #000;
 }
 
 .dependency-item:hover {
@@ -149,10 +156,8 @@ h3 i {
 }
 
 .dep-version {
-    color: var(--primary-color);
-    font-weight: 400;
     padding: 3px 8px;
-    background-color: rgba(1, 117, 194, 0.1);
+    background-color: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
 }
 
@@ -166,14 +171,13 @@ h3 i {
 
 .asset-list li {
     padding: 10px 16px;
-    border: 1px solid var(--border-color);
     border-radius: 6px;
     transition: all 0.3s ease;
-    background-color: var(--background-color);
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .asset-list li:hover {
-    background-color: var(--dependency-bg);
+    background-color: rgba(255, 255, 255, 0.1);
     transform: translateY(-2px);
     box-shadow: var(--card-shadow);
 }
@@ -184,43 +188,10 @@ footer {
     color: var(--text-light);
     font-size: 0.9rem;
     margin-top: auto;
+    border-top: 1px solid var(--border-color);
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .project-info {
-        padding: 20px;
-        width: 95%;
-    }
-    
-    h1 {
-        font-size: 1.8rem;
-    }
-    
-    .card-grid, 
-    .dependency-list,
-    .asset-list {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 480px) {
-    .project-info {
-        padding: 15px;
-        border-radius: 8px;
-    }
-    
-    h1 {
-        font-size: 1.5rem;
-        margin-bottom: 20px;
-    }
-    
-    h3 {
-        font-size: 1.1rem;
-    }
-    
-    .info-card,
-    .dependency-item {
-        padding: 12px;
-    }
+.section-title {
+    font-family: 'Audiowide', cursive;
+    letter-spacing: 1px;
 }
