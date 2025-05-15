@@ -7,42 +7,43 @@
         </h3>
         <div class="env-management">
             <p class="section-description">Manage environment variables and configuration files for your Flutter project.</p>
-            
+
             <div class="env-files">
                 <h4>Environment Files</h4>
                 <div class="card-grid">
-                    <div class="info-card">
-                        <span class="card-label">Development</span>
-                        <span class="card-value">.env.development</span>
-                        <div class="card-actions">
-                            <button class="action-btn"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="action-btn"><i class="fas fa-download"></i> Download</button>
+                    {{if .EnvFiles}}
+                        {{range .EnvFiles}}
+                        <div class="info-card {{if and $.SelectedEnvFile (eq .Name $.SelectedEnvFile.Name)}}selected{{end}}">
+                            <div class="card-header">
+                                <span class="card-label">{{.Name}}</span>
+                                <a href="#" class="download-btn" title="Download"><i class="fas fa-download"></i></a>
+                            </div>
+                            <span class="card-value">{{.Name}}.json</span>
+                            <div class="card-actions">
+                                <a href="/environment?env={{.Name}}" class="action-btn view-btn"><i class="fas fa-eye"></i> View</a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="info-card">
-                        <span class="card-label">Production</span>
-                        <span class="card-value">.env.production</span>
-                        <div class="card-actions">
-                            <button class="action-btn"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="action-btn"><i class="fas fa-download"></i> Download</button>
+                        {{end}}
+                    {{else}}
+                        <div class="info-card empty-card">
+                            <span class="card-label">No Environment Files</span>
+                            <span class="card-value">Create your first environment file</span>
                         </div>
-                    </div>
-                    <div class="info-card">
-                        <span class="card-label">Staging</span>
-                        <span class="card-value">.env.staging</span>
-                        <div class="card-actions">
-                            <button class="action-btn"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="action-btn"><i class="fas fa-download"></i> Download</button>
-                        </div>
-                    </div>
+                    {{end}}
                     <div class="info-card add-card">
                         <span class="add-label"><i class="fas fa-plus"></i> Add New Environment File</span>
                     </div>
                 </div>
             </div>
-            
+
             <div class="env-variables">
-                <h4>Current Environment Variables</h4>
+                <h4>
+                    {{if .SelectedEnvFile}}
+                        Environment Variables for {{.SelectedEnvFile.Name}}
+                    {{else}}
+                        Environment Variables
+                    {{end}}
+                </h4>
                 <div class="env-table">
                     <table>
                         <thead>
@@ -53,36 +54,36 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>API_URL</td>
-                                <td>https://api.example.com</td>
-                                <td>
-                                    <button class="table-btn"><i class="fas fa-edit"></i></button>
-                                    <button class="table-btn"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>DEBUG_MODE</td>
-                                <td>true</td>
-                                <td>
-                                    <button class="table-btn"><i class="fas fa-edit"></i></button>
-                                    <button class="table-btn"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>APP_VERSION</td>
-                                <td>1.0.0</td>
-                                <td>
-                                    <button class="table-btn"><i class="fas fa-edit"></i></button>
-                                    <button class="table-btn"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
+                            {{if .SelectedEnvFile}}
+                                {{if .SelectedEnvFile.Variables}}
+                                    {{range $key, $value := .SelectedEnvFile.Variables}}
+                                    <tr>
+                                        <td>{{$key}}</td>
+                                        <td>{{$value}}</td>
+                                        <td>
+                                            <button class="table-btn edit-var-btn" data-key="{{$key}}" data-value="{{$value}}"><i class="fas fa-edit"></i></button>
+                                            <button class="table-btn delete-var-btn" data-key="{{$key}}"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    {{end}}
+                                {{else}}
+                                    <tr>
+                                        <td colspan="3" class="empty-message">No variables defined in this environment</td>
+                                    </tr>
+                                {{end}}
+                            {{else}}
+                                <tr>
+                                    <td colspan="3" class="empty-message">Select an environment file to view variables</td>
+                                </tr>
+                            {{end}}
                         </tbody>
                     </table>
                 </div>
+                {{if .SelectedEnvFile}}
                 <div class="add-variable">
-                    <button class="primary-btn"><i class="fas fa-plus"></i> Add Variable</button>
+                    <button class="primary-btn add-var-btn" data-env="{{.SelectedEnvFile.Name}}"><i class="fas fa-plus"></i> Add Variable</button>
                 </div>
+                {{end}}
             </div>
         </div>
     </div>

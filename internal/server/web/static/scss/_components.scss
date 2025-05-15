@@ -15,29 +15,58 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  position: relative;
+  border: 2px solid transparent;
 
   &:hover {
     transform: translateY(-5px);
     box-shadow: $hover-shadow;
     background-color: rgba(255, 255, 255, 0.08);
   }
+
+  &.selected {
+    border-color: $primary-color;
+    background-color: rgba(1, 117, 194, 0.15);
+  }
+
+  &.empty-card {
+    background-color: rgba(255, 255, 255, 0.02);
+    color: $text-light;
+  }
 }
 
 // Card elements
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
 .card-label {
   font-weight: 500;
   color: $text-light;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 8px;
+}
+
+.download-btn {
+  color: $text-light;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $primary-color;
+  }
 }
 
 .card-value {
   font-size: 1.1rem;
   color: $text-color;
   word-break: break-word;
+  margin-bottom: 10px;
 }
 
 .card-actions {
@@ -163,9 +192,21 @@
   color: $text-color;
   padding: 5px 10px;
   font-size: 0.85rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  &.view-btn {
+    background-color: rgba(1, 117, 194, 0.2);
+
+    &:hover {
+      background-color: rgba(1, 117, 194, 0.3);
+    }
   }
 }
 
@@ -178,6 +219,56 @@
   &:hover {
     color: $text-color;
     background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  &.edit-var-btn:hover {
+    color: $primary-color;
+  }
+
+  &.delete-var-btn:hover {
+    color: #f44336;
+  }
+}
+
+// Environment table
+.env-table {
+  width: 100%;
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid $border-color;
+    }
+
+    th {
+      background-color: rgba(255, 255, 255, 0.05);
+      font-weight: 500;
+      color: $text-light;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+
+    tr:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    td:last-child {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .empty-message {
+      text-align: center;
+      color: $text-light;
+      padding: 20px;
+      font-style: italic;
+    }
   }
 }
 
@@ -249,4 +340,94 @@
   &:hover:not(.active) {
     color: $text-color;
   }
+}
+
+// Modal styles
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: $card-background;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid $border-color;
+
+  h3 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: $text-light;
+    font-size: 1.5rem;
+    cursor: pointer;
+
+    &:hover {
+      color: $text-color;
+    }
+  }
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    color: $text-light;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid $border-color;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: $text-color;
+    font-family: $font-primary;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
+
+    &[readonly] {
+      background-color: rgba(255, 255, 255, 0.02);
+      color: $text-light;
+    }
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
 }

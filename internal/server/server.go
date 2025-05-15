@@ -6,14 +6,17 @@ import (
 	"io/fs"
 	"net/http"
 
+	"github.com/Jerinji2016/fdawg/pkg/environment"
 	"github.com/Jerinji2016/fdawg/pkg/flutter"
 	"github.com/Jerinji2016/fdawg/pkg/utils"
 )
 
 // ServerData contains data to be passed to templates
 type ServerData struct {
-	Project    *flutter.ValidationResult
-	ActivePage string
+	Project         *flutter.ValidationResult
+	ActivePage      string
+	EnvFiles        []environment.EnvFile
+	SelectedEnvFile *environment.EnvFile
 }
 
 // Start initializes and starts the HTTP server
@@ -33,6 +36,35 @@ func Start(port string, project *flutter.ValidationResult) error {
 	http.HandleFunc("/environment", func(w http.ResponseWriter, r *http.Request) {
 		data := *baseData
 		data.ActivePage = "environment"
+
+		// Get environment files
+		envFiles, err := environment.ListEnvFiles(project.ProjectPath)
+		if err != nil {
+			utils.Error("Failed to list environment files: %v", err)
+		} else {
+			data.EnvFiles = envFiles
+
+			// Set selected environment file if available
+			if len(envFiles) > 0 {
+				// Check if there's a query parameter for selected environment
+				selectedEnv := r.URL.Query().Get("env")
+				if selectedEnv != "" {
+					// Find the selected environment file
+					for _, envFile := range envFiles {
+						if envFile.Name == selectedEnv {
+							data.SelectedEnvFile = &envFile
+							break
+						}
+					}
+				}
+
+				// If no environment is selected, use the first one
+				if data.SelectedEnvFile == nil {
+					data.SelectedEnvFile = &envFiles[0]
+				}
+			}
+		}
+
 		handlePage(w, r, &data, "environment")
 	})
 

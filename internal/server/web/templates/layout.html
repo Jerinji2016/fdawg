@@ -81,5 +81,8 @@
     </footer>
 
     <script src="/static/js/main.js"></script>
+    {{if eq .ActivePage "environment"}}
+    <script src="/static/js/environment.js"></script>
+    {{end}}
 </body>
 </html>

@@ -61,6 +61,13 @@ func EnvCommand() *cli.Command {
 				},
 				Action: addEnvVariable,
 			},
+			{
+				Name:        "delete",
+				Usage:       "Delete an environment file",
+				Description: "Deletes an environment file from the .environment directory",
+				ArgsUsage:   "<env-name>",
+				Action:      deleteEnvFile,
+			},
 		},
 	}
 }
@@ -141,7 +148,7 @@ func showEnvVariables(c *cli.Context) error {
 
 	// Display variables
 	utils.Success("Variables in %s environment:", envName)
-	
+
 	if len(envFile.Variables) == 0 {
 		utils.Info("No variables found")
 		return nil
@@ -151,7 +158,7 @@ func showEnvVariables(c *cli.Context) error {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	fmt.Fprintln(w, "  KEY\tVALUE")
 	fmt.Fprintln(w, "  ---\t-----")
-	
+
 	for key, value := range envFile.Variables {
 		fmt.Fprintf(w, "  %s\t%v\n", key, value)
 	}
@@ -182,7 +189,7 @@ func createEnvFile(c *cli.Context) error {
 	if copyFrom != "" {
 		// Copy from existing environment file
 		utils.Info("Creating %s environment by copying from %s...", envName, copyFrom)
-		
+
 		err := environment.CopyEnvFile(project.ProjectPath, copyFrom, envName)
 		if err != nil {
 			utils.Error("Failed to create environment file: %v", err)
@@ -191,7 +198,7 @@ func createEnvFile(c *cli.Context) error {
 	} else {
 		// Create empty environment file
 		utils.Info("Creating empty %s environment...", envName)
-		
+
 		err := environment.CreateEnvFile(project.ProjectPath, envName, make(map[string]interface{}))
 		if err != nil {
 			utils.Error("Failed to create environment file: %v", err)
@@ -224,7 +231,7 @@ func addEnvVariable(c *cli.Context) error {
 
 	// Parse value (try to convert to appropriate type)
 	var value interface{} = valueStr
-	
+
 	// Try to parse as number or boolean
 	if strings.EqualFold(valueStr, "true") {
 		value = true
@@ -244,7 +251,7 @@ func addEnvVariable(c *cli.Context) error {
 
 	// Add variable to environment file
 	utils.Info("Adding %s=%v to %s environment...", key, value, envName)
-	
+
 	err = environment.AddVariable(project.ProjectPath, envName, key, value)
 	if err != nil {
 		utils.Error("Failed to add variable: %v", err)
@@ -252,6 +259,46 @@ func addEnvVariable(c *cli.Context) error {
 	}
 
 	utils.Success("Variable added successfully")
+	return nil
+}
+
+// deleteEnvFile deletes an environment file
+func deleteEnvFile(c *cli.Context) error {
+	// Validate Flutter project
+	project, err := validateFlutterProject()
+	if err != nil {
+		return err
+	}
+
+	// Check if environment name is provided
+	if c.Args().Len() == 0 {
+		utils.Error("Environment name is required")
+		utils.Info("Usage: fdawg env delete <env-name>")
+		return fmt.Errorf("environment name is required")
+	}
+
+	envName := c.Args().First()
+
+	// Confirm deletion
+	utils.Warning("Are you sure you want to delete the %s environment file? (y/N): ", envName)
+	var confirm string
+	fmt.Scanln(&confirm)
+
+	if strings.ToLower(confirm) != "y" {
+		utils.Info("Deletion cancelled")
+		return nil
+	}
+
+	// Delete environment file
+	utils.Info("Deleting %s environment...", envName)
+
+	err = environment.DeleteEnvFile(project.ProjectPath, envName)
+	if err != nil {
+		utils.Error("Failed to delete environment file: %v", err)
+		return err
+	}
+
+	utils.Success("Environment file %s deleted successfully", envName)
 	return nil
 }
 
