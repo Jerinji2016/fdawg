@@ -8,18 +8,19 @@ import (
 )
 
 func main() {
-    app := &cli.App{
-        Name:  "fdawg",
-        Usage: "CLI tool to manage Flutter projects",
-        Commands: []*cli.Command{
-            commands.ServeCommand(),
-            commands.InitCommand(),
-            // More commands will be added here
-        },
-    }
+	app := &cli.App{
+		Name:  "fdawg",
+		Usage: "CLI tool to manage Flutter projects",
+		Commands: []*cli.Command{
+			commands.ServeCommand(),
+			commands.InitCommand(),
+			commands.EnvCommand(),
+			// More commands will be added here
+		},
+	}
 
-    err := app.Run(os.Args)
-    if err != nil {
-        os.Exit(1)
-    }
+	err := app.Run(os.Args)
+	if err != nil {
+		os.Exit(1)
+	}
 }
