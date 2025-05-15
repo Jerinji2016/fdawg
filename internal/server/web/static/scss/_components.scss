@@ -268,6 +268,7 @@
 .env-table {
   width: 100%;
   overflow-x: auto;
+  margin-bottom: 20px;
 
   table {
     width: 100%;
@@ -304,6 +305,10 @@
       font-style: italic;
     }
   }
+}
+
+.add-variable {
+  margin-top: 20px;
 }
 
 // Status badges
@@ -398,6 +403,8 @@
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .modal-header {
@@ -446,6 +453,10 @@
     background-color: rgba(255, 255, 255, 0.05);
     color: $text-color;
     font-family: $font-primary;
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     &:focus {
       outline: none;
@@ -456,7 +467,28 @@
       background-color: rgba(255, 255, 255, 0.02);
       color: $text-light;
     }
+
+    &.input-error {
+      border-color: #f44336;
+    }
   }
+
+  .form-hint {
+    font-size: 0.8rem;
+    color: $text-light;
+    margin-top: 5px;
+    font-style: italic;
+  }
+}
+
+.error-message {
+  color: #f44336;
+  font-size: 0.9rem;
+  margin: 10px 0;
+  padding: 5px 10px;
+  background-color: rgba(244, 67, 54, 0.1);
+  border-radius: 5px;
+  border-left: 3px solid #f44336;
 }
 
 .form-actions {

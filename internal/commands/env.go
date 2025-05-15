@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/tabwriter"
 
@@ -62,26 +63,32 @@ func EnvCommand() *cli.Command {
 				Action: addEnvVariable,
 			},
 			{
-				Name:        "delete-env",
+				Name:        "delete",
 				Usage:       "Delete an environment file",
 				Description: "Deletes an environment file from the .environment directory",
 				ArgsUsage:   "<env-name>",
 				Action:      deleteEnvFile,
 			},
 			{
-				Name:        "delete-var",
-				Usage:       "Delete a variable from an environment file",
-				Description: "Deletes a variable from a specific environment file",
+				Name:        "remove",
+				Usage:       "Remove a variable from an environment file",
+				Description: "Removes a variable from a specific environment file",
 				ArgsUsage:   "<key>",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:    "env",
 						Aliases: []string{"e"},
-						Usage:   "Environment file to delete the variable from",
+						Usage:   "Environment file to remove the variable from",
 						Value:   "development",
 					},
 				},
 				Action: deleteEnvVariable,
+			},
+			{
+				Name:        "generate-dart",
+				Usage:       "Generate Dart environment file",
+				Description: "Generates a Dart environment file with all environment variables",
+				Action:      generateDartEnvFile,
 			},
 		},
 	}
@@ -288,7 +295,7 @@ func deleteEnvFile(c *cli.Context) error {
 	// Check if environment name is provided
 	if c.Args().Len() == 0 {
 		utils.Error("Environment name is required")
-		utils.Info("Usage: fdawg env delete-env <env-name>")
+		utils.Info("Usage: fdawg env delete <env-name>")
 		return fmt.Errorf("environment name is required")
 	}
 
@@ -328,7 +335,7 @@ func deleteEnvVariable(c *cli.Context) error {
 	// Check if key is provided
 	if c.Args().Len() == 0 {
 		utils.Error("Variable key is required")
-		utils.Info("Usage: fdawg env delete-var <key> [--env <env-name>]")
+		utils.Info("Usage: fdawg env remove <key> [--env <env-name>]")
 		return fmt.Errorf("variable key is required")
 	}
 
@@ -355,6 +362,28 @@ func deleteEnvVariable(c *cli.Context) error {
 	}
 
 	utils.Success("Variable %s deleted successfully from %s environment", key, envName)
+	return nil
+}
+
+// generateDartEnvFile generates a Dart environment file with all environment variables
+func generateDartEnvFile(c *cli.Context) error {
+	// Validate Flutter project
+	project, err := validateFlutterProject()
+	if err != nil {
+		return err
+	}
+
+	// Generate the Dart environment file
+	utils.Info("Generating Dart environment file...")
+
+	err = environment.GenerateDartEnvironmentFile(project.ProjectPath)
+	if err != nil {
+		utils.Error("Failed to generate Dart environment file: %v", err)
+		return err
+	}
+
+	dartFilePath := filepath.Join(project.ProjectPath, "lib", "config", "environment.dart")
+	utils.Success("Dart environment file generated successfully at %s", dartFilePath)
 	return nil
 }
 

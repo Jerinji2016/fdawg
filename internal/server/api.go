@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/Jerinji2016/fdawg/pkg/environment"
@@ -79,6 +80,17 @@ func setupAPIRoutes(project *flutter.ValidationResult) {
 		key := r.FormValue("key")
 		if key == "" {
 			http.Error(w, "Key is required", http.StatusBadRequest)
+			return
+		}
+
+		// Validate key format (must start with letter or underscore, and contain only letters, numbers, and underscores)
+		keyRegex := regexp.MustCompile("^[A-Za-z_][A-Za-z0-9_]*$")
+		if !keyRegex.MatchString(key) {
+			if regexp.MustCompile("^\\d").MatchString(key) {
+				http.Error(w, "Key must not start with a number (Dart variable naming convention)", http.StatusBadRequest)
+			} else {
+				http.Error(w, "Key must contain only letters, numbers, and underscores (no spaces or special characters)", http.StatusBadRequest)
+			}
 			return
 		}
 

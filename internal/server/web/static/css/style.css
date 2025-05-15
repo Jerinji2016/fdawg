@@ -476,6 +476,7 @@ h4 {
 .env-table {
   width: 100%;
   overflow-x: auto;
+  margin-bottom: 20px;
 }
 .env-table table {
   width: 100%;
@@ -506,6 +507,10 @@ h4 {
   color: #b0b0b0;
   padding: 20px;
   font-style: italic;
+}
+
+.add-variable {
+  margin-top: 20px;
 }
 
 .status-badge {
@@ -589,6 +594,8 @@ h4 {
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .modal-header {
@@ -633,6 +640,10 @@ h4 {
   background-color: rgba(255, 255, 255, 0.05);
   color: #f0f0f0;
   font-family: "Outfit", sans-serif;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .form-group input:focus, .form-group select:focus {
   outline: none;
@@ -641,6 +652,25 @@ h4 {
 .form-group input[readonly], .form-group select[readonly] {
   background-color: rgba(255, 255, 255, 0.02);
   color: #b0b0b0;
+}
+.form-group input.input-error, .form-group select.input-error {
+  border-color: #f44336;
+}
+.form-group .form-hint {
+  font-size: 0.8rem;
+  color: #b0b0b0;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+.error-message {
+  color: #f44336;
+  font-size: 0.9rem;
+  margin: 10px 0;
+  padding: 5px 10px;
+  background-color: rgba(244, 67, 54, 0.1);
+  border-radius: 5px;
+  border-left: 3px solid #f44336;
 }
 
 .form-actions {

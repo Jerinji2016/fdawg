@@ -140,12 +140,14 @@ function showAddVarModal(envName) {
                     <form id="add-var-form">
                         <div class="form-group">
                             <label for="var-key">Key:</label>
-                            <input type="text" id="var-key" name="var-key" placeholder="e.g., API_URL" required>
+                            <input type="text" id="var-key" name="var-key" placeholder="e.g., API_URL" required pattern="^[A-Za-z0-9_]+$">
+                            <div class="form-hint">Use only letters, numbers, and underscores (no spaces or special characters)</div>
                         </div>
                         <div class="form-group">
                             <label for="var-value">Value:</label>
                             <input type="text" id="var-value" name="var-value" placeholder="e.g., https://api.example.com" required>
                         </div>
+                        <div id="key-error" class="error-message" style="display: none;"></div>
                         <div class="form-actions">
                             <button type="button" class="secondary-btn cancel-btn">Cancel</button>
                             <button type="submit" class="primary-btn">Add</button>
@@ -164,6 +166,13 @@ function showAddVarModal(envName) {
     const closeBtn = modal.querySelector('.modal-close');
     const cancelBtn = modal.querySelector('.cancel-btn');
     const form = modal.querySelector('#add-var-form');
+    const keyInput = document.getElementById('var-key');
+    const keyError = document.getElementById('key-error');
+
+    // Add input validation
+    keyInput.addEventListener('input', function() {
+        validateKey(keyInput, keyError);
+    });
 
     closeBtn.addEventListener('click', function() {
         modal.remove();
@@ -175,8 +184,14 @@ function showAddVarModal(envName) {
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        const key = document.getElementById('var-key').value;
+
+        const key = keyInput.value;
         const value = document.getElementById('var-value').value;
+
+        // Validate key format
+        if (!validateKey(keyInput, keyError)) {
+            return;
+        }
 
         addVariable(envName, key, value);
         modal.remove();
@@ -198,6 +213,7 @@ function showEditVarModal(envName, key, value) {
                         <div class="form-group">
                             <label for="var-key">Key:</label>
                             <input type="text" id="var-key" name="var-key" value="${key}" readonly>
+                            <div class="form-hint">Keys cannot be edited. Delete this variable and create a new one if needed.</div>
                         </div>
                         <div class="form-group">
                             <label for="var-value">Value:</label>
@@ -467,4 +483,25 @@ function downloadEnvFile(envName) {
 
     // Create a link to download the file
     window.location.href = `/api/environment/download?env_name=${encodeURIComponent(envName)}`;
+}
+
+// Validate environment variable key format
+function validateKey(inputElement, errorElement) {
+    const key = inputElement.value;
+    const keyRegex = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+    if (!keyRegex.test(key)) {
+        if (/^\d/.test(key)) {
+            errorElement.textContent = "Key must not start with a number (Dart variable naming convention)";
+        } else {
+            errorElement.textContent = "Key must contain only letters, numbers, and underscores (no spaces or special characters)";
+        }
+        errorElement.style.display = "block";
+        inputElement.classList.add("input-error");
+        return false;
+    } else {
+        errorElement.style.display = "none";
+        inputElement.classList.remove("input-error");
+        return true;
+    }
 }

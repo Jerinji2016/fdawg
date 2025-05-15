@@ -24,24 +24,111 @@ fdawg [command] [options]
 
 ## Available Commands
 
-| Command | Description | Options |
-|---------|-------------|---------|
-| `serve [directory]` | Start a web server for project management | `--port` - Port to run the server on (default: 8080) |
-| `init [directory]`  | Check if the specified directory is a Flutter project | Optional directory path (defaults to current directory) |
+| Command | Description |
+|---------|-------------|
+| `serve [directory]` | Start a web server for project management |
+| `init [directory]`  | Check if the specified directory is a Flutter project |
+| `env list` | List all environment files in the `.environment` directory |
+| `env show <env-name>` | Show all variables in a specific environment file |
+| `env create <env-name>` | Create a new environment file |
+| `env add <key> <value>` | Add or update a variable in an environment file |
+| `env delete <env-name>` | Delete an environment file |
+| `env remove <key>` | Remove a variable from an environment file |
+| `env generate-dart` | Generate a Dart environment file with all environment variables |
 
-## Examples
+### Environment Command Options
+
+- `env show <env-name>`:
+  - `<env-name>`: Name of the environment file
+
+- `env create <env-name>`:
+  - `<env-name>`: Name of the environment file
+  - `--copy` or `-c`: Copy variables from an existing environment file
+
+- `env add <key> <value>`:
+  - `<key>`: Variable key (must start with a letter or underscore)
+  - `<value>`: Variable value
+  - `--env` or `-e`: Environment file to add the variable to (default: development)
+
+- `env delete <env-name>`:
+  - `<env-name>`: Name of the environment file to delete
+
+- `env remove <key>`:
+  - `<key>`: Variable key to remove
+  - `--env` or `-e`: Environment file to remove the variable from (default: development)
+
+### Environment Command Examples
+
+List all environment files:
+
+```bash
+fdawg env list
+```
+
+Show variables in the development environment:
+
+```bash
+fdawg env show development
+```
+
+Create a new environment file:
+
+```bash
+fdawg env create production
+```
+
+Create a new environment file by copying from an existing one:
+
+```bash
+fdawg env create staging --copy development
+```
+
+Add a variable to the default (development) environment:
+
+```bash
+fdawg env add API_URL https://api.example.com
+```
+
+Add a variable to a specific environment:
+
+```bash
+fdawg env add DEBUG_MODE false --env production
+```
+
+Remove a variable from an environment:
+
+```bash
+fdawg env remove API_URL --env staging
+```
+
+Delete an environment file:
+
+```bash
+fdawg env delete staging
+```
+
+Generate the Dart environment file:
+
+```bash
+fdawg env generate-dart
+```
+
+## Server and Init Command Examples
 
 Start the web server for the current directory:
+
 ```bash
 fdawg serve
 ```
 
 Start the web server for a specific Flutter project:
+
 ```bash
 fdawg serve /path/to/my/flutter/project
 ```
 
 Start the web server on a custom port:
+
 ```bash
 fdawg serve --port 3000
 # or
@@ -49,6 +136,7 @@ fdawg serve -p 3000
 ```
 
 Start the web server for a specific project on a custom port:
+
 ```bash
 fdawg serve --port 3000 /path/to/my/flutter/project
 # or
@@ -61,11 +149,13 @@ fdawg serve /path/to/my/flutter/project -p 3000
 ```
 
 Check if the current directory is a Flutter project:
+
 ```bash
 fdawg init
 ```
 
 Check if a specific directory is a Flutter project:
+
 ```bash
 fdawg init /path/to/my/flutter/project
 ```
