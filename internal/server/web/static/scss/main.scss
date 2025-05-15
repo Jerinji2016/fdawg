@@ -1,0 +1,16 @@
+// Main SCSS file that imports all partials
+
+// Use variables first
+@use 'variables' as *;
+
+// Use base styles
+@use 'base';
+
+// Use layout components
+@use 'layout';
+
+// Use UI components
+@use 'components';
+
+// Use responsive styles last
+@use 'responsive';

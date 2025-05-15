@@ -79,11 +79,67 @@ fdawg/
 ├── internal/             # Private application code
 │   ├── commands/         # CLI command implementations
 │   └── server/           # Web server implementation
+│       ├── web/          # Web assets
+│       │   ├── static/   # Static assets
+│       │   │   ├── css/  # Compiled CSS
+│       │   │   ├── js/   # JavaScript files
+│       │   │   └── scss/ # SASS source files
+│       │   └── templates/# HTML templates
 ├── pkg/                  # Reusable packages
 │   └── utils/            # Utility functions
-└── web/                  # Web assets
-    ├── static/           # Static assets (CSS, JS)
-    └── templates/        # HTML templates
+```
+
+## SASS Structure
+
+The project uses SASS for styling with a modular structure:
+
+```text
+scss/
+├── _variables.scss      # Variables for colors, fonts, sizes, etc.
+├── _base.scss           # Base styles and typography
+├── _layout.scss         # Layout components (header, sidebar, content)
+├── _components.scss     # UI components (buttons, cards, etc.)
+├── _responsive.scss     # Media queries for responsive design
+└── main.scss            # Main file that imports all partials
+```
+
+## Development
+
+### SASS Compilation
+
+The project includes npm scripts for SASS compilation:
+
+```bash
+# Install dependencies
+npm install
+
+# Compile SASS to CSS
+npm run sass
+
+# Watch SASS files for changes
+npm run sass:watch
+```
+
+### Makefile Commands
+
+```bash
+# Build the project
+make build
+
+# Compile SASS and build
+make all
+
+# Compile SASS
+make sass
+
+# Watch SASS files for changes
+make sass-watch
+
+# Run the application (compiles SASS first)
+make run
+
+# Run in development mode (watches SASS files)
+make dev
 ```
 
 ## License

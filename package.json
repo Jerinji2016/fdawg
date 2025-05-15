@@ -1,0 +1,12 @@
+{
+  "name": "fdawg",
+  "version": "1.0.0",
+  "description": "Flutter Development Assistant Web GUI",
+  "scripts": {
+    "sass": "sass internal/server/web/static/scss/main.scss:internal/server/web/static/css/style.css --style compressed",
+    "sass:watch": "sass internal/server/web/static/scss/main.scss:internal/server/web/static/css/style.css --watch"
+  },
+  "devDependencies": {
+    "sass": "^1.69.5"
+  }
+}

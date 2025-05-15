@@ -1,0 +1,106 @@
+// Use variables
+@use 'variables' as *;
+
+// Large screens (992px and below)
+@media (max-width: 992px) {
+  .sidebar {
+    width: $sidebar-collapsed-width;
+
+    &-nav span {
+      display: none;
+    }
+
+    &.expanded {
+      width: $sidebar-width;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+
+      .sidebar-nav span {
+        display: inline;
+      }
+
+      .nav-title {
+        display: none;
+      }
+    }
+  }
+
+  .content-container {
+    margin-left: $sidebar-collapsed-width;
+  }
+}
+
+// Medium screens (768px and below)
+@media (max-width: 768px) {
+  .card-grid,
+  .dependency-list,
+  .asset-list {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    &-control span {
+      display: none;
+    }
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    width: $sidebar-width;
+    z-index: 1000; // Ensure sidebar appears above content
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); // Add shadow when expanded
+
+    &.expanded {
+      transform: translateX(0);
+    }
+
+    &-nav span {
+      display: inline;
+      padding-left: 10px;
+    }
+
+    .nav-item {
+      a {
+        justify-content: flex-start;
+        padding: 15px 20px;
+
+        i {
+          margin-right: 15px;
+          width: 20px;
+          text-align: center;
+        }
+
+        .tooltip {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .content-container {
+    margin-left: 0;
+  }
+}
+
+// Small screens (576px and below)
+@media (max-width: 576px) {
+  .project-info {
+    padding: 15px;
+    width: 100%;
+  }
+
+  .info-section {
+    padding: 15px;
+  }
+
+  .header {
+    padding: 0 15px;
+
+    h1 {
+      font-size: 1.3rem;
+    }
+  }
+}

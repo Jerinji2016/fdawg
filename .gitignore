@@ -3,3 +3,9 @@
 
 # Ignore test artifacts
 /dwag_tests
+
+# Ignore node modules
+/node_modules
+
+# Ignore package-lock.json
+/package-lock.json
