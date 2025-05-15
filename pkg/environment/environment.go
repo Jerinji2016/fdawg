@@ -164,6 +164,26 @@ func AddVariable(projectPath, envName, key string, value interface{}) error {
 	return writeEnvFile(envFile.Path, envFile.Variables)
 }
 
+// DeleteVariable deletes a variable from an environment file
+func DeleteVariable(projectPath, envName, key string) error {
+	// Get the environment file
+	envFile, err := GetEnvFile(projectPath, envName)
+	if err != nil {
+		return fmt.Errorf("failed to get environment file: %v", err)
+	}
+
+	// Check if the variable exists
+	if _, exists := envFile.Variables[key]; !exists {
+		return fmt.Errorf("variable %s does not exist in environment file %s", key, envName)
+	}
+
+	// Delete the variable
+	delete(envFile.Variables, key)
+
+	// Write the updated variables back to the file
+	return writeEnvFile(envFile.Path, envFile.Variables)
+}
+
 // readEnvFile reads and parses an environment file
 func readEnvFile(filePath string) (map[string]interface{}, error) {
 	// Read the file content

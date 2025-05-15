@@ -256,6 +256,8 @@ h4 {
   transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   position: relative;
   border: 2px solid transparent;
+  text-decoration: none;
+  color: inherit;
 }
 .info-card:hover {
   transform: translateY(-5px);
@@ -270,12 +272,27 @@ h4 {
   background-color: rgba(255, 255, 255, 0.02);
   color: #b0b0b0;
 }
+.info-card.add-card {
+  cursor: pointer;
+}
+.info-card button {
+  position: relative;
+  z-index: 2;
+}
+.info-card button:hover {
+  z-index: 3;
+}
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+}
+
+.card-actions-header {
+  display: flex;
+  gap: 5px;
 }
 
 .card-label {
@@ -286,13 +303,24 @@ h4 {
   letter-spacing: 0.5px;
 }
 
-.download-btn {
+.icon-btn {
+  background: none;
+  border: none;
   color: #b0b0b0;
   font-size: 0.9rem;
-  transition: color 0.2s ease;
+  cursor: pointer;
+  padding: 3px 5px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
 }
-.download-btn:hover {
+.icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.icon-btn.download-btn:hover {
   color: #0175C2;
+}
+.icon-btn.delete-env-btn:hover {
+  color: #f44336;
 }
 
 .card-value {
@@ -620,6 +648,13 @@ h4 {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
+}
+
+.warning-text {
+  color: #f44336;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  font-style: italic;
 }
 
 @media (max-width: 992px) {

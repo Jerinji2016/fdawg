@@ -13,16 +13,16 @@
                 <div class="card-grid">
                     {{if .EnvFiles}}
                         {{range .EnvFiles}}
-                        <div class="info-card {{if and $.SelectedEnvFile (eq .Name $.SelectedEnvFile.Name)}}selected{{end}}">
+                        <a href="/environment?env={{.Name}}" class="info-card {{if and $.SelectedEnvFile (eq .Name $.SelectedEnvFile.Name)}}selected{{end}}">
                             <div class="card-header">
                                 <span class="card-label">{{.Name}}</span>
-                                <a href="#" class="download-btn" title="Download"><i class="fas fa-download"></i></a>
+                                <div class="card-actions-header">
+                                    <button class="icon-btn download-btn" title="Download" data-env="{{.Name}}"><i class="fas fa-download"></i></button>
+                                    <button class="icon-btn delete-env-btn" title="Delete Environment" data-env="{{.Name}}"><i class="fas fa-trash"></i></button>
+                                </div>
                             </div>
                             <span class="card-value">{{.Name}}.json</span>
-                            <div class="card-actions">
-                                <a href="/environment?env={{.Name}}" class="action-btn view-btn"><i class="fas fa-eye"></i> View</a>
-                            </div>
-                        </div>
+                        </a>
                         {{end}}
                     {{else}}
                         <div class="info-card empty-card">

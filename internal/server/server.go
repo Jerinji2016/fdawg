@@ -26,6 +26,9 @@ func Start(port string, project *flutter.ValidationResult) error {
 		Project: project,
 	}
 
+	// Set up API routes
+	setupAPIRoutes(project)
+
 	// Set up routes
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		data := *baseData

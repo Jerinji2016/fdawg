@@ -18,6 +18,8 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   position: relative;
   border: 2px solid transparent;
+  text-decoration: none;
+  color: inherit;
 
   &:hover {
     transform: translateY(-5px);
@@ -34,6 +36,20 @@
     background-color: rgba(255, 255, 255, 0.02);
     color: $text-light;
   }
+
+  &.add-card {
+    cursor: pointer;
+  }
+
+  // Prevent event bubbling for buttons inside the card
+  button {
+    position: relative;
+    z-index: 2;
+
+    &:hover {
+      z-index: 3;
+    }
+  }
 }
 
 // Card elements
@@ -44,6 +60,11 @@
   margin-bottom: 8px;
 }
 
+.card-actions-header {
+  display: flex;
+  gap: 5px;
+}
+
 .card-label {
   font-weight: 500;
   color: $text-light;
@@ -52,13 +73,26 @@
   letter-spacing: 0.5px;
 }
 
-.download-btn {
+.icon-btn {
+  background: none;
+  border: none;
   color: $text-light;
   font-size: 0.9rem;
-  transition: color 0.2s ease;
+  cursor: pointer;
+  padding: 3px 5px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
 
   &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  &.download-btn:hover {
     color: $primary-color;
+  }
+
+  &.delete-env-btn:hover {
+    color: #f44336;
   }
 }
 
@@ -430,4 +464,11 @@
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
+}
+
+.warning-text {
+  color: #f44336;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  font-style: italic;
 }

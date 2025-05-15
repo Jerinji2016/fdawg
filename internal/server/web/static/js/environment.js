@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listener for the "Add New Environment File" card
     const addEnvCard = document.querySelector('.add-card');
     if (addEnvCard) {
-        addEnvCard.addEventListener('click', function() {
+        addEnvCard.addEventListener('click', function(e) {
+            e.preventDefault();
             showAddEnvModal();
         });
     }
@@ -22,7 +23,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listeners for edit variable buttons
     const editVarBtns = document.querySelectorAll('.edit-var-btn');
     editVarBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
             const key = this.getAttribute('data-key');
             const value = this.getAttribute('data-value');
             const envName = document.querySelector('.add-var-btn').getAttribute('data-env');
@@ -33,7 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listeners for delete variable buttons
     const deleteVarBtns = document.querySelectorAll('.delete-var-btn');
     deleteVarBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
             const key = this.getAttribute('data-key');
             const envName = document.querySelector('.add-var-btn').getAttribute('data-env');
             showDeleteVarModal(envName, key);
@@ -45,8 +48,20 @@ document.addEventListener('DOMContentLoaded', function() {
     downloadBtns.forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-            const envName = this.closest('.info-card').querySelector('.card-label').textContent;
+            e.stopPropagation();
+            const envName = this.getAttribute('data-env');
             downloadEnvFile(envName);
+        });
+    });
+
+    // Add event listeners for delete environment buttons
+    const deleteEnvBtns = document.querySelectorAll('.delete-env-btn');
+    deleteEnvBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const envName = this.getAttribute('data-env');
+            showDeleteEnvModal(envName);
         });
     });
 });
@@ -105,7 +120,7 @@ function showAddEnvModal() {
         e.preventDefault();
         const envName = document.getElementById('env-name').value;
         const copyFrom = document.getElementById('copy-from').value;
-        
+
         createEnvFile(envName, copyFrom);
         modal.remove();
     });
@@ -162,7 +177,7 @@ function showAddVarModal(envName) {
         e.preventDefault();
         const key = document.getElementById('var-key').value;
         const value = document.getElementById('var-value').value;
-        
+
         addVariable(envName, key, value);
         modal.remove();
     });
@@ -218,7 +233,7 @@ function showEditVarModal(envName, key, value) {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         const newValue = document.getElementById('var-value').value;
-        
+
         updateVariable(envName, key, newValue);
         modal.remove();
     });
@@ -268,16 +283,61 @@ function showDeleteVarModal(envName, key) {
     });
 }
 
+// Function to show the "Delete Environment" confirmation modal
+function showDeleteEnvModal(envName) {
+    // Create modal HTML
+    const modalHTML = `
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Delete Environment</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the ${envName} environment file?</p>
+                    <p class="warning-text">This will permanently delete all variables in this environment.</p>
+                    <div class="form-actions">
+                        <button type="button" class="secondary-btn cancel-btn">Cancel</button>
+                        <button type="button" class="primary-btn delete-btn">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Add modal to the DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Add event listeners
+    const modal = document.querySelector('.modal-overlay');
+    const closeBtn = modal.querySelector('.modal-close');
+    const cancelBtn = modal.querySelector('.cancel-btn');
+    const deleteBtn = modal.querySelector('.delete-btn');
+
+    closeBtn.addEventListener('click', function() {
+        modal.remove();
+    });
+
+    cancelBtn.addEventListener('click', function() {
+        modal.remove();
+    });
+
+    deleteBtn.addEventListener('click', function() {
+        deleteEnvFile(envName);
+        modal.remove();
+    });
+}
+
 // Helper function to get HTML options for environment select
 function getEnvOptionsHTML() {
     let options = '';
     const envCards = document.querySelectorAll('.info-card:not(.add-card):not(.empty-card)');
-    
+
     envCards.forEach(function(card) {
         const envName = card.querySelector('.card-label').textContent;
         options += `<option value="${envName}">${envName}</option>`;
     });
-    
+
     return options;
 }
 
@@ -285,35 +345,126 @@ function getEnvOptionsHTML() {
 // For now, they just reload the page to show the changes
 function createEnvFile(envName, copyFrom) {
     console.log(`Creating environment file: ${envName}, copy from: ${copyFrom}`);
-    // In a real implementation, this would make an AJAX request to the server
-    // For now, just reload the page
-    window.location.reload();
+
+    // Create a form to submit the request
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/api/environment/create';
+    form.style.display = 'none';
+
+    // Add the environment name
+    const envNameInput = document.createElement('input');
+    envNameInput.type = 'hidden';
+    envNameInput.name = 'env_name';
+    envNameInput.value = envName;
+    form.appendChild(envNameInput);
+
+    // Add the copy from parameter if provided
+    if (copyFrom) {
+        const copyFromInput = document.createElement('input');
+        copyFromInput.type = 'hidden';
+        copyFromInput.name = 'copy_from';
+        copyFromInput.value = copyFrom;
+        form.appendChild(copyFromInput);
+    }
+
+    // Submit the form
+    document.body.appendChild(form);
+    form.submit();
 }
 
 function addVariable(envName, key, value) {
     console.log(`Adding variable to ${envName}: ${key}=${value}`);
-    // In a real implementation, this would make an AJAX request to the server
-    // For now, just reload the page
-    window.location.reload();
+
+    // Create a form to submit the request
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/api/environment/add-variable';
+    form.style.display = 'none';
+
+    // Add the environment name
+    const envNameInput = document.createElement('input');
+    envNameInput.type = 'hidden';
+    envNameInput.name = 'env_name';
+    envNameInput.value = envName;
+    form.appendChild(envNameInput);
+
+    // Add the key
+    const keyInput = document.createElement('input');
+    keyInput.type = 'hidden';
+    keyInput.name = 'key';
+    keyInput.value = key;
+    form.appendChild(keyInput);
+
+    // Add the value
+    const valueInput = document.createElement('input');
+    valueInput.type = 'hidden';
+    valueInput.name = 'value';
+    valueInput.value = value;
+    form.appendChild(valueInput);
+
+    // Submit the form
+    document.body.appendChild(form);
+    form.submit();
 }
 
 function updateVariable(envName, key, value) {
-    console.log(`Updating variable in ${envName}: ${key}=${value}`);
-    // In a real implementation, this would make an AJAX request to the server
-    // For now, just reload the page
-    window.location.reload();
+    // For now, updating a variable is the same as adding it (upsert)
+    addVariable(envName, key, value);
 }
 
 function deleteVariable(envName, key) {
     console.log(`Deleting variable from ${envName}: ${key}`);
-    // In a real implementation, this would make an AJAX request to the server
-    // For now, just reload the page
-    window.location.reload();
+
+    // Create a form to submit the request
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/api/environment/delete-variable';
+    form.style.display = 'none';
+
+    // Add the environment name
+    const envNameInput = document.createElement('input');
+    envNameInput.type = 'hidden';
+    envNameInput.name = 'env_name';
+    envNameInput.value = envName;
+    form.appendChild(envNameInput);
+
+    // Add the key
+    const keyInput = document.createElement('input');
+    keyInput.type = 'hidden';
+    keyInput.name = 'key';
+    keyInput.value = key;
+    form.appendChild(keyInput);
+
+    // Submit the form
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function deleteEnvFile(envName) {
+    console.log(`Deleting environment file: ${envName}`);
+
+    // Create a form to submit the request
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/api/environment/delete-env';
+    form.style.display = 'none';
+
+    // Add the environment name
+    const envNameInput = document.createElement('input');
+    envNameInput.type = 'hidden';
+    envNameInput.name = 'env_name';
+    envNameInput.value = envName;
+    form.appendChild(envNameInput);
+
+    // Submit the form
+    document.body.appendChild(form);
+    form.submit();
 }
 
 function downloadEnvFile(envName) {
     console.log(`Downloading environment file: ${envName}`);
-    // In a real implementation, this would trigger a file download
-    // For now, just log to console
-    alert(`Download of ${envName}.json would start here`);
+
+    // Create a link to download the file
+    window.location.href = `/api/environment/download?env_name=${encodeURIComponent(envName)}`;
 }

@@ -48,8 +48,8 @@ func EnvCommand() *cli.Command {
 			},
 			{
 				Name:        "add",
-				Usage:       "Add a variable to an environment file",
-				Description: "Adds a new variable to a specific environment file",
+				Usage:       "Add or update a variable in an environment file",
+				Description: "Adds or updates a variable in a specific environment file",
 				ArgsUsage:   "<key> <value>",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
@@ -62,11 +62,26 @@ func EnvCommand() *cli.Command {
 				Action: addEnvVariable,
 			},
 			{
-				Name:        "delete",
+				Name:        "delete-env",
 				Usage:       "Delete an environment file",
 				Description: "Deletes an environment file from the .environment directory",
 				ArgsUsage:   "<env-name>",
 				Action:      deleteEnvFile,
+			},
+			{
+				Name:        "delete-var",
+				Usage:       "Delete a variable from an environment file",
+				Description: "Deletes a variable from a specific environment file",
+				ArgsUsage:   "<key>",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:    "env",
+						Aliases: []string{"e"},
+						Usage:   "Environment file to delete the variable from",
+						Value:   "development",
+					},
+				},
+				Action: deleteEnvVariable,
 			},
 		},
 	}
@@ -273,7 +288,7 @@ func deleteEnvFile(c *cli.Context) error {
 	// Check if environment name is provided
 	if c.Args().Len() == 0 {
 		utils.Error("Environment name is required")
-		utils.Info("Usage: fdawg env delete <env-name>")
+		utils.Info("Usage: fdawg env delete-env <env-name>")
 		return fmt.Errorf("environment name is required")
 	}
 
@@ -299,6 +314,47 @@ func deleteEnvFile(c *cli.Context) error {
 	}
 
 	utils.Success("Environment file %s deleted successfully", envName)
+	return nil
+}
+
+// deleteEnvVariable deletes a variable from an environment file
+func deleteEnvVariable(c *cli.Context) error {
+	// Validate Flutter project
+	project, err := validateFlutterProject()
+	if err != nil {
+		return err
+	}
+
+	// Check if key is provided
+	if c.Args().Len() == 0 {
+		utils.Error("Variable key is required")
+		utils.Info("Usage: fdawg env delete-var <key> [--env <env-name>]")
+		return fmt.Errorf("variable key is required")
+	}
+
+	key := c.Args().First()
+	envName := c.String("env")
+
+	// Confirm deletion
+	utils.Warning("Are you sure you want to delete the variable %s from the %s environment? (y/N): ", key, envName)
+	var confirm string
+	fmt.Scanln(&confirm)
+
+	if strings.ToLower(confirm) != "y" {
+		utils.Info("Deletion cancelled")
+		return nil
+	}
+
+	// Delete variable
+	utils.Info("Deleting variable %s from %s environment...", key, envName)
+
+	err = environment.DeleteVariable(project.ProjectPath, envName, key)
+	if err != nil {
+		utils.Error("Failed to delete variable: %v", err)
+		return err
+	}
+
+	utils.Success("Variable %s deleted successfully from %s environment", key, envName)
 	return nil
 }
 
