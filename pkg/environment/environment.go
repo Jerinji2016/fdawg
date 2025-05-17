@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"unicode"
 
+	"github.com/Jerinji2016/fdawg/pkg/flutter"
 	"github.com/Jerinji2016/fdawg/pkg/utils"
 )
 
@@ -355,10 +355,11 @@ class Environment {
 			}
 		}
 
+		varName := flutter.FormatDartVariableName(key)
 		// Add the static constant
 		content.WriteString(fmt.Sprintf("  /// %s environment variable\n", key))
 		content.WriteString(fmt.Sprintf("  static const %s %s = %s.fromEnvironment('%s', defaultValue: %s);\n\n",
-			varType, formatDartVariableName(key), varType, key, defaultValue))
+			varType, varName, varType, key, defaultValue))
 	}
 
 	// Close the class
@@ -379,23 +380,4 @@ class Environment {
 	}
 
 	return nil
-}
-
-// formatDartVariableName converts an environment variable name to a Dart variable name
-// For example, API_URL becomes apiUrl
-func formatDartVariableName(name string) string {
-	parts := strings.Split(name, "_")
-	for i := range parts {
-		if i == 0 {
-			parts[i] = strings.ToLower(parts[i])
-		} else {
-			// Capitalize the first letter of each word
-			if len(parts[i]) > 0 {
-				r := []rune(strings.ToLower(parts[i]))
-				r[0] = unicode.ToUpper(r[0])
-				parts[i] = string(r)
-			}
-		}
-	}
-	return strings.Join(parts, "")
 }

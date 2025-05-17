@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Jerinji2016/fdawg/pkg/flutter"
 	"gopkg.in/yaml.v3"
 )
 
@@ -406,20 +407,8 @@ func createDartVariableName(fileName string) string {
 	// Remove the file extension
 	name := strings.TrimSuffix(fileName, filepath.Ext(fileName))
 
-	// Replace non-alphanumeric characters with underscores
-	name = strings.Map(func(r rune) rune {
-		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') {
-			return r
-		}
-		return '_'
-	}, name)
-
-	// Ensure the name starts with a letter
-	if name[0] >= '0' && name[0] <= '9' {
-		name = "_" + name
-	}
-
-	return name
+	// Use the common helper function to format the name
+	return flutter.FormatDartVariableName(name)
 }
 
 // copyFile copies a file from src to dst
