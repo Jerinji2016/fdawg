@@ -15,6 +15,7 @@ func main() {
 			commands.ServeCommand(),
 			commands.InitCommand(),
 			commands.EnvCommand(),
+			commands.AssetCommand(),
 			// More commands will be added here
 		},
 	}

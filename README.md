@@ -35,6 +35,10 @@ fdawg [command] [options]
 | `env delete <env-name>` | Delete an environment file |
 | `env remove <key>` | Remove a variable from an environment file |
 | `env generate-dart` | Generate a Dart environment file with all environment variables |
+| `asset add <asset-path>` | Add an asset to the project |
+| `asset remove <asset-name>` | Remove an asset from the project |
+| `asset list` | List all assets in the project |
+| `asset generate-dart` | Generate a Dart asset file with all assets |
 
 ### Environment Command Options
 
@@ -111,6 +115,54 @@ Generate the Dart environment file:
 
 ```bash
 fdawg env generate-dart
+```
+
+### Asset Command Options
+
+- `asset add <asset-path>`:
+  - `--type, -t`: Type of asset (images, fonts, animations, audio, videos, json, svgs, translations)
+  - If no type is specified, it will be determined from the file extension
+
+- `asset remove <asset-name>`:
+  - `--type, -t`: Type of asset (images, fonts, animations, audio, videos, json, svgs, translations)
+  - If no type is specified, it will search for the asset in all directories
+
+### Asset Command Examples
+
+Add an image asset:
+
+```bash
+fdawg asset add path/to/image.png
+```
+
+Add an asset with a specific type:
+
+```bash
+fdawg asset add path/to/file.json --type animations
+```
+
+Remove an asset:
+
+```bash
+fdawg asset remove image.png
+```
+
+Remove an asset with a specific type:
+
+```bash
+fdawg asset remove font.ttf --type fonts
+```
+
+List all assets:
+
+```bash
+fdawg asset list
+```
+
+Generate the Dart asset file:
+
+```bash
+fdawg asset generate-dart
 ```
 
 ## Server and Init Command Examples
