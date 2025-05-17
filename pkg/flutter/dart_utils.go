@@ -11,33 +11,30 @@ import (
 // - "user-name" becomes "userName"
 // - "image.png" becomes "imagePng"
 // - "123test" becomes "_123test"
+// - "my file name.jpg" becomes "myFileName"
+// - "some weird@#$chars" becomes "someWeirdChars"
 func FormatDartVariableName(name string) string {
-	// Split by common separators
-	var parts []string
-	
-	// Check if the name contains underscores
-	if strings.Contains(name, "_") {
-		parts = strings.Split(name, "_")
-	} else if strings.Contains(name, "-") {
-		// If no underscores, try splitting by hyphens
-		parts = strings.Split(name, "-")
-	} else if strings.Contains(name, ".") {
-		// If no underscores or hyphens, try splitting by dots (for filenames)
-		parts = strings.Split(name, ".")
-	} else {
-		// If no common separators, treat the whole string as one part
-		parts = []string{name}
-	}
-	
+	// First, replace all non-alphanumeric characters with spaces
+	// This handles spaces, dots, underscores, hyphens, and any other special characters
+	spaceReplacer := strings.Map(func(r rune) rune {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			return r
+		}
+		return ' '
+	}, name)
+
+	// Split by spaces
+	parts := strings.Fields(spaceReplacer)
+
 	// Process each part
 	for i := range parts {
 		if len(parts[i]) == 0 {
 			continue
 		}
-		
+
 		// Convert to lowercase
 		parts[i] = strings.ToLower(parts[i])
-		
+
 		// Capitalize the first letter of each part except the first one
 		if i > 0 && len(parts[i]) > 0 {
 			r := []rune(parts[i])
@@ -45,23 +42,20 @@ func FormatDartVariableName(name string) string {
 			parts[i] = string(r)
 		}
 	}
-	
+
 	// Join the parts
 	result := strings.Join(parts, "")
-	
+
+	// If the result is empty, return a default name
+	if len(result) == 0 {
+		return "_asset"
+	}
+
 	// Ensure the name starts with a letter or underscore
-	if len(result) > 0 && unicode.IsDigit(rune(result[0])) {
+	if !unicode.IsLetter(rune(result[0])) {
 		result = "_" + result
 	}
-	
-	// Replace any remaining invalid characters with underscores
-	result = strings.Map(func(r rune) rune {
-		if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' {
-			return r
-		}
-		return '_'
-	}, result)
-	
+
 	return result
 }
 
@@ -71,7 +65,7 @@ func EnsureValidDartIdentifier(name string) string {
 	if len(name) == 0 {
 		return "_empty"
 	}
-	
+
 	// Replace invalid characters with underscores
 	result := strings.Map(func(r rune) rune {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' {
@@ -79,11 +73,11 @@ func EnsureValidDartIdentifier(name string) string {
 		}
 		return '_'
 	}, name)
-	
+
 	// Ensure the name starts with a letter or underscore
 	if unicode.IsDigit(rune(result[0])) {
 		result = "_" + result
 	}
-	
+
 	return result
 }

@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/Jerinji2016/fdawg/pkg/flutter"
@@ -35,6 +36,8 @@ const (
 	SVGAsset AssetType = "svgs"
 	// TranslationAsset represents translation assets
 	TranslationAsset AssetType = "translations"
+	// MiscAsset represents miscellaneous assets that don't fit in other categories
+	MiscAsset AssetType = "misc"
 )
 
 // GetAssetDir returns the path to the asset directory for a Flutter project
@@ -71,33 +74,60 @@ func EnsureAssetTypeDirExists(projectPath string, assetType AssetType) error {
 	return nil
 }
 
-// DetermineAssetType determines the type of asset based on its file extension
+// DetermineAssetType determines the type of asset based on its file extension and content
 func DetermineAssetType(filePath string) AssetType {
 	ext := strings.ToLower(filepath.Ext(filePath))
+	fileName := strings.ToLower(filepath.Base(filePath))
 
-	switch ext {
-	case ".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp":
-		return ImageAsset
-	case ".ttf", ".otf":
-		return FontAsset
-	case ".json":
-		// Check if it's a Lottie animation (could be more sophisticated)
-		if strings.Contains(strings.ToLower(filePath), "animation") {
-			return AnimationAsset
-		}
-		return JSONAsset
-	case ".svg":
-		return SVGAsset
-	case ".mp3", ".wav", ".ogg", ".aac":
-		return AudioAsset
-	case ".mp4", ".webm", ".avi", ".mov":
-		return VideoAsset
-	case ".arb":
-		return TranslationAsset
-	default:
-		// Default to image assets
+	// Image files
+	if isInList(ext, []string{".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".tiff", ".ico", ".heic", ".heif"}) {
 		return ImageAsset
 	}
+
+	// Font files
+	if isInList(ext, []string{".ttf", ".otf", ".woff", ".woff2", ".eot"}) {
+		return FontAsset
+	}
+
+	// Animation files
+	if isInList(ext, []string{".flr", ".riv"}) ||
+	   (ext == ".json" && (strings.Contains(fileName, "animation") || strings.Contains(fileName, "lottie"))) {
+		return AnimationAsset
+	}
+
+	// SVG files
+	if ext == ".svg" {
+		return SVGAsset
+	}
+
+	// Audio files
+	if isInList(ext, []string{".mp3", ".wav", ".ogg", ".aac", ".flac", ".m4a", ".opus"}) {
+		return AudioAsset
+	}
+
+	// Video files
+	if isInList(ext, []string{".mp4", ".webm", ".avi", ".mov", ".mkv", ".flv", ".wmv", ".m4v"}) {
+		return VideoAsset
+	}
+
+	// JSON files
+	if ext == ".json" {
+		return JSONAsset
+	}
+
+	// Translation files
+	if isInList(ext, []string{".arb", ".xml", ".strings"}) ||
+	   (ext == ".json" && strings.Contains(fileName, "translation")) {
+		return TranslationAsset
+	}
+
+	// If no specific type is determined, categorize as miscellaneous
+	return MiscAsset
+}
+
+// isInList checks if a string is in a list of strings
+func isInList(str string, list []string) bool {
+	return slices.Contains(list, str)
 }
 
 // AddAsset adds an asset to the project
@@ -153,6 +183,7 @@ func RemoveAsset(projectPath, assetName string, assetType AssetType) error {
 			JSONAsset,
 			SVGAsset,
 			TranslationAsset,
+			MiscAsset,
 		}
 
 		for _, at := range assetTypes {
@@ -205,6 +236,7 @@ func ListAssets(projectPath string) (map[AssetType][]string, error) {
 		JSONAsset,
 		SVGAsset,
 		TranslationAsset,
+		MiscAsset,
 	}
 
 	for _, assetType := range assetTypes {
@@ -280,6 +312,9 @@ class Asset {
 
   /// Translation assets
   static final Translations translations = Translations._();
+
+  /// Miscellaneous assets
+  static final Misc misc = Misc._();
 }
 
 `)
@@ -293,6 +328,7 @@ class Asset {
 	addAssetClass(&content, "Json", JSONAsset, assets[JSONAsset])
 	addAssetClass(&content, "Svgs", SVGAsset, assets[SVGAsset])
 	addAssetClass(&content, "Translations", TranslationAsset, assets[TranslationAsset])
+	addAssetClass(&content, "Misc", MiscAsset, assets[MiscAsset])
 
 	// Write the file
 	dartFilePath := filepath.Join(projectPath, "lib", "config")
