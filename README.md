@@ -39,6 +39,7 @@ fdawg [command] [options]
 | `asset remove <asset-name>` | Remove an asset from the project |
 | `asset list` | List all assets in the project |
 | `asset generate-dart` | Generate a Dart asset file with all assets |
+| `asset migrate` | Migrate assets to organized folders by type and clean up empty directories |
 
 ### Environment Command Options
 
@@ -120,12 +121,19 @@ fdawg env generate-dart
 ### Asset Command Options
 
 - `asset add <asset-path>`:
-  - `--type, -t`: Type of asset (images, fonts, animations, audio, videos, json, svgs, translations)
+  - `--type, -t`: Type of asset (images, animations, audio, videos, json, svgs, misc)
   - If no type is specified, it will be determined from the file extension
 
 - `asset remove <asset-name>`:
-  - `--type, -t`: Type of asset (images, fonts, animations, audio, videos, json, svgs, translations)
+  - `--type, -t`: Type of asset (images, animations, audio, videos, json, svgs, misc)
   - If no type is specified, it will search for the asset in all directories
+
+- `asset migrate`:
+  - Migrates assets to organized folders by type (images, animations, audio, etc.)
+  - Creates a backup of all assets in assets.backup directory
+  - Automatically categorizes assets based on file type and content
+  - Recursively processes all files in nested directories
+  - Removes empty directories after migration
 
 ### Asset Command Examples
 
@@ -163,6 +171,12 @@ Generate the Dart asset file:
 
 ```bash
 fdawg asset generate-dart
+```
+
+Migrate assets to organized folders:
+
+```bash
+fdawg asset migrate
 ```
 
 ## Server and Init Command Examples

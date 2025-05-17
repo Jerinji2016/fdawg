@@ -14,6 +14,8 @@ import (
 const (
 	// AssetDirName is the name of the directory where assets are stored
 	AssetDirName = "assets"
+	// AssetBackupDirName is the name of the directory where assets are backed up during migration
+	AssetBackupDirName = "assets.backup"
 )
 
 // AssetType represents the type of asset
@@ -22,8 +24,6 @@ type AssetType string
 const (
 	// ImageAsset represents image assets
 	ImageAsset AssetType = "images"
-	// FontAsset represents font assets
-	FontAsset AssetType = "fonts"
 	// AnimationAsset represents animation assets
 	AnimationAsset AssetType = "animations"
 	// AudioAsset represents audio assets
@@ -34,8 +34,6 @@ const (
 	JSONAsset AssetType = "json"
 	// SVGAsset represents SVG assets
 	SVGAsset AssetType = "svgs"
-	// TranslationAsset represents translation assets
-	TranslationAsset AssetType = "translations"
 	// MiscAsset represents miscellaneous assets that don't fit in other categories
 	MiscAsset AssetType = "misc"
 )
@@ -43,6 +41,11 @@ const (
 // GetAssetDir returns the path to the asset directory for a Flutter project
 func GetAssetDir(projectPath string) string {
 	return filepath.Join(projectPath, AssetDirName)
+}
+
+// GetAssetBackupDir returns the path to the asset backup directory for a Flutter project
+func GetAssetBackupDir(projectPath string) string {
+	return filepath.Join(projectPath, AssetBackupDirName)
 }
 
 // EnsureAssetDirExists ensures that the main asset directory exists
@@ -84,14 +87,9 @@ func DetermineAssetType(filePath string) AssetType {
 		return ImageAsset
 	}
 
-	// Font files
-	if isInList(ext, []string{".ttf", ".otf", ".woff", ".woff2", ".eot"}) {
-		return FontAsset
-	}
-
 	// Animation files
 	if isInList(ext, []string{".flr", ".riv"}) ||
-	   (ext == ".json" && (strings.Contains(fileName, "animation") || strings.Contains(fileName, "lottie"))) {
+		(ext == ".json" && (strings.Contains(fileName, "animation") || strings.Contains(fileName, "lottie"))) {
 		return AnimationAsset
 	}
 
@@ -113,12 +111,6 @@ func DetermineAssetType(filePath string) AssetType {
 	// JSON files
 	if ext == ".json" {
 		return JSONAsset
-	}
-
-	// Translation files
-	if isInList(ext, []string{".arb", ".xml", ".strings"}) ||
-	   (ext == ".json" && strings.Contains(fileName, "translation")) {
-		return TranslationAsset
 	}
 
 	// If no specific type is determined, categorize as miscellaneous
@@ -176,13 +168,11 @@ func RemoveAsset(projectPath, assetName string, assetType AssetType) error {
 	if assetType == "" {
 		assetTypes := []AssetType{
 			ImageAsset,
-			FontAsset,
 			AnimationAsset,
 			AudioAsset,
 			VideoAsset,
 			JSONAsset,
 			SVGAsset,
-			TranslationAsset,
 			MiscAsset,
 		}
 
@@ -229,13 +219,11 @@ func ListAssets(projectPath string) (map[AssetType][]string, error) {
 	assets := make(map[AssetType][]string)
 	assetTypes := []AssetType{
 		ImageAsset,
-		FontAsset,
 		AnimationAsset,
 		AudioAsset,
 		VideoAsset,
 		JSONAsset,
 		SVGAsset,
-		TranslationAsset,
 		MiscAsset,
 	}
 
@@ -262,6 +250,197 @@ func ListAssets(projectPath string) (map[AssetType][]string, error) {
 	}
 
 	return assets, nil
+}
+
+// MigrateAssets migrates assets from a flat structure to organized folders
+func MigrateAssets(projectPath string) error {
+	assetDir := GetAssetDir(projectPath)
+	backupDir := GetAssetBackupDir(projectPath)
+
+	// Check if the asset directory exists
+	if _, err := os.Stat(assetDir); os.IsNotExist(err) {
+		return fmt.Errorf("asset directory does not exist")
+	}
+
+	// Create backup directory
+	if err := os.MkdirAll(backupDir, 0755); err != nil {
+		return fmt.Errorf("failed to create backup directory: %v", err)
+	}
+
+	// Find all files in the asset directory (including in subdirectories)
+	var filesToMigrate []string
+	err := filepath.Walk(assetDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Skip the root directory
+		if path == assetDir {
+			return nil
+		}
+
+		// Skip directories that match our asset type directories
+		relPath, err := filepath.Rel(assetDir, path)
+		if err != nil {
+			return err
+		}
+
+		// If it's a directory, check if it's one of our asset type directories
+		if info.IsDir() {
+			for _, assetType := range []AssetType{
+				ImageAsset,
+				AnimationAsset,
+				AudioAsset,
+				VideoAsset,
+				JSONAsset,
+				SVGAsset,
+				MiscAsset,
+			} {
+				if relPath == string(assetType) {
+					return filepath.SkipDir
+				}
+			}
+			return nil
+		}
+
+		// It's a file, add it to the list
+		filesToMigrate = append(filesToMigrate, path)
+		return nil
+	})
+
+	if err != nil {
+		return fmt.Errorf("failed to walk asset directory: %v", err)
+	}
+
+	if len(filesToMigrate) == 0 {
+		return fmt.Errorf("no files to migrate")
+	}
+
+	// Move all files to the backup directory
+	for _, filePath := range filesToMigrate {
+		// Get the relative path from the asset directory
+		relPath, err := filepath.Rel(assetDir, filePath)
+		if err != nil {
+			return fmt.Errorf("failed to get relative path: %v", err)
+		}
+
+		// Create the backup path
+		destPath := filepath.Join(backupDir, filepath.Base(filePath))
+
+		// Copy the file to the backup directory
+		if err := copyFile(filePath, destPath); err != nil {
+			return fmt.Errorf("failed to backup file %s: %v", relPath, err)
+		}
+	}
+
+	// Now add each file to the appropriate directory
+	for _, filePath := range filesToMigrate {
+		// Determine the asset type
+		assetType := DetermineAssetType(filePath)
+
+		// Ensure the asset type directory exists
+		if err := EnsureAssetTypeDirExists(projectPath, assetType); err != nil {
+			return fmt.Errorf("failed to create asset type directory: %v", err)
+		}
+
+		// Get the file name
+		fileName := filepath.Base(filePath)
+
+		// Copy the file to the appropriate directory
+		destPath := filepath.Join(assetDir, string(assetType), fileName)
+		if err := copyFile(filePath, destPath); err != nil {
+			return fmt.Errorf("failed to copy file %s to %s: %v", fileName, assetType, err)
+		}
+
+		// Remove the original file
+		if err := os.Remove(filePath); err != nil {
+			return fmt.Errorf("failed to remove original file %s: %v", filePath, err)
+		}
+	}
+
+	// Remove empty directories
+	removeEmptyDirs(assetDir)
+
+	// Update the pubspec.yaml file for each asset type
+	assetTypes := []AssetType{
+		ImageAsset,
+		AnimationAsset,
+		AudioAsset,
+		VideoAsset,
+		JSONAsset,
+		SVGAsset,
+		MiscAsset,
+	}
+
+	for _, assetType := range assetTypes {
+		assetTypeDir := filepath.Join(assetDir, string(assetType))
+		if _, err := os.Stat(assetTypeDir); os.IsNotExist(err) {
+			continue
+		}
+
+		if err := updatePubspecWithAsset(projectPath, assetType); err != nil {
+			return fmt.Errorf("failed to update pubspec.yaml for %s: %v", assetType, err)
+		}
+	}
+
+	// Generate the Dart asset file
+	if err := GenerateDartAssetFile(projectPath); err != nil {
+		return fmt.Errorf("failed to generate Dart asset file: %v", err)
+	}
+
+	return nil
+}
+
+// removeEmptyDirs removes empty directories recursively
+func removeEmptyDirs(dir string) error {
+	// Skip asset type directories
+	assetTypes := []AssetType{
+		ImageAsset,
+		AnimationAsset,
+		AudioAsset,
+		VideoAsset,
+		JSONAsset,
+		SVGAsset,
+		MiscAsset,
+	}
+
+	for _, assetType := range assetTypes {
+		if filepath.Base(dir) == string(assetType) {
+			return nil
+		}
+	}
+
+	// Read directory entries
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+
+	// Process each entry
+	for _, entry := range entries {
+		if entry.IsDir() {
+			// Recursively process subdirectories
+			subDir := filepath.Join(dir, entry.Name())
+			if err := removeEmptyDirs(subDir); err != nil {
+				return err
+			}
+		}
+	}
+
+	// Check if directory is empty now
+	entries, err = os.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+
+	// If directory is empty, remove it
+	if len(entries) == 0 {
+		if err := os.Remove(dir); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // updatePubspecWithAsset is implemented in pubspec_updater.go
@@ -292,9 +471,6 @@ class Asset {
   /// Images assets
   static final Images images = Images._();
 
-  /// Fonts assets
-  static final Fonts fonts = Fonts._();
-
   /// Animations assets
   static final Animations animations = Animations._();
 
@@ -310,9 +486,6 @@ class Asset {
   /// SVG assets
   static final Svgs svgs = Svgs._();
 
-  /// Translation assets
-  static final Translations translations = Translations._();
-
   /// Miscellaneous assets
   static final Misc misc = Misc._();
 }
@@ -321,13 +494,11 @@ class Asset {
 
 	// Add asset classes
 	addAssetClass(&content, "Images", ImageAsset, assets[ImageAsset])
-	addAssetClass(&content, "Fonts", FontAsset, assets[FontAsset])
 	addAssetClass(&content, "Animations", AnimationAsset, assets[AnimationAsset])
 	addAssetClass(&content, "Audio", AudioAsset, assets[AudioAsset])
 	addAssetClass(&content, "Videos", VideoAsset, assets[VideoAsset])
 	addAssetClass(&content, "Json", JSONAsset, assets[JSONAsset])
 	addAssetClass(&content, "Svgs", SVGAsset, assets[SVGAsset])
-	addAssetClass(&content, "Translations", TranslationAsset, assets[TranslationAsset])
 	addAssetClass(&content, "Misc", MiscAsset, assets[MiscAsset])
 
 	// Write the file

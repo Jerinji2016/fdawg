@@ -26,7 +26,7 @@ func AssetCommand() *cli.Command {
 					&cli.StringFlag{
 						Name:    "type",
 						Aliases: []string{"t"},
-						Usage:   "Type of asset (images, fonts, animations, audio, videos, json, svgs, translations)",
+						Usage:   "Type of asset (images, animations, audio, videos, json, svgs, misc)",
 					},
 				},
 				Action: addAsset,
@@ -40,7 +40,7 @@ func AssetCommand() *cli.Command {
 					&cli.StringFlag{
 						Name:    "type",
 						Aliases: []string{"t"},
-						Usage:   "Type of asset (images, fonts, animations, audio, videos, json, svgs, translations)",
+						Usage:   "Type of asset (images, animations, audio, videos, json, svgs, misc)",
 					},
 				},
 				Action: removeAsset,
@@ -56,6 +56,12 @@ func AssetCommand() *cli.Command {
 				Usage:       "Generate Dart asset file",
 				Description: "Generates a Dart asset file with all assets",
 				Action:      generateDartAssetFile,
+			},
+			{
+				Name:        "migrate",
+				Usage:       "Migrate assets to organized folders by type",
+				Description: "Migrates assets to organized folders by type and cleans up empty directories",
+				Action:      migrateAssets,
 			},
 		},
 	}
@@ -240,5 +246,38 @@ func generateDartAssetFile(c *cli.Context) error {
 
 	dartFilePath := filepath.Join(project.ProjectPath, "lib", "config", "asset.dart")
 	utils.Success("Dart asset file generated successfully at %s", dartFilePath)
+	return nil
+}
+
+// migrateAssets migrates assets from a flat structure to organized folders
+func migrateAssets(c *cli.Context) error {
+	// Validate Flutter project
+	project, err := validateFlutterProjectForAsset()
+	if err != nil {
+		return err
+	}
+
+	// Migrate assets
+	utils.Info("Migrating assets to organized folders...")
+
+	err = asset.MigrateAssets(project.ProjectPath)
+	if err != nil {
+		utils.Error("Failed to migrate assets: %v", err)
+		return err
+	}
+
+	utils.Success("Assets migrated successfully")
+
+	// Generate the Dart asset file
+	utils.Info("Generating Dart asset file...")
+
+	err = asset.GenerateDartAssetFile(project.ProjectPath)
+	if err != nil {
+		utils.Warning("Failed to generate Dart asset file: %v", err)
+	} else {
+		dartFilePath := filepath.Join(project.ProjectPath, "lib", "config", "asset.dart")
+		utils.Success("Dart asset file generated successfully at %s", dartFilePath)
+	}
+
 	return nil
 }
