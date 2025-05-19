@@ -37,33 +37,64 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Migrate button functionality
     const migrateBtn = document.getElementById('migrate-assets-btn');
-    const migrateDialog = document.getElementById('migrate-dialog');
-    const migrateClose = document.getElementById('migrate-close');
-    const migrateCancel = document.getElementById('migrate-cancel');
-    const migrateConfirm = document.getElementById('migrate-confirm');
 
-    if (migrateBtn && migrateDialog) {
+    if (migrateBtn) {
         migrateBtn.addEventListener('click', function() {
-            migrateDialog.style.display = 'flex';
+            // Create a confirmation toast with action buttons
+            const toastId = showToast(
+                'This will organize your assets into folders by type (images, animations, audio, etc.) and update your pubspec.yaml file.',
+                'warning',
+                'Migrate Assets?',
+                0 // Don't auto-dismiss
+            );
+
+            // Get the toast element
+            const toast = document.getElementById(toastId);
+            if (!toast) return;
+
+            // Replace the close button with action buttons
+            const closeBtn = toast.querySelector('.toast-close');
+            if (closeBtn && closeBtn.parentNode) {
+                // Create action buttons container
+                const actionsContainer = document.createElement('div');
+                actionsContainer.className = 'toast-actions';
+                actionsContainer.style.display = 'flex';
+                actionsContainer.style.gap = '8px';
+
+                // Cancel button
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'secondary-btn';
+                cancelBtn.style.padding = '4px 8px';
+                cancelBtn.style.fontSize = '0.8rem';
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.addEventListener('click', () => {
+                    removeToast(toastId);
+                });
+
+                // Migrate button
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = 'primary-btn';
+                confirmBtn.style.padding = '4px 8px';
+                confirmBtn.style.fontSize = '0.8rem';
+                confirmBtn.textContent = 'Migrate';
+                confirmBtn.addEventListener('click', () => {
+                    removeToast(toastId);
+                    migrateAssets();
+                });
+
+                actionsContainer.appendChild(cancelBtn);
+                actionsContainer.appendChild(confirmBtn);
+
+                // Replace close button with actions
+                closeBtn.parentNode.replaceChild(actionsContainer, closeBtn);
+
+                // Remove progress bar
+                const progressBar = toast.querySelector('.toast-progress');
+                if (progressBar && progressBar.parentNode) {
+                    progressBar.parentNode.removeChild(progressBar);
+                }
+            }
         });
-
-        if (migrateClose) {
-            migrateClose.addEventListener('click', function() {
-                migrateDialog.style.display = 'none';
-            });
-        }
-
-        if (migrateCancel) {
-            migrateCancel.addEventListener('click', function() {
-                migrateDialog.style.display = 'none';
-            });
-        }
-
-        if (migrateConfirm) {
-            migrateConfirm.addEventListener('click', function() {
-                migrateAssets();
-            });
-        }
     }
 
     // Page-level drag and drop functionality
@@ -489,10 +520,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadAssets();
 
                 // Show success message
-                alert('Files uploaded successfully!');
+                showSuccessToast('Files uploaded successfully!');
             } else {
                 console.error('Failed to upload files:', data);
-                alert('Failed to upload files. Please try again.');
+                showErrorToast('Failed to upload files. Please try again.');
 
                 // Reset upload button
                 if (uploadSelectedBtn) {
@@ -503,7 +534,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error uploading files:', error);
-            alert('Error uploading files. Please try again.');
+            showErrorToast('Error uploading files. Please try again.');
 
             // Reset upload button
             if (uploadSelectedBtn) {
@@ -520,10 +551,65 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to delete an asset
     function deleteAsset(fileName, assetType, row) {
-        if (!confirm(`Are you sure you want to delete the asset "${fileName}"?`)) {
-            return;
-        }
+        // Create a confirmation toast with action buttons
+        const toastId = showToast(
+            `Are you sure you want to delete "${fileName}"?`,
+            'warning',
+            'Confirm Deletion',
+            0 // Don't auto-dismiss
+        );
 
+        // Get the toast element
+        const toast = document.getElementById(toastId);
+        if (!toast) return;
+
+        // Replace the close button with action buttons
+        const closeBtn = toast.querySelector('.toast-close');
+        if (closeBtn && closeBtn.parentNode) {
+            // Create action buttons container
+            const actionsContainer = document.createElement('div');
+            actionsContainer.className = 'toast-actions';
+            actionsContainer.style.display = 'flex';
+            actionsContainer.style.gap = '8px';
+
+            // Cancel button
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'secondary-btn';
+            cancelBtn.style.padding = '4px 8px';
+            cancelBtn.style.fontSize = '0.8rem';
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.addEventListener('click', () => {
+                removeToast(toastId);
+            });
+
+            // Delete button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'primary-btn';
+            deleteBtn.style.padding = '4px 8px';
+            deleteBtn.style.fontSize = '0.8rem';
+            deleteBtn.style.backgroundColor = '#f44336';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.addEventListener('click', () => {
+                removeToast(toastId);
+                performAssetDeletion(fileName, assetType, row);
+            });
+
+            actionsContainer.appendChild(cancelBtn);
+            actionsContainer.appendChild(deleteBtn);
+
+            // Replace close button with actions
+            closeBtn.parentNode.replaceChild(actionsContainer, closeBtn);
+
+            // Remove progress bar
+            const progressBar = toast.querySelector('.toast-progress');
+            if (progressBar && progressBar.parentNode) {
+                progressBar.parentNode.removeChild(progressBar);
+            }
+        }
+    }
+
+    // Function to perform the actual asset deletion
+    function performAssetDeletion(fileName, assetType, row) {
         // Log the values being sent to help debug
         console.log('Deleting asset:', { fileName, assetType });
 
@@ -531,12 +617,18 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('asset_name', fileName);
         formData.append('asset_type', assetType);
 
+        // Show a loading toast
+        const loadingToastId = showInfoToast('Deleting asset...', 'Please wait', 0);
+
         fetch('/api/assets/delete', {
             method: 'POST',
             body: formData
         })
         .then(response => response.json())
         .then(data => {
+            // Remove loading toast
+            removeToast(loadingToastId);
+
             if (data.success) {
                 // Remove row from table
                 if (row) {
@@ -554,26 +646,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Show success message
-                alert('Asset deleted successfully!');
+                showSuccessToast('Asset deleted successfully!');
             } else {
                 console.error('Failed to delete asset:', data);
-                alert('Failed to delete asset. Please try again.');
+                showErrorToast('Failed to delete asset. Please try again.');
             }
         })
         .catch(error => {
+            // Remove loading toast
+            removeToast(loadingToastId);
+
             console.error('Error deleting asset:', error);
-            alert('Error deleting asset. Please try again.');
+            showErrorToast('Error deleting asset. Please try again.');
         });
     }
 
     // Function to migrate assets
     function migrateAssets() {
-        // Hide migrate dialog
-        const migrateDialog = document.getElementById('migrate-dialog');
-        if (migrateDialog) {
-            migrateDialog.style.display = 'none';
-        }
-
         // Show loading state
         const migrateBtn = document.getElementById('migrate-assets-btn');
         if (migrateBtn) {
@@ -581,21 +670,27 @@ document.addEventListener('DOMContentLoaded', function() {
             migrateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Migrating...';
         }
 
+        // Show a loading toast
+        const loadingToastId = showInfoToast('Migrating assets...', 'Please wait', 0);
+
         // Migrate assets on server
         fetch('/api/assets/migrate', {
             method: 'POST'
         })
         .then(response => response.json())
         .then(data => {
+            // Remove loading toast
+            removeToast(loadingToastId);
+
             if (data.success) {
                 // Reload assets
                 loadAssets();
 
                 // Show success message
-                alert('Assets migrated successfully!');
+                showSuccessToast('Assets migrated successfully!');
             } else {
                 console.error('Failed to migrate assets:', data);
-                alert('Failed to migrate assets. Please try again.');
+                showErrorToast('Failed to migrate assets. Please try again.');
             }
 
             // Reset migrate button
@@ -605,8 +700,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
+            // Remove loading toast
+            removeToast(loadingToastId);
+
             console.error('Error migrating assets:', error);
-            alert('Error migrating assets. Please try again.');
+            showErrorToast('Error migrating assets. Please try again.');
 
             // Reset migrate button
             if (migrateBtn) {

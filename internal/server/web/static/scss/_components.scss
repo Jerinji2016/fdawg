@@ -306,6 +306,153 @@
   margin-top: 20px;
 }
 
+// Toast Notifications
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 350px;
+
+  .toast {
+    background-color: $card-background;
+    border-radius: 8px;
+    padding: 12px 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: flex-start;
+    overflow: hidden;
+    position: relative;
+    animation: toast-in 0.3s ease forwards;
+
+    &.toast-exiting {
+      animation: toast-out 0.3s ease forwards;
+    }
+
+    .toast-icon {
+      margin-right: 12px;
+      font-size: 1.2rem;
+
+      &.success {
+        color: #4caf50;
+      }
+
+      &.error {
+        color: #f44336;
+      }
+
+      &.info {
+        color: #2196f3;
+      }
+
+      &.warning {
+        color: #ff9800;
+      }
+    }
+
+    .toast-content {
+      flex: 1;
+
+      .toast-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+        font-size: 1rem;
+      }
+
+      .toast-message {
+        font-size: 0.9rem;
+        color: $text-light;
+        word-break: break-word;
+      }
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      color: $text-light;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 10px;
+      font-size: 1rem;
+
+      &:hover {
+        color: $text-color;
+      }
+    }
+
+    // Progress bar
+    .toast-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background-color: rgba(255, 255, 255, 0.2);
+      width: 100%;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background-color: currentColor;
+        animation: toast-progress 5s linear forwards;
+      }
+
+      &.success::after {
+        background-color: #4caf50;
+      }
+
+      &.error::after {
+        background-color: #f44336;
+      }
+
+      &.info::after {
+        background-color: #2196f3;
+      }
+
+      &.warning::after {
+        background-color: #ff9800;
+      }
+    }
+  }
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes toast-progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0;
+  }
+}
+
 // Loading Indicator
 .loading-indicator {
   text-align: center;

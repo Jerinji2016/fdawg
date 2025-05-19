@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+    <!-- Toast notifications container -->
+    <div id="toast-container" class="toast-container"></div>
+
     <div class="header">
         <div class="header-left">
             <button id="sidebar-toggle" class="sidebar-toggle">
@@ -80,6 +83,7 @@
         <p class="section-title">Powered by FDAWG - Flutter Development Assistant with Go</p>
     </footer>
 
+    <script src="/static/js/toast.js"></script>
     <script src="/static/js/main.js"></script>
     {{if eq .ActivePage "environment"}}
     <script src="/static/js/environment.js"></script>
