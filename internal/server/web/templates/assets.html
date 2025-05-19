@@ -7,73 +7,163 @@
         </h3>
         <div class="assets-management">
             <p class="section-description">Manage assets used in your Flutter project. Upload, organize, and optimize your images, fonts, and other assets.</p>
-            
-            <div class="assets-stats">
-                <div class="card-grid">
-                    <div class="info-card">
-                        <span class="card-label">Total Assets</span>
-                        <span class="card-value">{{len .Project.PubspecInfo.Flutter.Assets}}</span>
+
+            <!-- Asset Summary Container -->
+            <div class="assets-summary">
+                <div class="summary-header">
+                    <h4>Asset Summary <button id="toggle-summary" class="toggle-btn"><i class="fas fa-chevron-up"></i></button></h4>
+
+                    <!-- Action Buttons Container -->
+                    <div class="action-buttons-container">
+                        <button class="primary-btn" id="upload-assets-btn">
+                            <i class="fas fa-cloud-upload-alt"></i> Upload Assets
+                        </button>
+                        <button class="secondary-btn" id="migrate-assets-btn">
+                            <i class="fas fa-exchange-alt"></i> Migrate Assets
+                        </button>
                     </div>
-                    <div class="info-card">
-                        <span class="card-label">Images</span>
-                        <span class="card-value">{{len .Project.PubspecInfo.Flutter.Assets}}</span>
-                    </div>
-                    <div class="info-card">
-                        <span class="card-label">Fonts</span>
-                        <span class="card-value">{{len .Project.PubspecInfo.Flutter.Fonts}}</span>
+                </div>
+
+                <div id="summary-content" class="summary-content">
+                    <div class="small-card-grid">
+                        <div class="info-card small">
+                            <span class="card-label">Total</span>
+                            <span class="card-value" id="total-assets-count">{{len .Project.PubspecInfo.Flutter.Assets}}</span>
+                        </div>
+                        <div class="info-card small">
+                            <span class="card-label"><i class="fas fa-image"></i> Images</span>
+                            <span class="card-value" id="images-count">0</span>
+                        </div>
+
+                        <div class="info-card small">
+                            <span class="card-label"><i class="fas fa-film"></i> Animations</span>
+                            <span class="card-value" id="animations-count">0</span>
+                        </div>
+                        <div class="info-card small">
+                            <span class="card-label"><i class="fas fa-music"></i> Audio</span>
+                            <span class="card-value" id="audio-count">0</span>
+                        </div>
+                        <div class="info-card small">
+                            <span class="card-label"><i class="fas fa-video"></i> Videos</span>
+                            <span class="card-value" id="videos-count">0</span>
+                        </div>
+                        <div class="info-card small">
+                            <span class="card-label"><i class="fas fa-code"></i> JSON</span>
+                            <span class="card-value" id="json-count">0</span>
+                        </div>
+                        <div class="info-card small">
+                            <span class="card-label"><i class="fas fa-bezier-curve"></i> SVGs</span>
+                            <span class="card-value" id="svgs-count">0</span>
+                        </div>
+                        <div class="info-card small">
+                            <span class="card-label"><i class="fas fa-file-alt"></i> Misc</span>
+                            <span class="card-value" id="misc-count">0</span>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="assets-upload">
-                <h4>Upload New Assets</h4>
+
+            <!-- Drag and Drop Upload Area (hidden by default) -->
+            <div class="assets-upload" id="assets-upload-area" style="display: none;">
                 <div class="upload-area">
-                    <div class="upload-dropzone">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Drag and drop files here or click to browse</p>
-                        <input type="file" id="asset-upload" multiple style="display: none;">
-                        <button class="primary-btn" onclick="document.getElementById('asset-upload').click()">Browse Files</button>
+                    <form id="upload-form" enctype="multipart/form-data">
+                        <div class="upload-dropzone" id="drop-zone">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag and drop files here or click to browse</p>
+                            <input type="file" id="asset-upload" name="files" multiple style="display: none;">
+                            <div class="form-group">
+                                <label for="asset-type-select">Asset Type (optional):</label>
+                                <select id="asset-type-select" name="asset_type">
+                                    <option value="">Auto-detect</option>
+                                    <option value="images">Images</option>
+                                    <option value="animations">Animations</option>
+                                    <option value="audio">Audio</option>
+                                    <option value="videos">Videos</option>
+                                    <option value="json">JSON</option>
+                                    <option value="svgs">SVGs</option>
+                                    <option value="misc">Misc</option>
+                                </select>
+                                <p class="form-hint">If not specified, the asset type will be determined from the file extension.</p>
+                            </div>
+                            <button type="button" class="primary-btn" onclick="document.getElementById('asset-upload').click()">Browse Files</button>
+                            <div id="selected-files" class="selected-files"></div>
+                            <button type="submit" class="primary-btn upload-submit-btn" id="upload-submit-btn" style="display: none;">
+                                <i class="fas fa-upload"></i> Upload Selected Files
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Migration Confirmation Dialog (hidden by default) -->
+            <div id="migrate-dialog" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Migrate Assets</h3>
+                        <button class="modal-close" id="migrate-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>This will organize your assets into folders by type (images, animations, audio, etc.) and update your pubspec.yaml file.</p>
+                        <p>Are you sure you want to migrate your assets?</p>
+                        <div class="modal-actions">
+                            <button class="secondary-btn" id="migrate-cancel">Cancel</button>
+                            <button class="primary-btn" id="migrate-confirm">Migrate Assets</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            
+
+            <!-- Assets List with Table -->
             <div class="assets-list">
                 <h4>Project Assets</h4>
-                <div class="assets-filter">
+
+                <!-- Improved Filter and Search Layout -->
+                <div class="assets-controls">
                     <div class="filter-group">
-                        <label>Filter by type:</label>
-                        <select>
-                            <option value="all">All Assets</option>
+                        <select id="asset-type-filter">
+                            <option value="all">All Asset Types</option>
                             <option value="images">Images</option>
-                            <option value="fonts">Fonts</option>
-                            <option value="other">Other</option>
+                            <option value="animations">Animations</option>
+                            <option value="audio">Audio</option>
+                            <option value="videos">Videos</option>
+                            <option value="json">JSON</option>
+                            <option value="svgs">SVGs</option>
+                            <option value="misc">Misc</option>
                         </select>
                     </div>
                     <div class="search-group">
-                        <input type="text" placeholder="Search assets...">
-                        <button><i class="fas fa-search"></i></button>
+                        <input type="text" id="asset-search" placeholder="Search assets...">
+                        <button class="search-btn"><i class="fas fa-search"></i></button>
                     </div>
                 </div>
-                
-                <div class="assets-grid">
-                    {{range .Project.PubspecInfo.Flutter.Assets}}
-                    <div class="asset-item">
-                        <div class="asset-preview">
-                            <i class="fas fa-file-image"></i>
-                        </div>
-                        <div class="asset-info">
-                            <span class="asset-name">{{.}}</span>
-                            <div class="asset-actions">
-                                <button class="table-btn"><i class="fas fa-eye"></i></button>
-                                <button class="table-btn"><i class="fas fa-download"></i></button>
-                                <button class="table-btn"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
+
+                <!-- Assets Table -->
+                <div class="assets-table-container">
+                    <table class="assets-table">
+                        <thead>
+                            <tr>
+                                <th>Preview</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Path</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assets-table-body">
+                            <!-- Asset rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                    <div id="loading-assets" class="loading-indicator">
+                        <i class="fas fa-spinner fa-spin"></i> Loading assets...
                     </div>
-                    {{end}}
+                    <div id="no-assets-message" class="no-data-message" style="display: none;">
+                        <p>No assets found. Upload some assets to get started.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
 {{end}}

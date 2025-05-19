@@ -28,6 +28,7 @@ func Start(port string, project *flutter.ValidationResult) error {
 
 	// Set up API routes
 	setupAPIRoutes(project)
+	setupAssetAPIRoutes(project)
 
 	// Set up routes
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

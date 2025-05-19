@@ -17,6 +17,7 @@ import (
 //go:embed web/static/css/style.css
 //go:embed web/static/js/main.js
 //go:embed web/static/js/environment.js
+//go:embed web/static/js/assets.js
 var webFS embed.FS
 
 // GetTemplateFS returns a filesystem for accessing embedded templates
