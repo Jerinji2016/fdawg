@@ -367,6 +367,34 @@
         color: $text-light;
         word-break: break-word;
       }
+
+      .toast-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 12px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+        button {
+          padding: 6px 12px;
+          font-size: 0.9rem;
+
+          &.primary-btn {
+            background-color: $primary-color;
+
+            &:hover {
+              background-color: darken($primary-color, 10%);
+            }
+
+            &[style*="background-color: #f44336"] {
+              &:hover {
+                background-color: darken(#f44336, 10%) !important;
+              }
+            }
+          }
+        }
+      }
     }
 
     .toast-close {

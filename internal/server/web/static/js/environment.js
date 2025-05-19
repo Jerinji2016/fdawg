@@ -121,6 +121,18 @@ function showAddEnvModal() {
         const envName = document.getElementById('env-name').value;
         const copyFrom = document.getElementById('copy-from').value;
 
+        // Validate the form
+        if (!envName) {
+            showErrorToast('Please enter an environment name');
+            return;
+        }
+
+        // Check if the environment name is valid (alphanumeric, underscores, hyphens)
+        if (!/^[a-zA-Z0-9_-]+$/.test(envName)) {
+            showErrorToast('Environment name can only contain letters, numbers, underscores, and hyphens');
+            return;
+        }
+
         createEnvFile(envName, copyFrom);
         modal.remove();
     });
@@ -255,93 +267,44 @@ function showEditVarModal(envName, key, value) {
     });
 }
 
-// Function to show the "Delete Variable" confirmation modal
+// Function to show the "Delete Variable" confirmation toast
 function showDeleteVarModal(envName, key) {
-    // Create modal HTML
-    const modalHTML = `
-        <div class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Delete Variable</h3>
-                    <button class="modal-close">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete the variable "${key}" from the ${envName} environment?</p>
-                    <div class="form-actions">
-                        <button type="button" class="secondary-btn cancel-btn">Cancel</button>
-                        <button type="button" class="primary-btn delete-btn">Delete</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+    showConfirmationToast(
+        `Are you sure you want to delete the variable "${key}" from the ${envName} environment?`,
+        'Confirm Deletion',
+        {
+            confirmText: 'Delete',
+            cancelText: 'Cancel',
+            confirmButtonClass: 'primary-btn',
+            onConfirm: () => {
+                // Show loading toast
+                const loadingToastId = showInfoToast('Deleting variable...', 'Please wait', 0);
 
-    // Add modal to the DOM
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-    // Add event listeners
-    const modal = document.querySelector('.modal-overlay');
-    const closeBtn = modal.querySelector('.modal-close');
-    const cancelBtn = modal.querySelector('.cancel-btn');
-    const deleteBtn = modal.querySelector('.delete-btn');
-
-    closeBtn.addEventListener('click', function() {
-        modal.remove();
-    });
-
-    cancelBtn.addEventListener('click', function() {
-        modal.remove();
-    });
-
-    deleteBtn.addEventListener('click', function() {
-        deleteVariable(envName, key);
-        modal.remove();
-    });
+                // Delete the variable
+                deleteVariable(envName, key, loadingToastId);
+            }
+        }
+    );
 }
 
-// Function to show the "Delete Environment" confirmation modal
+// Function to show the "Delete Environment" confirmation toast
 function showDeleteEnvModal(envName) {
-    // Create modal HTML
-    const modalHTML = `
-        <div class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Delete Environment</h3>
-                    <button class="modal-close">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete the ${envName} environment file?</p>
-                    <p class="warning-text">This will permanently delete all variables in this environment.</p>
-                    <div class="form-actions">
-                        <button type="button" class="secondary-btn cancel-btn">Cancel</button>
-                        <button type="button" class="primary-btn delete-btn">Delete</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+    showConfirmationToast(
+        `Are you sure you want to delete the ${envName} environment file? This will permanently delete all variables in this environment.`,
+        'Confirm Environment Deletion',
+        {
+            confirmText: 'Delete',
+            cancelText: 'Cancel',
+            confirmButtonClass: 'primary-btn',
+            onConfirm: () => {
+                // Show loading toast
+                const loadingToastId = showInfoToast('Deleting environment...', 'Please wait', 0);
 
-    // Add modal to the DOM
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-    // Add event listeners
-    const modal = document.querySelector('.modal-overlay');
-    const closeBtn = modal.querySelector('.modal-close');
-    const cancelBtn = modal.querySelector('.cancel-btn');
-    const deleteBtn = modal.querySelector('.delete-btn');
-
-    closeBtn.addEventListener('click', function() {
-        modal.remove();
-    });
-
-    cancelBtn.addEventListener('click', function() {
-        modal.remove();
-    });
-
-    deleteBtn.addEventListener('click', function() {
-        deleteEnvFile(envName);
-        modal.remove();
-    });
+                // Delete the environment file
+                deleteEnvFile(envName, loadingToastId);
+            }
+        }
+    );
 }
 
 // Helper function to get HTML options for environment select
@@ -361,6 +324,9 @@ function getEnvOptionsHTML() {
 // For now, they just reload the page to show the changes
 function createEnvFile(envName, copyFrom) {
     console.log(`Creating environment file: ${envName}, copy from: ${copyFrom}`);
+
+    // Show loading toast
+    const loadingToastId = showInfoToast('Creating environment file...', 'Please wait', 0);
 
     // Create a form to submit the request
     const form = document.createElement('form');
@@ -384,6 +350,31 @@ function createEnvFile(envName, copyFrom) {
         form.appendChild(copyFromInput);
     }
 
+    // Add a callback to show success message
+    const iframe = document.createElement('iframe');
+    iframe.name = 'create-env-frame';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    iframe.onload = function() {
+        // Remove loading toast
+        removeToast(loadingToastId);
+
+        // Show success toast
+        const message = copyFrom
+            ? `Environment "${envName}" created successfully (copied from ${copyFrom})`
+            : `Environment "${envName}" created successfully`;
+
+        showSuccessToast(message);
+
+        // Reload the page after a short delay
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    };
+
+    form.target = 'create-env-frame';
+
     // Submit the form
     document.body.appendChild(form);
     form.submit();
@@ -391,6 +382,9 @@ function createEnvFile(envName, copyFrom) {
 
 function addVariable(envName, key, value) {
     console.log(`Adding variable to ${envName}: ${key}=${value}`);
+
+    // Show loading toast
+    const loadingToastId = showInfoToast('Adding variable...', 'Please wait', 0);
 
     // Create a form to submit the request
     const form = document.createElement('form');
@@ -419,6 +413,27 @@ function addVariable(envName, key, value) {
     valueInput.value = value;
     form.appendChild(valueInput);
 
+    // Add a callback to show success message
+    const iframe = document.createElement('iframe');
+    iframe.name = 'add-var-frame';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    iframe.onload = function() {
+        // Remove loading toast
+        removeToast(loadingToastId);
+
+        // Show success toast
+        showSuccessToast(`Variable "${key}" added successfully to ${envName} environment`);
+
+        // Reload the page after a short delay
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    };
+
+    form.target = 'add-var-frame';
+
     // Submit the form
     document.body.appendChild(form);
     form.submit();
@@ -429,7 +444,7 @@ function updateVariable(envName, key, value) {
     addVariable(envName, key, value);
 }
 
-function deleteVariable(envName, key) {
+function deleteVariable(envName, key, loadingToastId) {
     console.log(`Deleting variable from ${envName}: ${key}`);
 
     // Create a form to submit the request
@@ -452,12 +467,35 @@ function deleteVariable(envName, key) {
     keyInput.value = key;
     form.appendChild(keyInput);
 
+    // Add a callback to show success message
+    const iframe = document.createElement('iframe');
+    iframe.name = 'delete-var-frame';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    iframe.onload = function() {
+        // Remove loading toast if it exists
+        if (loadingToastId) {
+            removeToast(loadingToastId);
+        }
+
+        // Show success toast
+        showSuccessToast(`Variable "${key}" deleted successfully from ${envName} environment`);
+
+        // Reload the page after a short delay
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    };
+
+    form.target = 'delete-var-frame';
+
     // Submit the form
     document.body.appendChild(form);
     form.submit();
 }
 
-function deleteEnvFile(envName) {
+function deleteEnvFile(envName, loadingToastId) {
     console.log(`Deleting environment file: ${envName}`);
 
     // Create a form to submit the request
@@ -472,6 +510,29 @@ function deleteEnvFile(envName) {
     envNameInput.name = 'env_name';
     envNameInput.value = envName;
     form.appendChild(envNameInput);
+
+    // Add a callback to show success message
+    const iframe = document.createElement('iframe');
+    iframe.name = 'delete-env-frame';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    iframe.onload = function() {
+        // Remove loading toast if it exists
+        if (loadingToastId) {
+            removeToast(loadingToastId);
+        }
+
+        // Show success toast
+        showSuccessToast(`Environment "${envName}" deleted successfully`);
+
+        // Reload the page after a short delay
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    };
+
+    form.target = 'delete-env-frame';
 
     // Submit the form
     document.body.appendChild(form);
@@ -491,17 +552,33 @@ function validateKey(inputElement, errorElement) {
     const keyRegex = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
     if (!keyRegex.test(key)) {
+        let errorMessage;
         if (/^\d/.test(key)) {
-            errorElement.textContent = "Key must not start with a number (Dart variable naming convention)";
+            errorMessage = "Key must not start with a number (Dart variable naming convention)";
         } else {
-            errorElement.textContent = "Key must contain only letters, numbers, and underscores (no spaces or special characters)";
+            errorMessage = "Key must contain only letters, numbers, and underscores (no spaces or special characters)";
         }
-        errorElement.style.display = "block";
-        inputElement.classList.add("input-error");
+
+        // Show in the form error element
+        if (errorElement) {
+            errorElement.textContent = errorMessage;
+            errorElement.style.display = "block";
+        }
+
+        // Also show a toast notification
+        showWarningToast(errorMessage, "Invalid Key Format");
+
+        if (inputElement) {
+            inputElement.classList.add("input-error");
+        }
         return false;
     } else {
-        errorElement.style.display = "none";
-        inputElement.classList.remove("input-error");
+        if (errorElement) {
+            errorElement.style.display = "none";
+        }
+        if (inputElement) {
+            inputElement.classList.remove("input-error");
+        }
         return true;
     }
 }

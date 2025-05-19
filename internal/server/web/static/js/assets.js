@@ -40,60 +40,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (migrateBtn) {
         migrateBtn.addEventListener('click', function() {
-            // Create a confirmation toast with action buttons
-            const toastId = showToast(
+            showConfirmationToast(
                 'This will organize your assets into folders by type (images, animations, audio, etc.) and update your pubspec.yaml file.',
-                'warning',
                 'Migrate Assets?',
-                0 // Don't auto-dismiss
-            );
-
-            // Get the toast element
-            const toast = document.getElementById(toastId);
-            if (!toast) return;
-
-            // Replace the close button with action buttons
-            const closeBtn = toast.querySelector('.toast-close');
-            if (closeBtn && closeBtn.parentNode) {
-                // Create action buttons container
-                const actionsContainer = document.createElement('div');
-                actionsContainer.className = 'toast-actions';
-                actionsContainer.style.display = 'flex';
-                actionsContainer.style.gap = '8px';
-
-                // Cancel button
-                const cancelBtn = document.createElement('button');
-                cancelBtn.className = 'secondary-btn';
-                cancelBtn.style.padding = '4px 8px';
-                cancelBtn.style.fontSize = '0.8rem';
-                cancelBtn.textContent = 'Cancel';
-                cancelBtn.addEventListener('click', () => {
-                    removeToast(toastId);
-                });
-
-                // Migrate button
-                const confirmBtn = document.createElement('button');
-                confirmBtn.className = 'primary-btn';
-                confirmBtn.style.padding = '4px 8px';
-                confirmBtn.style.fontSize = '0.8rem';
-                confirmBtn.textContent = 'Migrate';
-                confirmBtn.addEventListener('click', () => {
-                    removeToast(toastId);
-                    migrateAssets();
-                });
-
-                actionsContainer.appendChild(cancelBtn);
-                actionsContainer.appendChild(confirmBtn);
-
-                // Replace close button with actions
-                closeBtn.parentNode.replaceChild(actionsContainer, closeBtn);
-
-                // Remove progress bar
-                const progressBar = toast.querySelector('.toast-progress');
-                if (progressBar && progressBar.parentNode) {
-                    progressBar.parentNode.removeChild(progressBar);
+                {
+                    confirmText: 'Migrate',
+                    cancelText: 'Cancel',
+                    confirmButtonClass: 'primary-btn',
+                    onConfirm: () => {
+                        migrateAssets();
+                    }
                 }
-            }
+            );
         });
     }
 
@@ -103,7 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const floatingFilesList = document.getElementById('floating-files-list');
     const uploadSelectedBtn = document.getElementById('upload-selected-files');
     const closeFloatingBtn = document.getElementById('close-floating-container');
-    const floatingAssetType = document.getElementById('floating-asset-type');
     const assetsContainer = document.getElementById('assets-management-container');
 
     let selectedFiles = [];
@@ -551,61 +508,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to delete an asset
     function deleteAsset(fileName, assetType, row) {
-        // Create a confirmation toast with action buttons
-        const toastId = showToast(
+        showConfirmationToast(
             `Are you sure you want to delete "${fileName}"?`,
-            'warning',
             'Confirm Deletion',
-            0 // Don't auto-dismiss
-        );
-
-        // Get the toast element
-        const toast = document.getElementById(toastId);
-        if (!toast) return;
-
-        // Replace the close button with action buttons
-        const closeBtn = toast.querySelector('.toast-close');
-        if (closeBtn && closeBtn.parentNode) {
-            // Create action buttons container
-            const actionsContainer = document.createElement('div');
-            actionsContainer.className = 'toast-actions';
-            actionsContainer.style.display = 'flex';
-            actionsContainer.style.gap = '8px';
-
-            // Cancel button
-            const cancelBtn = document.createElement('button');
-            cancelBtn.className = 'secondary-btn';
-            cancelBtn.style.padding = '4px 8px';
-            cancelBtn.style.fontSize = '0.8rem';
-            cancelBtn.textContent = 'Cancel';
-            cancelBtn.addEventListener('click', () => {
-                removeToast(toastId);
-            });
-
-            // Delete button
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'primary-btn';
-            deleteBtn.style.padding = '4px 8px';
-            deleteBtn.style.fontSize = '0.8rem';
-            deleteBtn.style.backgroundColor = '#f44336';
-            deleteBtn.textContent = 'Delete';
-            deleteBtn.addEventListener('click', () => {
-                removeToast(toastId);
-                performAssetDeletion(fileName, assetType, row);
-            });
-
-            actionsContainer.appendChild(cancelBtn);
-            actionsContainer.appendChild(deleteBtn);
-
-            // Replace close button with actions
-            closeBtn.parentNode.replaceChild(actionsContainer, closeBtn);
-
-            // Remove progress bar
-            const progressBar = toast.querySelector('.toast-progress');
-            if (progressBar && progressBar.parentNode) {
-                progressBar.parentNode.removeChild(progressBar);
+            {
+                confirmText: 'Delete',
+                cancelText: 'Cancel',
+                confirmButtonClass: 'primary-btn',
+                onConfirm: () => {
+                    performAssetDeletion(fileName, assetType, row);
+                }
             }
-        }
+        );
     }
 
     // Function to perform the actual asset deletion
