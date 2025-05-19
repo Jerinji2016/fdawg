@@ -25,13 +25,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Upload button toggle
-    const uploadBtn = document.getElementById('upload-assets-btn');
-    const uploadArea = document.getElementById('assets-upload-area');
+    // Browse files button
+    const browseBtn = document.getElementById('browse-assets-btn');
+    const fileInput = document.getElementById('asset-upload');
 
-    if (uploadBtn && uploadArea) {
-        uploadBtn.addEventListener('click', function() {
-            uploadArea.style.display = uploadArea.style.display === 'none' ? 'block' : 'none';
+    if (browseBtn && fileInput) {
+        browseBtn.addEventListener('click', function() {
+            fileInput.click();
         });
     }
 
@@ -66,53 +66,68 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Drag and drop functionality
-    const dropZone = document.getElementById('drop-zone');
-    const fileInput = document.getElementById('asset-upload');
-    const selectedFilesContainer = document.getElementById('selected-files');
-    const uploadSubmitBtn = document.getElementById('upload-submit-btn');
-    const uploadForm = document.getElementById('upload-form');
+    // Page-level drag and drop functionality
+    const pageDropZone = document.getElementById('page-drop-zone');
+    const floatingContainer = document.getElementById('floating-files-container');
+    const floatingFilesList = document.getElementById('floating-files-list');
+    const uploadSelectedBtn = document.getElementById('upload-selected-files');
+    const closeFloatingBtn = document.getElementById('close-floating-container');
+    const floatingAssetType = document.getElementById('floating-asset-type');
+    const assetsContainer = document.getElementById('assets-management-container');
 
     let selectedFiles = [];
 
-    if (dropZone && fileInput) {
+    // Prevent defaults for drag events
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    // Setup page-level drag and drop
+    if (assetsContainer && pageDropZone && floatingContainer) {
+        // Add event listeners to the entire document
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, preventDefaults, false);
+            document.addEventListener(eventName, preventDefaults, false);
         });
 
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
+        // Show drop zone when files are dragged over the document
         ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, highlight, false);
+            document.addEventListener(eventName, function(e) {
+                // Only show if it's a file being dragged
+                if (e.dataTransfer.types.includes('Files')) {
+                    pageDropZone.classList.add('active');
+                }
+            }, false);
         });
 
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, unhighlight, false);
-        });
+        // Hide drop zone when files are dragged out or dropped
+        document.addEventListener('dragleave', function(e) {
+            // Only hide if dragleave is on the document itself and not a child element
+            if (e.target === document.documentElement) {
+                pageDropZone.classList.remove('active');
+            }
+        }, false);
 
-        function highlight() {
-            dropZone.classList.add('highlight');
+        // Handle file drop
+        document.addEventListener('drop', function(e) {
+            pageDropZone.classList.remove('active');
+
+            // Only process if files were dropped
+            if (e.dataTransfer.files.length > 0) {
+                handleFiles(e.dataTransfer.files);
+            }
+        }, false);
+
+        // Handle file input change
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    handleFiles(this.files);
+                }
+            });
         }
 
-        function unhighlight() {
-            dropZone.classList.remove('highlight');
-        }
-
-        dropZone.addEventListener('drop', handleDrop, false);
-
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleFiles(files);
-        }
-
-        fileInput.addEventListener('change', function() {
-            handleFiles(this.files);
-        });
-
+        // Handle files
         function handleFiles(files) {
             if (files.length === 0) return;
 
@@ -123,51 +138,91 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Update selected files display
-            updateSelectedFilesDisplay();
+            // Update floating files display
+            updateFloatingFilesDisplay();
 
-            // Show upload button
-            if (uploadSubmitBtn) {
-                uploadSubmitBtn.style.display = 'inline-flex';
-            }
+            // Show floating container
+            floatingContainer.classList.add('active');
         }
 
-        function updateSelectedFilesDisplay() {
-            if (!selectedFilesContainer) return;
+        // Update floating files display
+        function updateFloatingFilesDisplay() {
+            if (!floatingFilesList) return;
 
-            selectedFilesContainer.innerHTML = '';
+            floatingFilesList.innerHTML = '';
+
+            if (selectedFiles.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.className = 'empty-message';
+                emptyMessage.textContent = 'No files selected';
+                floatingFilesList.appendChild(emptyMessage);
+                return;
+            }
 
             selectedFiles.forEach((file, index) => {
                 const fileElement = document.createElement('div');
-                fileElement.className = 'selected-file';
+                fileElement.className = 'floating-file';
+
+                const fileInfo = document.createElement('div');
+                fileInfo.className = 'file-info';
+
+                // Set icon based on file type
+                let iconClass = 'fa-file';
+                const ext = file.name.split('.').pop().toLowerCase();
+
+                if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext)) {
+                    iconClass = 'fa-file-image';
+                } else if (['mp3', 'wav', 'ogg'].includes(ext)) {
+                    iconClass = 'fa-file-audio';
+                } else if (['mp4', 'webm', 'avi', 'mov'].includes(ext)) {
+                    iconClass = 'fa-file-video';
+                } else if (ext === 'json') {
+                    iconClass = 'fa-file-code';
+                } else if (ext === 'svg') {
+                    iconClass = 'fa-bezier-curve';
+                }
+
+                const icon = document.createElement('i');
+                icon.className = `fas ${iconClass}`;
+                fileInfo.appendChild(icon);
 
                 const fileName = document.createElement('span');
                 fileName.className = 'file-name';
                 fileName.textContent = file.name;
+                fileInfo.appendChild(fileName);
 
                 const removeBtn = document.createElement('button');
                 removeBtn.className = 'remove-file';
                 removeBtn.innerHTML = '<i class="fas fa-times"></i>';
                 removeBtn.addEventListener('click', function() {
                     selectedFiles.splice(index, 1);
-                    updateSelectedFilesDisplay();
+                    updateFloatingFilesDisplay();
 
-                    if (selectedFiles.length === 0 && uploadSubmitBtn) {
-                        uploadSubmitBtn.style.display = 'none';
+                    if (selectedFiles.length === 0) {
+                        floatingContainer.classList.remove('active');
                     }
                 });
 
-                fileElement.appendChild(fileName);
+                fileElement.appendChild(fileInfo);
                 fileElement.appendChild(removeBtn);
-                selectedFilesContainer.appendChild(fileElement);
+                floatingFilesList.appendChild(fileElement);
             });
         }
 
-        // Handle form submission
-        if (uploadForm) {
-            uploadForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                uploadFiles();
+        // Close floating container
+        if (closeFloatingBtn) {
+            closeFloatingBtn.addEventListener('click', function() {
+                floatingContainer.classList.remove('active');
+                selectedFiles = [];
+            });
+        }
+
+        // Upload selected files
+        if (uploadSelectedBtn) {
+            uploadSelectedBtn.addEventListener('click', function() {
+                if (selectedFiles.length > 0) {
+                    uploadFiles();
+                }
             });
         }
     }
@@ -396,7 +451,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (selectedFiles.length === 0) return;
 
         const formData = new FormData();
-        const assetType = document.getElementById('asset-type-select').value;
+        const assetType = document.getElementById('floating-asset-type').value;
 
         // Add asset type if specified
         if (assetType) {
@@ -409,10 +464,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Show loading state
-        const uploadSubmitBtn = document.getElementById('upload-submit-btn');
-        if (uploadSubmitBtn) {
-            uploadSubmitBtn.disabled = true;
-            uploadSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        if (uploadSelectedBtn) {
+            uploadSelectedBtn.disabled = true;
+            uploadSelectedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
         }
 
         // Upload files to server
@@ -425,18 +479,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 // Reset selected files
                 selectedFiles = [];
-                updateSelectedFilesDisplay();
 
-                // Hide upload button
-                if (uploadSubmitBtn) {
-                    uploadSubmitBtn.style.display = 'none';
-                    uploadSubmitBtn.disabled = false;
-                    uploadSubmitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Selected Files';
-                }
-
-                // Hide upload area
-                if (uploadArea) {
-                    uploadArea.style.display = 'none';
+                // Hide floating container
+                if (floatingContainer) {
+                    floatingContainer.classList.remove('active');
                 }
 
                 // Reload assets
@@ -449,9 +495,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Failed to upload files. Please try again.');
 
                 // Reset upload button
-                if (uploadSubmitBtn) {
-                    uploadSubmitBtn.disabled = false;
-                    uploadSubmitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Selected Files';
+                if (uploadSelectedBtn) {
+                    uploadSelectedBtn.disabled = false;
+                    uploadSelectedBtn.innerHTML = '<i class="fas fa-upload"></i> Upload';
                 }
             }
         })
@@ -460,9 +506,9 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Error uploading files. Please try again.');
 
             // Reset upload button
-            if (uploadSubmitBtn) {
-                uploadSubmitBtn.disabled = false;
-                uploadSubmitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Selected Files';
+            if (uploadSelectedBtn) {
+                uploadSelectedBtn.disabled = false;
+                uploadSelectedBtn.innerHTML = '<i class="fas fa-upload"></i> Upload';
             }
         });
     }

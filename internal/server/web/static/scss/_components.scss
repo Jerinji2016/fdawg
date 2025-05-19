@@ -390,30 +390,160 @@
   }
 }
 
-// Upload Dropzone
-.upload-dropzone {
-  border: 2px dashed $border-color;
+// Page-level Drop Zone
+.page-drop-zone {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  display: none;
+  justify-content: center;
+  align-items: center;
+
+  .drop-zone-content {
+    border: 3px dashed $primary-color;
+    border-radius: 15px;
+    padding: 60px 40px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    max-width: 500px;
+    width: 90%;
+
+    i {
+      font-size: 4rem;
+      color: $primary-color;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.5rem;
+      color: white;
+    }
+  }
+
+  &.active {
+    display: flex;
+  }
+}
+
+// Floating Files Container
+.floating-files-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  background-color: $card-background;
   border-radius: 10px;
-  padding: 40px 20px;
-  text-align: center;
-  background-color: rgba(255, 255, 255, 0.02);
-  transition: all 0.3s ease;
-  margin-bottom: 30px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  z-index: 900;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 80vh;
 
-  i {
-    font-size: 3rem;
-    color: $text-light;
-    margin-bottom: 15px;
+  .floating-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid $border-color;
+
+    h4 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .floating-actions {
+      display: flex;
+      gap: 8px;
+
+      .close-btn {
+        background: none;
+        border: none;
+        color: $text-light;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0;
+
+        &:hover {
+          color: $text-color;
+        }
+      }
+    }
   }
 
-  p {
-    margin-bottom: 20px;
-    color: $text-light;
+  .floating-files-list {
+    padding: 10px;
+    overflow-y: auto;
+    max-height: 300px;
+
+    .floating-file {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      margin-bottom: 5px;
+
+      .file-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        min-width: 0;
+
+        i {
+          font-size: 1.2rem;
+          color: $text-light;
+        }
+
+        .file-name {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      .remove-file {
+        background: none;
+        border: none;
+        color: $text-light;
+        cursor: pointer;
+
+        &:hover {
+          color: #f44336;
+        }
+      }
+    }
   }
 
-  &.highlight {
-    border-color: $primary-color;
-    background-color: rgba(1, 117, 194, 0.05);
+  .floating-footer {
+    padding: 10px;
+    border-top: 1px solid $border-color;
+
+    .asset-type-select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 4px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid $border-color;
+      color: $text-color;
+      font-family: $font-primary;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+      }
+    }
+  }
+
+  &.active {
+    display: flex;
   }
 }
 

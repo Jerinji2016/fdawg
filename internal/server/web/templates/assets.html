@@ -1,11 +1,43 @@
 {{define "content"}}
+<!-- Page-level drop zone (hidden by default) -->
+<div id="page-drop-zone" class="page-drop-zone">
+    <div class="drop-zone-content">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p>Drop files here to upload</p>
+    </div>
+</div>
+
+<!-- Floating files container (hidden by default) -->
+<div id="floating-files-container" class="floating-files-container">
+    <div class="floating-header">
+        <h4>Files to Upload</h4>
+        <div class="floating-actions">
+            <button id="upload-selected-files" class="primary-btn"><i class="fas fa-upload"></i> Upload</button>
+            <button id="close-floating-container" class="close-btn"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+    <div id="floating-files-list" class="floating-files-list"></div>
+    <div class="floating-footer">
+        <select id="floating-asset-type" class="asset-type-select">
+            <option value="">Auto-detect asset type</option>
+            <option value="images">Images</option>
+            <option value="animations">Animations</option>
+            <option value="audio">Audio</option>
+            <option value="videos">Videos</option>
+            <option value="json">JSON</option>
+            <option value="svgs">SVGs</option>
+            <option value="misc">Misc</option>
+        </select>
+    </div>
+</div>
+
 <div class="project-info">
     <div class="info-section">
         <h3>
             <span><i class="fas fa-images"></i> Assets Management</span>
             <i class="fas fa-ellipsis-h"></i>
         </h3>
-        <div class="assets-management">
+        <div class="assets-management" id="assets-management-container">
             <p class="section-description">Manage assets used in your Flutter project. Upload, organize, and optimize your images, fonts, and other assets.</p>
 
             <!-- Asset Summary Container -->
@@ -15,13 +47,14 @@
 
                     <!-- Action Buttons Container -->
                     <div class="action-buttons-container">
-                        <button class="primary-btn" id="upload-assets-btn">
-                            <i class="fas fa-cloud-upload-alt"></i> Upload Assets
+                        <button class="primary-btn" id="browse-assets-btn">
+                            <i class="fas fa-folder-open"></i> Browse Files
                         </button>
                         <button class="secondary-btn" id="migrate-assets-btn">
                             <i class="fas fa-exchange-alt"></i> Migrate Assets
                         </button>
                     </div>
+                    <input type="file" id="asset-upload" name="files" multiple style="display: none;">
                 </div>
 
                 <div id="summary-content" class="summary-content">
@@ -63,37 +96,7 @@
                 </div>
             </div>
 
-            <!-- Drag and Drop Upload Area (hidden by default) -->
-            <div class="assets-upload" id="assets-upload-area" style="display: none;">
-                <div class="upload-area">
-                    <form id="upload-form" enctype="multipart/form-data">
-                        <div class="upload-dropzone" id="drop-zone">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <p>Drag and drop files here or click to browse</p>
-                            <input type="file" id="asset-upload" name="files" multiple style="display: none;">
-                            <div class="form-group">
-                                <label for="asset-type-select">Asset Type (optional):</label>
-                                <select id="asset-type-select" name="asset_type">
-                                    <option value="">Auto-detect</option>
-                                    <option value="images">Images</option>
-                                    <option value="animations">Animations</option>
-                                    <option value="audio">Audio</option>
-                                    <option value="videos">Videos</option>
-                                    <option value="json">JSON</option>
-                                    <option value="svgs">SVGs</option>
-                                    <option value="misc">Misc</option>
-                                </select>
-                                <p class="form-hint">If not specified, the asset type will be determined from the file extension.</p>
-                            </div>
-                            <button type="button" class="primary-btn" onclick="document.getElementById('asset-upload').click()">Browse Files</button>
-                            <div id="selected-files" class="selected-files"></div>
-                            <button type="submit" class="primary-btn upload-submit-btn" id="upload-submit-btn" style="display: none;">
-                                <i class="fas fa-upload"></i> Upload Selected Files
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+
 
             <!-- Migration Confirmation Dialog (hidden by default) -->
             <div id="migrate-dialog" class="modal-overlay" style="display: none;">
