@@ -40,6 +40,12 @@ fdawg [command] [options]
 | `asset list` | List all assets in the project |
 | `asset generate-dart` | Generate a Dart asset file with all assets |
 | `asset migrate` | Migrate assets to organized folders by type and clean up empty directories |
+| `lang init` | Initialize localization using easy_localization package |
+| `lang add <language-code>` | Add support for a new language |
+| `lang remove <language-code>` | Remove support for a language |
+| `lang insert <key>` | Add a new translation key to all languages |
+| `lang delete <key>` | Delete a translation key from all languages |
+| `lang list` | List all supported languages in the project |
 
 ### Environment Command Options
 
@@ -177,6 +183,76 @@ Migrate assets to organized folders:
 
 ```bash
 fdawg asset migrate
+```
+
+### Localization Command Options
+
+- `lang init`:
+  - Initializes localization using the easy_localization package
+  - Creates the translations directory and default English (US) translation file
+  - Updates pubspec.yaml to add the easy_localization dependency
+  - Updates main.dart to initialize easy_localization
+
+- `lang add <language-code>`:
+  - `<language-code>`: ISO language code (e.g., 'en', 'es', 'fr')
+  - For country-specific variants, use format like 'en_US', 'pt_BR'
+
+- `lang remove <language-code>`:
+  - `<language-code>`: ISO language code of the language to remove
+  - Cannot remove the default language (en_US)
+
+- `lang insert <key>`:
+  - `<key>`: Translation key in dot notation (e.g., 'app.welcome', 'auth.login.title')
+  - Will prompt for translation values for each supported language
+
+- `lang delete <key>`:
+  - `<key>`: Translation key to delete from all language files
+
+- `lang list`:
+  - Lists all supported languages in the project
+
+### Localization Command Examples
+
+Initialize localization:
+
+```bash
+fdawg lang init
+```
+
+Add support for Spanish:
+
+```bash
+fdawg lang add es
+```
+
+Add support for French (France):
+
+```bash
+fdawg lang add fr_FR
+```
+
+Remove support for a language:
+
+```bash
+fdawg lang remove es
+```
+
+Add a new translation key:
+
+```bash
+fdawg lang insert app.welcome
+```
+
+Delete a translation key:
+
+```bash
+fdawg lang delete app.welcome
+```
+
+List all supported languages:
+
+```bash
+fdawg lang list
 ```
 
 ## Server and Init Command Examples

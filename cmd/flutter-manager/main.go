@@ -16,6 +16,7 @@ func main() {
 			commands.InitCommand(),
 			commands.EnvCommand(),
 			commands.AssetCommand(),
+			commands.LangCommand(),
 			// More commands will be added here
 		},
 	}
