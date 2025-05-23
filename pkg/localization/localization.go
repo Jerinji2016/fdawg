@@ -80,8 +80,13 @@ func AddLanguage(projectPath, languageCode string) error {
 	// Format the language code
 	formattedCode := langInfo.String()
 
-	// Check if the language already exists
+	// Check if translations directory exists
 	translationsPath := filepath.Join(projectPath, TranslationsDir)
+	if _, err := os.Stat(translationsPath); os.IsNotExist(err) {
+		return fmt.Errorf("translations directory not found. Please run 'fdawg lang init' first to initialize localization")
+	}
+
+	// Check if the language already exists
 	translationFilePath := filepath.Join(translationsPath, formattedCode+".json")
 
 	if _, err := os.Stat(translationFilePath); err == nil {
@@ -92,10 +97,15 @@ func AddLanguage(projectPath, languageCode string) error {
 	defaultLang := fmt.Sprintf("%s_%s", DefaultLanguage, DefaultCountry)
 	defaultTranslationPath := filepath.Join(translationsPath, defaultLang+".json")
 
+	// Check if default translation file exists
+	if _, err := os.Stat(defaultTranslationPath); os.IsNotExist(err) {
+		return fmt.Errorf("default translation file (%s.json) not found. Please run 'fdawg lang init' first to initialize localization", defaultLang)
+	}
+
 	// Read default translations
 	defaultTranslations, err := readTranslationFile(defaultTranslationPath)
 	if err != nil {
-		return fmt.Errorf("failed to read default translations: %v", err)
+		return fmt.Errorf("failed to read default translations: %v. Please run 'fdawg lang init' first to initialize localization", err)
 	}
 
 	// Create a new translation file with the same structure but empty values
@@ -126,6 +136,12 @@ func RemoveLanguage(projectPath, languageCode string) error {
 	// Format the language code
 	formattedCode := langInfo.String()
 
+	// Check if translations directory exists
+	translationsPath := filepath.Join(projectPath, TranslationsDir)
+	if _, err := os.Stat(translationsPath); os.IsNotExist(err) {
+		return fmt.Errorf("translations directory not found. Please run 'fdawg lang init' first to initialize localization")
+	}
+
 	// Check if it's the default language
 	defaultLang := fmt.Sprintf("%s_%s", DefaultLanguage, DefaultCountry)
 	if formattedCode == defaultLang {
@@ -133,11 +149,10 @@ func RemoveLanguage(projectPath, languageCode string) error {
 	}
 
 	// Check if the language exists
-	translationsPath := filepath.Join(projectPath, TranslationsDir)
 	translationFilePath := filepath.Join(translationsPath, formattedCode+".json")
 
 	if _, err := os.Stat(translationFilePath); os.IsNotExist(err) {
-		return fmt.Errorf("language %s (%s) does not exist", langInfo.DisplayName(), formattedCode)
+		return fmt.Errorf("language %s (%s) does not exist. Use 'fdawg lang list' to see available languages", langInfo.DisplayName(), formattedCode)
 	}
 
 	// Remove the translation file
@@ -160,6 +175,12 @@ func InsertTranslationKey(projectPath, key string, values map[string]string) err
 		return fmt.Errorf("invalid translation key format: %s (use dot notation, e.g., 'category.subcategory.key')", key)
 	}
 
+	// Check if translations directory exists
+	translationsPath := filepath.Join(projectPath, TranslationsDir)
+	if _, err := os.Stat(translationsPath); os.IsNotExist(err) {
+		return fmt.Errorf("translations directory not found. Please run 'fdawg lang init' first to initialize localization")
+	}
+
 	// Get all translation files
 	translationFiles, err := ListTranslationFiles(projectPath)
 	if err != nil {
@@ -167,7 +188,7 @@ func InsertTranslationKey(projectPath, key string, values map[string]string) err
 	}
 
 	if len(translationFiles) == 0 {
-		return fmt.Errorf("no translation files found, initialize localization first")
+		return fmt.Errorf("no translation files found. Please run 'fdawg lang init' first to initialize localization")
 	}
 
 	// Add the key to each translation file
@@ -190,6 +211,12 @@ func InsertTranslationKey(projectPath, key string, values map[string]string) err
 
 // DeleteTranslationKey deletes a translation key from all language files
 func DeleteTranslationKey(projectPath, key string) error {
+	// Check if translations directory exists
+	translationsPath := filepath.Join(projectPath, TranslationsDir)
+	if _, err := os.Stat(translationsPath); os.IsNotExist(err) {
+		return fmt.Errorf("translations directory not found. Please run 'fdawg lang init' first to initialize localization")
+	}
+
 	// Get all translation files
 	translationFiles, err := ListTranslationFiles(projectPath)
 	if err != nil {
@@ -197,7 +224,7 @@ func DeleteTranslationKey(projectPath, key string) error {
 	}
 
 	if len(translationFiles) == 0 {
-		return fmt.Errorf("no translation files found, initialize localization first")
+		return fmt.Errorf("no translation files found. Please run 'fdawg lang init' first to initialize localization")
 	}
 
 	// Delete the key from each translation file
@@ -479,10 +506,12 @@ func updatePubspecForLocalization(projectPath string) error {
 			// If flutter section doesn't exist, add it
 			pubspecContent += "\nflutter:\n  assets:\n    - assets/translations/\n"
 		} else {
-			// Check if assets section exists
+			// Check if assets section exists (commented or uncommented)
 			assetsIndex := strings.Index(pubspecContent[flutterIndex:], "assets:")
-			if assetsIndex == -1 {
-				// Add assets section
+			commentedAssetsIndex := strings.Index(pubspecContent[flutterIndex:], "# assets:")
+
+			if assetsIndex == -1 && commentedAssetsIndex == -1 {
+				// No assets section at all, add one
 				usesIndex := strings.Index(pubspecContent[flutterIndex:], "uses-material-design:")
 				if usesIndex == -1 {
 					// Add after flutter:
@@ -498,6 +527,21 @@ func updatePubspecForLocalization(projectPath string) error {
 						pubspecContent = pubspecContent[:insertPos] + "\n  assets:\n    - assets/translations/\n" + pubspecContent[insertPos:]
 					}
 				}
+			} else if commentedAssetsIndex != -1 && (assetsIndex == -1 || commentedAssetsIndex < assetsIndex) {
+				// There's a commented assets section, uncomment it and add our asset
+				commentPos := flutterIndex + commentedAssetsIndex
+				// Find the line with "# assets:"
+				lineStart := strings.LastIndex(pubspecContent[:commentPos], "\n") + 1
+				lineEnd := strings.Index(pubspecContent[commentPos:], "\n")
+				if lineEnd == -1 {
+					lineEnd = len(pubspecContent) - commentPos
+				}
+				lineEnd += commentPos
+
+				// Replace "# assets:" with "assets:" and add our translation
+				oldLine := pubspecContent[lineStart:lineEnd]
+				newLine := strings.Replace(oldLine, "# assets:", "assets:", 1)
+				pubspecContent = pubspecContent[:lineStart] + newLine + "\n    - assets/translations/" + pubspecContent[lineEnd:]
 			} else {
 				// Add to existing assets section
 				insertPos := flutterIndex + assetsIndex + 8 // 8 is the length of "assets:"

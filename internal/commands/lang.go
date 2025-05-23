@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/Jerinji2016/fdawg/pkg/flutter"
@@ -310,6 +311,14 @@ func listLanguages(c *cli.Context) error {
 	project, err := validateFlutterProjectForLocalization()
 	if err != nil {
 		return err
+	}
+
+	// Check if translations directory exists
+	translationsPath := filepath.Join(project.ProjectPath, localization.TranslationsDir)
+	if _, err := os.Stat(translationsPath); os.IsNotExist(err) {
+		utils.Error("Translations directory not found")
+		utils.Info("Run 'fdawg lang init' to initialize localization first")
+		return nil
 	}
 
 	// Get all translation files

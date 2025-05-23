@@ -10,4 +10,4 @@
 # Ignore package-lock.json
 /package-lock.json
 
-/test_flutter_**
+/test_**
