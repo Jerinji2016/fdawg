@@ -487,6 +487,9 @@ func buildLocalizationData(translationFiles []localization.TranslationFile) Loca
 	if len(translationFiles) > 0 && totalKeys > 0 {
 		totalPossibleTranslations := len(translationFiles) * totalKeys
 		completedTranslations := totalPossibleTranslations - totalMissingTranslations
+		if completedTranslations < 0 {
+			completedTranslations = 0
+		}
 		data.Stats.CompletionRate = (completedTranslations * 100) / totalPossibleTranslations
 	}
 

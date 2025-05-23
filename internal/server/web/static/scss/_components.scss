@@ -256,9 +256,19 @@
   @extend .assets-summary;
 }
 
+// Localization Management Container
+.localizations-management {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden; // Prevent any child overflow from affecting the page
+  box-sizing: border-box;
+}
+
 // Language Management
 .language-management {
   margin-bottom: 30px;
+  width: 100%;
+  overflow: hidden; // Prevent overflow from affecting parent
 
   .language-header {
     display: flex;
@@ -273,14 +283,19 @@
 
   .language-cards-container {
     position: relative;
+    width: 100%;
+    overflow: hidden; // Contain the horizontal scroll
   }
 
   .language-cards {
     display: flex;
     gap: 15px;
     overflow-x: auto;
+    overflow-y: hidden;
     padding: 10px 0;
     scroll-behavior: smooth;
+    width: 100%;
+    max-width: 100%; // Ensure it doesn't exceed parent width
 
     &::-webkit-scrollbar {
       height: 6px;
@@ -382,6 +397,8 @@
 // Translation Management
 .translation-management {
   margin-bottom: 30px;
+  width: 100%;
+  overflow: hidden; // Prevent overflow from affecting parent
 
   .translation-tools {
     display: flex;
@@ -432,11 +449,34 @@
   .translation-table-container {
     background-color: rgba(255, 255, 255, 0.02);
     border-radius: 8px;
-    overflow: hidden;
+    overflow-x: auto; // Enable horizontal scroll for the table
+    overflow-y: auto; // Enable vertical scroll for the table
     border: 1px solid $border-color;
+    width: 100%;
+    max-width: 100%; // Ensure it doesn't exceed parent width
+    max-height: 600px; // Set a max height to enable vertical scrolling
+
+    &::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $primary-color;
+      border-radius: 3px;
+
+      &:hover {
+        background: $secondary-color;
+      }
+    }
 
     .translation-table {
-      width: 100%;
+      min-width: 100%;
       border-collapse: collapse;
       font-family: $font-primary;
 
@@ -444,6 +484,8 @@
         padding: 12px 15px;
         text-align: left;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        white-space: nowrap; // Prevent text wrapping to maintain table structure
+        min-width: 120px; // Minimum width for each column
       }
 
       th {
@@ -453,6 +495,21 @@
         font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+
+        &:first-child {
+          background-color: $card-background;
+          z-index: 3;
+          border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        &:last-child {
+          background-color: $card-background;
+          z-index: 3;
+          border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
       }
 
       td {
@@ -463,6 +520,21 @@
           font-family: $font-mono;
           color: $primary-color;
           font-weight: 500;
+          position: sticky;
+          left: 0;
+          background-color: $card-background;
+          z-index: 2;
+          min-width: 200px; // Give more space for translation keys
+          border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        &:last-child {
+          position: sticky;
+          right: 0;
+          background-color: $card-background;
+          z-index: 2;
+          min-width: 100px; // Actions column
+          border-left: 1px solid rgba(255, 255, 255, 0.1);
         }
       }
 

@@ -201,6 +201,7 @@
   flex: 1;
   margin-left: $sidebar-width;
   transition: margin-left 0.3s ease;
+  overflow: auto;
 
   &.expanded {
     margin-left: $sidebar-collapsed-width;
@@ -211,9 +212,9 @@
 .project-info {
   background-color: $background-color;
   padding: 20px;
-  max-width: 1200px;
-  width: 95%;
-  margin: 20px auto;
+  width: 100%;
+  margin: 20px 0;
+  box-sizing: border-box;
 }
 
 // Info section
