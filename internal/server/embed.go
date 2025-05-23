@@ -18,6 +18,7 @@ import (
 //go:embed web/static/js/main.js
 //go:embed web/static/js/environment.js
 //go:embed web/static/js/assets.js
+//go:embed web/static/js/localizations.js
 //go:embed web/static/js/toast.js
 var webFS embed.FS
 

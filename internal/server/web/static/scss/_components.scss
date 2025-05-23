@@ -251,6 +251,276 @@
   }
 }
 
+// Localization Summary (reuse assets summary styles)
+.localization-summary {
+  @extend .assets-summary;
+}
+
+// Language Management
+.language-management {
+  margin-bottom: 30px;
+
+  .language-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+
+    h4 {
+      margin: 0;
+    }
+  }
+
+  .language-cards-container {
+    position: relative;
+  }
+
+  .language-cards {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding: 10px 0;
+    scroll-behavior: smooth;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $primary-color;
+      border-radius: 3px;
+
+      &:hover {
+        background: $secondary-color;
+      }
+    }
+  }
+
+  .language-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 15px;
+    min-width: 200px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    position: relative;
+    border: 2px solid transparent;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: $hover-shadow;
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .language-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+
+      .language-flag {
+        font-size: 1.5rem;
+        margin-right: 10px;
+      }
+
+      .language-actions {
+        display: flex;
+        gap: 5px;
+      }
+    }
+
+    .language-info {
+      .language-name {
+        display: block;
+        font-weight: 600;
+        color: $text-color;
+        font-size: 1rem;
+        margin-bottom: 4px;
+      }
+
+      .language-code {
+        display: block;
+        color: $text-light;
+        font-size: 0.85rem;
+        font-family: $font-mono;
+      }
+    }
+
+    .language-status {
+      margin-top: 10px;
+
+      .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+
+        &.complete {
+          background-color: rgba(76, 175, 80, 0.2);
+          color: #4caf50;
+        }
+
+        &.incomplete {
+          background-color: rgba(255, 152, 0, 0.2);
+          color: #ff9800;
+        }
+
+        &.empty {
+          background-color: rgba(244, 67, 54, 0.2);
+          color: #f44336;
+        }
+      }
+    }
+  }
+}
+
+// Translation Management
+.translation-management {
+  margin-bottom: 30px;
+
+  .translation-tools {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 15px;
+
+    .search-group {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      max-width: 400px;
+
+      input {
+        flex: 1;
+        padding: 10px 15px;
+        border-radius: 6px 0 0 6px;
+        border: 1px solid $border-color;
+        background-color: rgba(255, 255, 255, 0.05);
+        color: $text-color;
+        font-family: $font-primary;
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+        }
+      }
+
+      .search-btn {
+        padding: 10px 15px;
+        border-radius: 0 6px 6px 0;
+        border: 1px solid $border-color;
+        border-left: none;
+        background-color: rgba(255, 255, 255, 0.1);
+        color: $text-light;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: $primary-color;
+          color: white;
+        }
+      }
+    }
+  }
+
+  .translation-table-container {
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid $border-color;
+
+    .translation-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: $font-primary;
+
+      th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      th {
+        background-color: rgba(255, 255, 255, 0.05);
+        font-weight: 600;
+        color: $text-color;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      td {
+        color: $text-color;
+        font-size: 0.95rem;
+
+        &:first-child {
+          font-family: $font-mono;
+          color: $primary-color;
+          font-weight: 500;
+        }
+      }
+
+      tbody tr {
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        &:last-child td {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}
+
+// Loading and No Data Messages
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: $text-light;
+  font-size: 1rem;
+
+  i {
+    margin-right: 10px;
+    animation: spin 1s linear infinite;
+  }
+}
+
+.no-data-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: $text-light;
+  font-style: italic;
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+// Empty translation styling
+.empty-translation {
+  color: $text-light !important;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+// Spin animation for loading indicators
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 // Action Buttons Container
 .action-buttons-container {
   display: flex;
