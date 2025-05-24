@@ -215,7 +215,13 @@ document.addEventListener('DOMContentLoaded', function() {
         translationKeys.forEach(keyData => {
             rowsHTML += `
                 <tr data-key="${keyData.key}">
-                    <td>${keyData.key}</td>
+                    <td class="editable-key" data-original-key="${keyData.key}" title="Double-click to edit key">
+                        <span class="key-text">${keyData.key}</span>
+                        <input type="text" class="key-input" value="${keyData.key}" style="display: none;">
+                        <button class="table-btn save-key-btn" style="display: none;" title="Save key">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </td>
             `;
 
             // Add language columns
@@ -223,17 +229,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 const value = keyData.translations[language.code] || '';
                 const isEmpty = !value.trim();
                 rowsHTML += `
-                    <td class="${isEmpty ? 'empty-translation' : ''}" title="${isEmpty ? 'Missing translation' : value}">
-                        ${isEmpty ? '<em>Missing</em>' : value}
+                    <td class="editable-translation ${isEmpty ? 'empty-translation' : ''}"
+                        data-key="${keyData.key}"
+                        data-language="${language.code}"
+                        title="Double-click to edit translation">
+                        <span class="translation-text">${isEmpty ? '<em>Missing</em>' : value}</span>
+                        <input type="text" class="translation-input" value="${value}" style="display: none;">
+                        <button class="table-btn save-translation-btn" style="display: none;" title="Save translation">
+                            <i class="fas fa-check"></i>
+                        </button>
                     </td>
                 `;
             });
 
             rowsHTML += `
                     <td>
-                        <button class="table-btn edit-key-btn" data-key="${keyData.key}" title="Edit translations">
-                            <i class="fas fa-edit"></i>
-                        </button>
                         <button class="table-btn delete-key-btn" data-key="${keyData.key}" title="Delete key">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -244,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         tbody.innerHTML = rowsHTML;
 
-        // Add event listeners to table buttons
+        // Add event listeners to table elements
         addTableEventListeners();
     }
 
@@ -265,21 +275,86 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Function to add event listeners to table buttons
+    // Function to add event listeners to table elements
     function addTableEventListeners() {
-        // Edit buttons
-        document.querySelectorAll('.edit-key-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const key = this.getAttribute('data-key');
-                showEditTranslationModal(key);
-            });
-        });
-
         // Delete buttons
         document.querySelectorAll('.delete-key-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const key = this.getAttribute('data-key');
                 showDeleteKeyConfirmation(key);
+            });
+        });
+
+        // Editable key cells
+        document.querySelectorAll('.editable-key').forEach(cell => {
+            const keyText = cell.querySelector('.key-text');
+            const keyInput = cell.querySelector('.key-input');
+            const saveBtn = cell.querySelector('.save-key-btn');
+
+            // Double-click to edit key
+            keyText.addEventListener('dblclick', function() {
+                enterEditMode(cell, keyText, keyInput, saveBtn);
+            });
+
+            // Save key button
+            saveBtn.addEventListener('click', function() {
+                const originalKey = cell.getAttribute('data-original-key');
+                const newKey = keyInput.value.trim();
+                if (newKey && newKey !== originalKey) {
+                    updateTranslationKey(originalKey, newKey, cell, keyText, keyInput, saveBtn);
+                } else {
+                    exitEditMode(cell, keyText, keyInput, saveBtn, originalKey);
+                }
+            });
+
+            // Enter key to save
+            keyInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    saveBtn.click();
+                }
+            });
+
+            // Escape key to cancel
+            keyInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const originalKey = cell.getAttribute('data-original-key');
+                    exitEditMode(cell, keyText, keyInput, saveBtn, originalKey);
+                }
+            });
+        });
+
+        // Editable translation cells
+        document.querySelectorAll('.editable-translation').forEach(cell => {
+            const translationText = cell.querySelector('.translation-text');
+            const translationInput = cell.querySelector('.translation-input');
+            const saveBtn = cell.querySelector('.save-translation-btn');
+
+            // Double-click to edit translation
+            translationText.addEventListener('dblclick', function() {
+                enterEditMode(cell, translationText, translationInput, saveBtn);
+            });
+
+            // Save translation button
+            saveBtn.addEventListener('click', function() {
+                const key = cell.getAttribute('data-key');
+                const language = cell.getAttribute('data-language');
+                const newValue = translationInput.value.trim();
+                updateSingleTranslation(key, language, newValue, cell, translationText, translationInput, saveBtn);
+            });
+
+            // Enter key to save
+            translationInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    saveBtn.click();
+                }
+            });
+
+            // Escape key to cancel
+            translationInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const originalValue = translationInput.getAttribute('data-original-value') || '';
+                    exitEditMode(cell, translationText, translationInput, saveBtn, originalValue);
+                }
             });
         });
     }
@@ -296,7 +371,170 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Modal and action functions will be added in the next part...
+    // Helper function to enter edit mode
+    function enterEditMode(cell, textElement, inputElement, saveBtn) {
+        // Store original value for cancellation
+        let originalValue;
+        if (textElement.innerHTML.includes('<em>Missing</em>')) {
+            originalValue = '';
+        } else {
+            originalValue = textElement.textContent.trim();
+        }
+        inputElement.setAttribute('data-original-value', originalValue);
+
+        // Hide text, show input and save button
+        textElement.style.display = 'none';
+        inputElement.style.display = 'inline-block';
+        saveBtn.style.display = 'inline-flex';
+
+        // Focus and select input
+        setTimeout(() => {
+            inputElement.focus();
+            inputElement.select();
+        }, 10);
+
+        // Add editing class for styling
+        cell.classList.add('editing');
+    }
+
+    // Helper function to exit edit mode
+    function exitEditMode(cell, textElement, inputElement, saveBtn, displayValue) {
+        // Show text, hide input and save button
+        textElement.style.display = 'inline';
+        inputElement.style.display = 'none';
+        saveBtn.style.display = 'none';
+
+        // Update display value
+        if (displayValue !== undefined) {
+            if (displayValue.trim() === '') {
+                textElement.innerHTML = '<em>Missing</em>';
+                cell.classList.add('empty-translation');
+            } else {
+                textElement.textContent = displayValue;
+                cell.classList.remove('empty-translation');
+            }
+            inputElement.value = displayValue;
+        }
+
+        // Remove editing class
+        cell.classList.remove('editing');
+    }
+
+    // Function to update a single translation
+    function updateSingleTranslation(key, language, newValue, cell, textElement, inputElement, saveBtn) {
+        const formData = new FormData();
+        formData.append('translation_key', key);
+
+        // Create translations object with just this language
+        const translations = {};
+        translations[language] = newValue;
+        formData.append('translations', JSON.stringify(translations));
+
+        fetch('/api/localizations/update-translations', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the local data
+                const keyData = localizationData.translationKeys.find(k => k.key === key);
+                if (keyData) {
+                    keyData.translations[language] = newValue;
+                }
+
+                // Exit edit mode with new value
+                exitEditMode(cell, textElement, inputElement, saveBtn, newValue);
+
+                showSuccessToast(`Translation updated successfully`, 'Success');
+            } else {
+                showErrorToast(data.error || 'Failed to update translation', 'Error');
+                // Exit edit mode with original value
+                const originalValue = inputElement.getAttribute('data-original-value') || '';
+                exitEditMode(cell, textElement, inputElement, saveBtn, originalValue);
+            }
+        })
+        .catch(error => {
+            console.error('Error updating translation:', error);
+            showErrorToast('Failed to update translation', 'Error');
+            // Exit edit mode with original value
+            const originalValue = inputElement.getAttribute('data-original-value') || '';
+            exitEditMode(cell, textElement, inputElement, saveBtn, originalValue);
+        });
+    }
+
+    // Function to update a translation key
+    function updateTranslationKey(originalKey, newKey, cell, textElement, inputElement, saveBtn) {
+        // First, get all current translations for this key
+        const keyData = localizationData.translationKeys.find(k => k.key === originalKey);
+        if (!keyData) {
+            showErrorToast('Translation key not found', 'Error');
+            exitEditMode(cell, textElement, inputElement, saveBtn, originalKey);
+            return;
+        }
+
+        // Delete the old key first
+        const deleteFormData = new FormData();
+        deleteFormData.append('translation_key', originalKey);
+
+        fetch('/api/localizations/delete-key', {
+            method: 'POST',
+            body: deleteFormData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Now add the new key with all the translations
+                const addFormData = new FormData();
+                addFormData.append('translation_key', newKey);
+                addFormData.append('translations', JSON.stringify(keyData.translations));
+
+                return fetch('/api/localizations/update-translations', {
+                    method: 'POST',
+                    body: addFormData
+                });
+            } else {
+                throw new Error(data.error || 'Failed to delete old key');
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the row data-key attribute
+                const row = cell.closest('tr');
+                row.setAttribute('data-key', newKey);
+                cell.setAttribute('data-original-key', newKey);
+
+                // Update all translation cells in this row
+                const translationCells = row.querySelectorAll('.editable-translation');
+                translationCells.forEach(translationCell => {
+                    translationCell.setAttribute('data-key', newKey);
+                });
+
+                // Update delete button
+                const deleteBtn = row.querySelector('.delete-key-btn');
+                if (deleteBtn) {
+                    deleteBtn.setAttribute('data-key', newKey);
+                }
+
+                // Exit edit mode with new key
+                exitEditMode(cell, textElement, inputElement, saveBtn, newKey);
+
+                showSuccessToast(`Translation key updated successfully`, 'Success');
+
+                // Reload data to ensure consistency
+                loadLocalizationData();
+            } else {
+                throw new Error(data.error || 'Failed to create new key');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating translation key:', error);
+            showErrorToast('Failed to update translation key', 'Error');
+            // Exit edit mode with original key
+            exitEditMode(cell, textElement, inputElement, saveBtn, originalKey);
+        });
+    }
 
     // Modal and action functions
     function showAddLanguageModal() {
@@ -327,96 +565,7 @@ document.addEventListener('DOMContentLoaded', function() {
         );
     }
 
-    function showEditTranslationModal(key) {
-        const keyData = localizationData.translationKeys.find(k => k.key === key);
-        if (!keyData) {
-            showErrorToast('Translation key not found', 'Error');
-            return;
-        }
 
-        // Create modal HTML for editing translations
-        const languages = localizationData.languages;
-        let languageInputsHTML = '';
-
-        languages.forEach(language => {
-            const value = keyData.translations[language.code] || '';
-            languageInputsHTML += `
-                <div class="form-group">
-                    <label for="translation-${language.code}">${language.name} (${language.code}):</label>
-                    <input type="text" id="translation-${language.code}" value="${value}" placeholder="Enter translation for ${language.name}">
-                </div>
-            `;
-        });
-
-        const modalHTML = `
-            <div class="modal-overlay">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Edit Translations for "${key}"</h3>
-                        <button class="modal-close">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="edit-translation-form">
-                            ${languageInputsHTML}
-                            <div class="form-actions">
-                                <button type="button" class="secondary-btn cancel-btn">Cancel</button>
-                                <button type="submit" class="primary-btn">Save Changes</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Add modal to the DOM
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-        // Get modal elements
-        const modal = document.querySelector('.modal-overlay');
-        const closeBtn = modal.querySelector('.modal-close');
-        const cancelBtn = modal.querySelector('.cancel-btn');
-        const form = modal.querySelector('#edit-translation-form');
-
-        // Close modal function
-        function closeModal() {
-            modal.remove();
-        }
-
-        // Handle close events
-        closeBtn.addEventListener('click', closeModal);
-        cancelBtn.addEventListener('click', closeModal);
-
-        // Handle form submission
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Collect translation values
-            const translations = {};
-            languages.forEach(language => {
-                const input = document.getElementById(`translation-${language.code}`);
-                translations[language.code] = input.value.trim();
-            });
-
-            // Update translations
-            updateTranslations(key, translations);
-            closeModal();
-        });
-
-        // Close modal when clicking outside
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
-
-        // Handle Escape key
-        document.addEventListener('keydown', function escapeHandler(e) {
-            if (e.key === 'Escape') {
-                document.removeEventListener('keydown', escapeHandler);
-                closeModal();
-            }
-        });
-    }
 
     function showDeleteLanguageConfirmation(languageCode) {
         const language = localizationData.languages.find(lang => lang.code === languageCode);
@@ -560,27 +709,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function updateTranslations(key, translations) {
-        const formData = new FormData();
-        formData.append('translation_key', key);
-        formData.append('translations', JSON.stringify(translations));
-
-        fetch('/api/localizations/update-translations', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showSuccessToast(`Translations for "${key}" updated successfully`, 'Success');
-                loadLocalizationData(); // Reload data
-            } else {
-                showErrorToast(data.error || 'Failed to update translations', 'Error');
-            }
-        })
-        .catch(error => {
-            console.error('Error updating translations:', error);
-            showErrorToast('Failed to update translations', 'Error');
-        });
-    }
 });

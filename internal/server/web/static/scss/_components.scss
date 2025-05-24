@@ -601,6 +601,48 @@
   opacity: 0.7;
 }
 
+// Inline editing styles
+.editable-key, .editable-translation {
+  position: relative;
+  cursor: pointer;
+
+  &:hover:not(.editing) {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  &.editing {
+    background-color: rgba(1, 117, 194, 0.1);
+
+    .key-input, .translation-input {
+      width: calc(100% - 40px);
+      padding: 4px 8px;
+      border: 1px solid $primary-color;
+      border-radius: 4px;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: $text-color;
+      font-family: $font-primary;
+      font-size: 0.9rem;
+
+      &:focus {
+        outline: none;
+        border-color: $secondary-color;
+        background-color: rgba(255, 255, 255, 0.15);
+      }
+    }
+
+    .save-key-btn, .save-translation-btn {
+      margin-left: 5px;
+      background-color: #4caf50;
+      color: white;
+
+      &:hover {
+        background-color: #45a049;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
 // Spin animation for loading indicators
 @keyframes spin {
   0% { transform: rotate(0deg); }
