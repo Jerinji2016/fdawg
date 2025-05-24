@@ -14,6 +14,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    // Translation configuration
+    let translationConfig = {
+        enabled: false,
+        hasApiKey: false
+    };
+
     // Toggle localization summary section
     const toggleSummaryBtn = document.getElementById('toggle-localization-summary');
     const summaryContent = document.getElementById('localization-summary-content');
@@ -51,6 +57,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load initial data
     loadLocalizationData();
+    loadTranslationConfig();
+    updateConfigurationUI();
 
     // Function to load localization data from the server
     function loadLocalizationData() {
@@ -69,6 +77,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error loading localization data:', error);
                 hideLoadingIndicators();
                 showErrorToast('Failed to load localization data', 'Error');
+            });
+    }
+
+    // Function to load translation configuration
+    function loadTranslationConfig() {
+        fetch('/api/localizations/translate-config')
+            .then(response => response.json())
+            .then(data => {
+                translationConfig = data;
+                console.log('Translation config loaded:', translationConfig);
+                updateConfigurationUI();
+            })
+            .catch(error => {
+                console.error('Error loading translation config:', error);
+                translationConfig = { enabled: false, hasApiKey: false };
+                updateConfigurationUI();
             });
     }
 
@@ -244,6 +268,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         title="Double-click to edit translation">
                         <span class="translation-text">${isEmpty ? '<em>Missing</em>' : value}</span>
                         <button class="expand-btn" style="display: none;">...</button>
+                        <button class="table-btn translate-btn" style="display: none;" title="Translate to ${language.name}">
+                            <i class="fas fa-language"></i>
+                        </button>
                         <div class="edit-container" style="display: none;">
                             <textarea class="translation-input" rows="3">${value}</textarea>
                             <button class="table-btn save-translation-btn" title="Save translation">
@@ -256,6 +283,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             rowsHTML += `
                     <td>
+                        <button class="table-btn translate-row-btn" data-key="${keyData.key}" title="Translate row">
+                            <i class="fas fa-language"></i>
+                        </button>
                         <button class="table-btn delete-key-btn" data-key="${keyData.key}" title="Delete key">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -268,6 +298,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Add event listeners to table elements
         addTableEventListeners();
+
+        // Update translate button states
+        updateTranslateButtonStates();
 
         // Check for text overflow and add expand buttons (with delay to ensure DOM is rendered)
         setTimeout(() => {
@@ -405,6 +438,40 @@ document.addEventListener('DOMContentLoaded', function() {
                     toggleRowExpansion(cell);
                 });
             }
+
+            // Translate button
+            const translateBtn = cell.querySelector('.translate-btn');
+            if (translateBtn) {
+                translateBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const key = cell.getAttribute('data-key');
+                    const targetLanguage = cell.getAttribute('data-language');
+                    handleCellTranslation(key, targetLanguage);
+                });
+            }
+
+            // Add hover functionality for translate button
+            cell.addEventListener('mouseenter', function() {
+                if (!cell.classList.contains('editing') && translateBtn && translationConfig.enabled) {
+                    translateBtn.style.display = 'block';
+                }
+            });
+
+            cell.addEventListener('mouseleave', function() {
+                if (translateBtn) {
+                    translateBtn.style.display = 'none';
+                }
+            });
+        });
+
+        // Row translate button handlers
+        document.querySelectorAll('.translate-row-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!this.disabled && !this.classList.contains('disabled')) {
+                    const key = this.getAttribute('data-key');
+                    handleRowTranslation(key);
+                }
+            });
         });
     }
 
@@ -851,5 +918,447 @@ document.addEventListener('DOMContentLoaded', function() {
             showErrorToast('Failed to delete translation key', 'Error');
         });
     }
+
+    // Translation functions
+    function updateTranslateButtonStates() {
+        if (!translationConfig.enabled) {
+            // Hide all translate buttons if translation is disabled
+            document.querySelectorAll('.translate-btn, .translate-row-btn').forEach(btn => {
+                btn.style.display = 'none';
+            });
+            return;
+        }
+
+        // Update row translate button states
+        document.querySelectorAll('.translate-row-btn').forEach(btn => {
+            const key = btn.getAttribute('data-key');
+            const keyData = localizationData.translationKeys.find(k => k.key === key);
+
+            if (keyData && hasTranslatableContent(keyData.translations)) {
+                btn.classList.remove('disabled');
+                btn.disabled = false;
+                const availableLanguages = getAvailableSourceLanguages(keyData.translations);
+                btn.title = `Translate from ${availableLanguages.length} available language(s)`;
+            } else {
+                btn.classList.add('disabled');
+                btn.disabled = true;
+                btn.title = 'No content available to translate from';
+            }
+        });
+    }
+
+    function handleCellTranslation(key, targetLanguage) {
+        if (!translationConfig.enabled) {
+            showErrorToast('Translation service is not enabled. Please set GOOGLE_TRANSLATE_API_KEY environment variable.', 'Translation Error');
+            return;
+        }
+
+        const keyData = localizationData.translationKeys.find(k => k.key === key);
+        if (!keyData) {
+            showErrorToast('Translation key not found', 'Translation Error');
+            return;
+        }
+
+        const availableSourceLanguages = getAvailableSourceLanguages(keyData.translations, targetLanguage);
+
+        if (availableSourceLanguages.length === 0) {
+            showErrorToast('No content available to translate from', 'Translation Error');
+            return;
+        }
+
+        if (availableSourceLanguages.length === 1) {
+            // Auto-translate from the only available source
+            translateCell(key, targetLanguage, availableSourceLanguages[0]);
+        } else {
+            // Show selection modal with only languages that have content
+            showSourceLanguageModal(availableSourceLanguages, (sourceLanguage) => {
+                translateCell(key, targetLanguage, sourceLanguage);
+            });
+        }
+    }
+
+    function handleRowTranslation(key) {
+        if (!translationConfig.enabled) {
+            showErrorToast('Translation service is not enabled. Please set GOOGLE_TRANSLATE_API_KEY environment variable.', 'Translation Error');
+            return;
+        }
+
+        const keyData = localizationData.translationKeys.find(k => k.key === key);
+        if (!keyData) {
+            showErrorToast('Translation key not found', 'Translation Error');
+            return;
+        }
+
+        const availableSourceLanguages = getAvailableSourceLanguages(keyData.translations);
+
+        if (availableSourceLanguages.length === 0) {
+            showErrorToast('No content available to translate from', 'Translation Error');
+            return;
+        }
+
+        if (availableSourceLanguages.length === 1) {
+            // Auto-translate from the only available source
+            const sourceLanguage = availableSourceLanguages[0];
+            const targetLanguages = localizationData.languages.map(lang => lang.code);
+            translateRow(key, sourceLanguage, targetLanguages);
+        } else {
+            // Show selection modal with only languages that have content
+            showSourceLanguageModal(availableSourceLanguages, (sourceLanguage) => {
+                const targetLanguages = localizationData.languages.map(lang => lang.code);
+                translateRow(key, sourceLanguage, targetLanguages);
+            });
+        }
+    }
+
+    function translateCell(key, targetLanguage, sourceLanguage) {
+        const keyData = localizationData.translationKeys.find(k => k.key === key);
+        if (!keyData) {
+            showErrorToast('Translation key not found', 'Translation Error');
+            return;
+        }
+
+        // Find the cell element
+        const cell = document.querySelector(`[data-key="${key}"][data-language="${targetLanguage}"]`);
+        if (!cell) {
+            showErrorToast('Translation cell not found', 'Translation Error');
+            return;
+        }
+
+        // Show loading indicator
+        const translationText = cell.querySelector('.translation-text');
+        const originalContent = translationText.innerHTML;
+        translationText.innerHTML = 'Translating... <span class="translating-spinner"></span>';
+
+        const formData = new FormData();
+        formData.append('translation_key', key);
+        formData.append('target_language', targetLanguage);
+        formData.append('source_language', sourceLanguage);
+        formData.append('existing_translations', JSON.stringify(keyData.translations));
+
+        fetch('/api/localizations/translate-cell', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.translated_text) {
+                // Update the translation in the UI
+                translationText.textContent = data.translated_text;
+                cell.classList.remove('empty-translation');
+
+                // Update local data
+                keyData.translations[targetLanguage] = data.translated_text;
+
+                // Save the translation to the server
+                updateSingleTranslationFromAPI(key, targetLanguage, data.translated_text);
+
+                showSuccessToast(`Translated to ${getLanguageName(targetLanguage)}`, 'Translation Complete');
+            } else {
+                translationText.innerHTML = originalContent;
+                showErrorToast(data.error || 'Translation failed', 'Translation Error');
+            }
+        })
+        .catch(error => {
+            console.error('Error translating cell:', error);
+            translationText.innerHTML = originalContent;
+            showErrorToast('Translation failed', 'Translation Error');
+        });
+    }
+
+    function translateRow(key, sourceLanguage, targetLanguages) {
+        const keyData = localizationData.translationKeys.find(k => k.key === key);
+        if (!keyData) {
+            showErrorToast('Translation key not found', 'Translation Error');
+            return;
+        }
+
+        // Show loading indicators for all target cells
+        const loadingCells = new Map();
+        targetLanguages.forEach(targetLang => {
+            if (targetLang !== sourceLanguage) {
+                const cell = document.querySelector(`[data-key="${key}"][data-language="${targetLang}"]`);
+                if (cell) {
+                    const translationText = cell.querySelector('.translation-text');
+                    const isEmpty = !keyData.translations[targetLang] || keyData.translations[targetLang].trim() === '';
+
+                    if (isEmpty) {
+                        const originalContent = translationText.innerHTML;
+                        loadingCells.set(targetLang, { cell, translationText, originalContent });
+                        translationText.innerHTML = 'Translating... <span class="translating-spinner"></span>';
+                    }
+                }
+            }
+        });
+
+        const formData = new FormData();
+        formData.append('translation_key', key);
+        formData.append('source_language', sourceLanguage);
+        formData.append('target_languages', JSON.stringify(targetLanguages));
+        formData.append('existing_translations', JSON.stringify(keyData.translations));
+
+        fetch('/api/localizations/translate-row', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.translations) {
+                let successCount = 0;
+                let errorCount = 0;
+
+                // Update each translation
+                Object.entries(data.translations).forEach(([targetLang, result]) => {
+                    const cellData = loadingCells.get(targetLang);
+                    if (cellData) {
+                        const { cell, translationText } = cellData;
+
+                        if (result.success && result.text) {
+                            translationText.textContent = result.text;
+                            cell.classList.remove('empty-translation');
+                            keyData.translations[targetLang] = result.text;
+                            successCount++;
+                        } else {
+                            translationText.innerHTML = cellData.originalContent;
+                            errorCount++;
+                        }
+                    }
+                });
+
+                // Save all successful translations
+                if (successCount > 0) {
+                    updateSingleTranslationFromAPI(key, null, null, keyData.translations);
+                }
+
+                if (successCount > 0 && errorCount === 0) {
+                    showSuccessToast(`Translated ${successCount} language(s)`, 'Translation Complete');
+                } else if (successCount > 0 && errorCount > 0) {
+                    showSuccessToast(`Translated ${successCount} language(s), ${errorCount} failed`, 'Partial Success');
+                } else {
+                    showErrorToast('All translations failed', 'Translation Error');
+                }
+            } else {
+                // Restore original content for all loading cells
+                loadingCells.forEach(({ translationText, originalContent }) => {
+                    translationText.innerHTML = originalContent;
+                });
+                showErrorToast(data.error || 'Translation failed', 'Translation Error');
+            }
+        })
+        .catch(error => {
+            console.error('Error translating row:', error);
+            // Restore original content for all loading cells
+            loadingCells.forEach(({ translationText, originalContent }) => {
+                translationText.innerHTML = originalContent;
+            });
+            showErrorToast('Translation failed', 'Translation Error');
+        });
+    }
+
+    function showSourceLanguageModal(availableLanguages, callback) {
+        // Get language display names
+        const languageOptions = availableLanguages.map(langCode => {
+            const langInfo = localizationData.languages.find(l => l.code === langCode);
+            return {
+                code: langCode,
+                name: langInfo ? langInfo.name : langCode
+            };
+        }).sort((a, b) => a.name.localeCompare(b.name));
+
+        const modalContent = `
+            <div class="source-language-selection">
+                <p>Select source language to translate from:</p>
+                <div class="language-options">
+                    ${languageOptions.map(lang => `
+                        <button class="language-option-btn" data-language="${lang.code}">
+                            ${lang.name}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        showCustomDialog('Select Source Language', modalContent, (result) => {
+            if (result) {
+                callback(result);
+            }
+        });
+
+        // Add event listeners to language option buttons
+        setTimeout(() => {
+            document.querySelectorAll('.language-option-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const selectedLanguage = this.getAttribute('data-language');
+                    // Close modal and call callback
+                    const modal = document.querySelector('.modal-overlay');
+                    if (modal) {
+                        modal.remove();
+                    }
+                    callback(selectedLanguage);
+                });
+            });
+        }, 100);
+    }
+
+    // Helper functions
+    function getAvailableSourceLanguages(translations, excludeLanguage = null) {
+        const availableLanguages = [];
+
+        for (const [lang, text] of Object.entries(translations)) {
+            if (lang !== excludeLanguage && text && text.trim() !== '') {
+                availableLanguages.push(lang);
+            }
+        }
+
+        return availableLanguages;
+    }
+
+    function hasTranslatableContent(translations) {
+        return Object.values(translations).some(text => text && text.trim() !== '');
+    }
+
+    function getLanguageName(languageCode) {
+        const langInfo = localizationData.languages.find(l => l.code === languageCode);
+        return langInfo ? langInfo.name : languageCode;
+    }
+
+    function updateSingleTranslationFromAPI(key, language, newValue, allTranslations = null) {
+        const formData = new FormData();
+        formData.append('translation_key', key);
+
+        if (allTranslations) {
+            // Update all translations for the key
+            formData.append('translations', JSON.stringify(allTranslations));
+        } else {
+            // Update single translation
+            const keyData = localizationData.translationKeys.find(k => k.key === key);
+            const existingTranslations = keyData ? { ...keyData.translations } : {};
+            existingTranslations[language] = newValue;
+            formData.append('translations', JSON.stringify(existingTranslations));
+        }
+
+        fetch('/api/localizations/update-translations', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                console.error('Failed to save translation:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error saving translation:', error);
+        });
+    }
+
+    // Translation configuration functions
+    function updateConfigurationUI() {
+        const statusText = document.getElementById('config-status-text');
+        const configBtn = document.getElementById('config-btn');
+
+        if (translationConfig.enabled && translationConfig.hasApiKey) {
+            statusText.textContent = 'Configured and ready';
+            statusText.className = 'config-status-text configured';
+            configBtn.innerHTML = '<i class="fas fa-edit"></i> Update';
+        } else {
+            statusText.textContent = 'Not configured';
+            statusText.className = 'config-status-text not-configured';
+            configBtn.innerHTML = '<i class="fas fa-cog"></i> Configure';
+        }
+    }
+
+    function showTranslationConfigModal() {
+        const modalContent = `
+            <div class="translation-config-modal">
+                <div class="form-group">
+                    <label for="api-key-input">Google Translate API Key:</label>
+                    <input type="password" id="api-key-input" placeholder="Enter your Google Translate API key" />
+                    <div class="form-hint">
+                        Your API key will be saved securely in the project's .fdawg-config file.
+                    </div>
+                </div>
+                <div class="config-help">
+                    <h6>How to get Google Translate API Key:</h6>
+                    <ol>
+                        <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+                        <li>Create or select a project</li>
+                        <li>Enable the "Cloud Translation API"</li>
+                        <li>Go to "APIs & Services" → "Credentials"</li>
+                        <li>Click "Create Credentials" → "API Key"</li>
+                        <li>Copy the generated API key and paste it above</li>
+                    </ol>
+                </div>
+                <div class="form-actions">
+                    <button class="secondary-btn" onclick="closeConfigModal()">Cancel</button>
+                    <button class="primary-btn" onclick="saveApiKey()">Save API Key</button>
+                </div>
+            </div>
+        `;
+
+        showCustomDialog('Translation Configuration', modalContent);
+    }
+
+    function closeConfigModal() {
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
+    function saveApiKey() {
+        const apiKeyInput = document.getElementById('api-key-input');
+        const apiKey = apiKeyInput.value.trim();
+
+        if (!apiKey) {
+            showErrorToast('Please enter a valid API key', 'Configuration Error');
+            return;
+        }
+
+        // Show loading state
+        const saveBtn = document.querySelector('.primary-btn');
+        const originalText = saveBtn.innerHTML;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        saveBtn.disabled = true;
+
+        const formData = new FormData();
+        formData.append('api_key', apiKey);
+
+        fetch('/api/localizations/update-api-key', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update local config
+                translationConfig.enabled = true;
+                translationConfig.hasApiKey = true;
+
+                // Update UI
+                updateConfigurationUI();
+                updateTranslateButtonStates();
+
+                // Close modal
+                closeConfigModal();
+
+                showSuccessToast('Google Translate API key saved successfully', 'Configuration Updated');
+            } else {
+                showErrorToast(data.error || 'Failed to save API key', 'Configuration Error');
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error saving API key:', error);
+            showErrorToast('Failed to save API key', 'Configuration Error');
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+        });
+    }
+
+    // Make functions globally available
+    window.showTranslationConfigModal = showTranslationConfigModal;
+    window.closeConfigModal = closeConfigModal;
+    window.saveApiKey = saveApiKey;
 
 });

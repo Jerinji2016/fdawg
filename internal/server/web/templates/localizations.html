@@ -36,6 +36,34 @@
                 </div>
             </div>
 
+            <!-- Translation Configuration Section -->
+            <div class="translation-config-section">
+                <h4>Translation Configuration</h4>
+                <div class="config-card">
+                    <div class="config-status">
+                        <i class="fas fa-language config-icon"></i>
+                        <div class="config-info">
+                            <h5>Google Translate API</h5>
+                            <p class="config-status-text" id="config-status-text">Not configured</p>
+                        </div>
+                        <button class="primary-btn" id="config-btn" onclick="showTranslationConfigModal()">
+                            <i class="fas fa-cog"></i> Configure
+                        </button>
+                    </div>
+                    <div class="config-help" id="config-help" style="display: none;">
+                        <h6>How to get Google Translate API Key:</h6>
+                        <ol>
+                            <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
+                            <li>Create or select a project</li>
+                            <li>Enable the "Cloud Translation API"</li>
+                            <li>Go to "APIs & Services" → "Credentials"</li>
+                            <li>Click "Create Credentials" → "API Key"</li>
+                            <li>Copy the generated API key</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
             <!-- Supported Languages Section -->
             <div class="language-management">
                 <div class="language-header">

@@ -317,3 +317,59 @@ function showInputDialog(title, message, defaultValue = '', placeholder = '', on
         }
     });
 }
+
+/**
+ * Show a custom dialog modal with custom content
+ * @param {string} title - The title for the dialog
+ * @param {string} content - The HTML content to display
+ * @param {Function} onResult - Callback function when dialog is closed with result
+ */
+function showCustomDialog(title, content, onResult = () => {}) {
+    // Create modal HTML
+    const modalHTML = `
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>${title}</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    ${content}
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Add modal to the DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Get modal elements
+    const modal = document.querySelector('.modal-overlay');
+    const closeBtn = modal.querySelector('.modal-close');
+
+    // Close modal function
+    function closeModal(result = null) {
+        modal.remove();
+        onResult(result);
+    }
+
+    // Handle close events
+    closeBtn.addEventListener('click', () => {
+        closeModal();
+    });
+
+    // Handle Escape key
+    document.addEventListener('keydown', function escapeHandler(e) {
+        if (e.key === 'Escape') {
+            document.removeEventListener('keydown', escapeHandler);
+            closeModal();
+        }
+    });
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+}

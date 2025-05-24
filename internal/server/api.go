@@ -9,9 +9,11 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/Jerinji2016/fdawg/pkg/config"
 	"github.com/Jerinji2016/fdawg/pkg/environment"
 	"github.com/Jerinji2016/fdawg/pkg/flutter"
 	"github.com/Jerinji2016/fdawg/pkg/localization"
+	"github.com/Jerinji2016/fdawg/pkg/translate"
 )
 
 // setupAPIRoutes sets up the API routes for the server
@@ -462,6 +464,229 @@ func setupLocalizationAPIRoutes(project *flutter.ValidationResult) {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success": true,
 			"message": fmt.Sprintf("Translations for %s updated successfully", translationKey),
+		})
+	})
+
+	// Translation configuration endpoint
+	http.HandleFunc("/api/localizations/translate-config", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		// Load translation configuration
+		config, err := translate.LoadConfig(project.ProjectPath)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to load translation config: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"enabled":   config.IsEnabled(),
+			"hasApiKey": config.APIKey != "",
+		})
+	})
+
+	// Translate cell endpoint
+	http.HandleFunc("/api/localizations/translate-cell", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		// Load translation service
+		config, err := translate.LoadConfig(project.ProjectPath)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to load translation config: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		if !config.IsEnabled() {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   "Translation service is not enabled. Please set GOOGLE_TRANSLATE_API_KEY environment variable.",
+			})
+			return
+		}
+
+		service, err := translate.NewService(config)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to create translation service: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		// Parse request parameters
+		translationKey := r.FormValue("translation_key")
+		if translationKey == "" {
+			http.Error(w, "Translation key is required", http.StatusBadRequest)
+			return
+		}
+
+		targetLanguage := r.FormValue("target_language")
+		if targetLanguage == "" {
+			http.Error(w, "Target language is required", http.StatusBadRequest)
+			return
+		}
+
+		sourceLanguage := r.FormValue("source_language") // Optional
+
+		existingTranslationsJSON := r.FormValue("existing_translations")
+		if existingTranslationsJSON == "" {
+			http.Error(w, "Existing translations data is required", http.StatusBadRequest)
+			return
+		}
+
+		// Parse existing translations JSON
+		var existingTranslations map[string]string
+		if err := json.Unmarshal([]byte(existingTranslationsJSON), &existingTranslations); err != nil {
+			http.Error(w, "Invalid existing translations JSON", http.StatusBadRequest)
+			return
+		}
+
+		// Create translation request
+		req := translate.CellTranslationRequest{
+			Key:                  translationKey,
+			TargetLanguage:       targetLanguage,
+			SourceLanguage:       sourceLanguage,
+			ExistingTranslations: existingTranslations,
+		}
+
+		// Perform translation
+		resp, err := service.TranslateCell(req)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   fmt.Sprintf("Translation failed: %v", err),
+			})
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
+	})
+
+	// Translate row endpoint
+	http.HandleFunc("/api/localizations/translate-row", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		// Load translation service
+		config, err := translate.LoadConfig(project.ProjectPath)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to load translation config: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		if !config.IsEnabled() {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   "Translation service is not enabled. Please set GOOGLE_TRANSLATE_API_KEY environment variable.",
+			})
+			return
+		}
+
+		service, err := translate.NewService(config)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to create translation service: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		// Parse request parameters
+		translationKey := r.FormValue("translation_key")
+		if translationKey == "" {
+			http.Error(w, "Translation key is required", http.StatusBadRequest)
+			return
+		}
+
+		sourceLanguage := r.FormValue("source_language")
+		if sourceLanguage == "" {
+			http.Error(w, "Source language is required", http.StatusBadRequest)
+			return
+		}
+
+		targetLanguagesJSON := r.FormValue("target_languages")
+		if targetLanguagesJSON == "" {
+			http.Error(w, "Target languages data is required", http.StatusBadRequest)
+			return
+		}
+
+		existingTranslationsJSON := r.FormValue("existing_translations")
+		if existingTranslationsJSON == "" {
+			http.Error(w, "Existing translations data is required", http.StatusBadRequest)
+			return
+		}
+
+		// Parse target languages JSON
+		var targetLanguages []string
+		if err := json.Unmarshal([]byte(targetLanguagesJSON), &targetLanguages); err != nil {
+			http.Error(w, "Invalid target languages JSON", http.StatusBadRequest)
+			return
+		}
+
+		// Parse existing translations JSON
+		var existingTranslations map[string]string
+		if err := json.Unmarshal([]byte(existingTranslationsJSON), &existingTranslations); err != nil {
+			http.Error(w, "Invalid existing translations JSON", http.StatusBadRequest)
+			return
+		}
+
+		// Create translation request
+		req := translate.RowTranslationRequest{
+			Key:                  translationKey,
+			SourceLanguage:       sourceLanguage,
+			TargetLanguages:      targetLanguages,
+			ExistingTranslations: existingTranslations,
+		}
+
+		// Perform translation
+		resp, err := service.TranslateRow(req)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   fmt.Sprintf("Translation failed: %v", err),
+			})
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
+	})
+
+	// Update translation API key endpoint
+	http.HandleFunc("/api/localizations/update-api-key", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		apiKey := r.FormValue("api_key")
+		if apiKey == "" {
+			http.Error(w, "API key is required", http.StatusBadRequest)
+			return
+		}
+
+		// Update the API key in the project config
+		err := config.UpdateTranslationAPIKey(project.ProjectPath, apiKey)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   fmt.Sprintf("Failed to update API key: %v", err),
+			})
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": true,
+			"message": "Google Translate API key updated successfully",
 		})
 	})
 }
