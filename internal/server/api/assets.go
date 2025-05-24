@@ -1,4 +1,4 @@
-package server
+package api
 
 import (
 	"encoding/json"
@@ -12,9 +12,9 @@ import (
 	"github.com/Jerinji2016/fdawg/pkg/flutter"
 )
 
-// setupAssetAPIRoutes sets up the API routes for asset management
-func setupAssetAPIRoutes(project *flutter.ValidationResult) {
-	// Add asset API route
+// SetupAssetAPIRoutes sets up the API routes for asset management
+func SetupAssetAPIRoutes(project *flutter.ValidationResult) {
+	// Upload asset API route
 	http.HandleFunc("/api/assets/upload", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

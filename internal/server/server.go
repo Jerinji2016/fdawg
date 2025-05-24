@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"net/http"
 
+	"github.com/Jerinji2016/fdawg/internal/server/api"
 	"github.com/Jerinji2016/fdawg/pkg/environment"
 	"github.com/Jerinji2016/fdawg/pkg/flutter"
 	"github.com/Jerinji2016/fdawg/pkg/utils"
@@ -27,8 +28,7 @@ func Start(port string, project *flutter.ValidationResult) error {
 	}
 
 	// Set up API routes
-	setupAPIRoutes(project)
-	setupAssetAPIRoutes(project)
+	api.SetupAPIRoutes(project)
 
 	// Set up routes
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -107,17 +107,6 @@ func Start(port string, project *flutter.ValidationResult) error {
 	utils.Info("Press Ctrl+C to stop the server")
 
 	return http.ListenAndServe(addr, nil)
-}
-
-func handleIndex(w http.ResponseWriter, r *http.Request, data *ServerData) {
-	// If path is not root, return 404
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-
-	// Use the new handlePage function
-	handlePage(w, r, data, "overview")
 }
 
 // handlePage renders a page using the layout template and the specified content template
