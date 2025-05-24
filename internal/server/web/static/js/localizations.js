@@ -300,17 +300,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Modal and action functions
     function showAddLanguageModal() {
-        const languageCode = prompt('Enter language code (e.g., de, it, pt_BR):');
-        if (languageCode && languageCode.trim()) {
-            addLanguage(languageCode.trim());
-        }
+        showInputDialog(
+            'Add New Language',
+            'Enter language code (e.g., de, it, pt_BR):',
+            '',
+            'Language Code',
+            (languageCode) => {
+                if (languageCode && languageCode.trim()) {
+                    addLanguage(languageCode.trim());
+                }
+            }
+        );
     }
 
     function showAddTranslationKeyModal() {
-        const key = prompt('Enter translation key (e.g., auth.logout, common.cancel):');
-        if (key && key.trim()) {
-            addTranslationKey(key.trim());
-        }
+        showInputDialog(
+            'Add Translation Key',
+            'Enter translation key (e.g., auth.logout, common.cancel):',
+            '',
+            'Translation Key',
+            (key) => {
+                if (key && key.trim()) {
+                    addTranslationKey(key.trim());
+                }
+            }
+        );
     }
 
     function showEditTranslationModal(key) {
@@ -371,8 +385,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData();
         formData.append('language_code', languageCode);
 
-        showInfoToast('Adding language...', 'Please wait', 0);
-
         fetch('/api/localizations/add-language', {
             method: 'POST',
             body: formData
@@ -395,8 +407,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function deleteLanguage(languageCode) {
         const formData = new FormData();
         formData.append('language_code', languageCode);
-
-        showInfoToast('Deleting language...', 'Please wait', 0);
 
         fetch('/api/localizations/delete-language', {
             method: 'POST',
@@ -421,8 +431,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData();
         formData.append('translation_key', key);
 
-        showInfoToast('Adding translation key...', 'Please wait', 0);
-
         fetch('/api/localizations/add-key', {
             method: 'POST',
             body: formData
@@ -445,8 +453,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function deleteTranslationKey(key) {
         const formData = new FormData();
         formData.append('translation_key', key);
-
-        showInfoToast('Deleting translation key...', 'Please wait', 0);
 
         fetch('/api/localizations/delete-key', {
             method: 'POST',

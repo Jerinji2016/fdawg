@@ -1,5 +1,6 @@
 // Use variables
 @use 'variables' as *;
+@use 'sass:color';
 
 // Card grid
 .card-grid {
@@ -91,7 +92,8 @@
     color: $primary-color;
   }
 
-  &.delete-env-btn:hover {
+  &.delete-env-btn:hover,
+  &.delete-language-btn:hover {
     color: #f44336;
   }
 }
@@ -503,12 +505,16 @@
           background-color: $card-background;
           z-index: 3;
           border-right: 1px solid rgba(255, 255, 255, 0.1);
+          position: sticky;
+          left: 0;
         }
 
         &:last-child {
           background-color: $card-background;
           z-index: 3;
           border-left: 1px solid rgba(255, 255, 255, 0.1);
+          position: sticky;
+          right: 0;
         }
       }
 
@@ -726,12 +732,12 @@
             background-color: $primary-color;
 
             &:hover {
-              background-color: darken($primary-color, 10%);
+              background-color: color.adjust($primary-color, $lightness: -10%);
             }
 
             &[style*="background-color: #f44336"] {
               &:hover {
-                background-color: darken(#f44336, 10%) !important;
+                background-color: color.adjust(#f44336, $lightness: -10%) !important;
               }
             }
           }
