@@ -10,4 +10,5 @@ func SetupAPIRoutes(project *flutter.ValidationResult) {
 	SetupAssetAPIRoutes(project)
 	SetupEnvironmentAPIRoutes(project)
 	SetupLocalizationAPIRoutes(project)
+	SetupNamerAPIRoutes(project)
 }

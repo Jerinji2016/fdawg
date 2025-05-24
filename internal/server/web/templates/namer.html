@@ -1,0 +1,362 @@
+{{define "content"}}
+<div class="page-header">
+    <h1><i class="fas fa-tag"></i> App Namer</h1>
+    <p>Manage your app's display name across all platforms</p>
+</div>
+
+<div class="content-wrapper">
+    <!-- Current App Names Section -->
+    <div class="info-section">
+        <div class="section-header">
+            <h2><i class="fas fa-list"></i> Current App Names</h2>
+            <div class="section-actions">
+                <button id="refresh-names-btn" class="btn btn-secondary">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+        
+        <div id="current-names-container" class="platforms-grid">
+            <!-- Platform cards will be populated here -->
+        </div>
+    </div>
+
+    <!-- Set App Names Section -->
+    <div class="info-section">
+        <div class="section-header">
+            <h2><i class="fas fa-edit"></i> Set App Names</h2>
+        </div>
+        
+        <div class="form-container">
+            <!-- Universal Name Setting -->
+            <div class="form-group">
+                <label for="universal-name">
+                    <i class="fas fa-globe"></i> Universal Name
+                </label>
+                <div class="input-group">
+                    <input type="text" id="universal-name" placeholder="Enter app name for all platforms">
+                    <button id="set-universal-btn" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Set for All
+                    </button>
+                </div>
+                <small class="form-help">This will set the same name for all available platforms</small>
+            </div>
+
+            <!-- Platform-Specific Settings -->
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-cogs"></i> Platform-Specific Names
+                </label>
+                <div class="platform-forms" id="platform-forms">
+                    <!-- Platform-specific forms will be populated here -->
+                </div>
+                <div class="form-actions">
+                    <button id="set-platform-specific-btn" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Set Platform Names
+                    </button>
+                    <button id="clear-platform-forms-btn" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Clear All
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Platform Information Section -->
+    <div class="info-section">
+        <div class="section-header">
+            <h2><i class="fas fa-info-circle"></i> Platform Information</h2>
+        </div>
+        
+        <div class="platform-info">
+            <div class="info-card">
+                <h3><i class="fab fa-android"></i> Android</h3>
+                <p>App name is configured in <code>android/app/src/main/AndroidManifest.xml</code></p>
+                <p>Property: <code>android:label</code></p>
+            </div>
+            
+            <div class="info-card">
+                <h3><i class="fab fa-apple"></i> iOS</h3>
+                <p>App name is configured in <code>ios/Runner/Info.plist</code></p>
+                <p>Properties: <code>CFBundleDisplayName</code> and <code>CFBundleName</code></p>
+            </div>
+            
+            <div class="info-card">
+                <h3><i class="fab fa-apple"></i> macOS</h3>
+                <p>App name is configured in <code>macos/Runner/Configs/AppInfo.xcconfig</code></p>
+                <p>Property: <code>PRODUCT_NAME</code></p>
+            </div>
+            
+            <div class="info-card">
+                <h3><i class="fab fa-linux"></i> Linux</h3>
+                <p>App name is configured in <code>linux/CMakeLists.txt</code></p>
+                <p>Property: <code>BINARY_NAME</code></p>
+            </div>
+            
+            <div class="info-card">
+                <h3><i class="fab fa-windows"></i> Windows</h3>
+                <p>App name is configured in <code>windows/CMakeLists.txt</code></p>
+                <p>Properties: <code>project()</code> and <code>BINARY_NAME</code></p>
+            </div>
+            
+            <div class="info-card">
+                <h3><i class="fas fa-globe"></i> Web</h3>
+                <p>App name is configured in <code>web/manifest.json</code> and <code>web/index.html</code></p>
+                <p>Properties: <code>name</code>, <code>short_name</code>, and <code>&lt;title&gt;</code></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading overlay -->
+<div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Processing...</p>
+    </div>
+</div>
+
+<!-- Confirmation Dialog -->
+<div id="confirmation-dialog" class="dialog-overlay" style="display: none;">
+    <div class="dialog">
+        <div class="dialog-header">
+            <h3><i class="fas fa-question-circle"></i> Confirm Action</h3>
+        </div>
+        <div class="dialog-body">
+            <p id="confirmation-message"></p>
+            <div class="confirmation-details" id="confirmation-details"></div>
+        </div>
+        <div class="dialog-footer">
+            <button id="confirm-yes-btn" class="btn btn-primary">
+                <i class="fas fa-check"></i> Yes, Continue
+            </button>
+            <button id="confirm-no-btn" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.platforms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.platform-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.platform-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.platform-card.unavailable {
+    opacity: 0.6;
+    background: var(--bg-secondary);
+}
+
+.platform-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.platform-header i {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+.platform-status {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    margin-left: auto;
+}
+
+.platform-status.available {
+    background: var(--success-color);
+    color: white;
+}
+
+.platform-status.unavailable {
+    background: var(--warning-color);
+    color: white;
+}
+
+.platform-names {
+    margin-top: 0.5rem;
+}
+
+.platform-names .name-item {
+    margin-bottom: 0.3rem;
+}
+
+.platform-names .name-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.platform-names .name-value {
+    font-family: 'Courier New', monospace;
+    background: var(--bg-secondary);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.platform-forms {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.platform-form {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.platform-form.unavailable {
+    opacity: 0.6;
+    background: var(--bg-secondary);
+}
+
+.platform-form .platform-header {
+    margin-bottom: 0.5rem;
+}
+
+.platform-form input {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.platform-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.info-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.info-card h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-card p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.info-card code {
+    background: var(--bg-secondary);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+}
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.loading-spinner {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.loading-spinner i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+}
+
+.dialog {
+    background: white;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.dialog-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dialog-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dialog-body {
+    padding: 1rem;
+}
+
+.dialog-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.confirmation-details {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+</style>
+{{end}}

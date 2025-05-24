@@ -67,6 +67,43 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load initial data
     loadInitializationStatus();
 
+    // Function to toggle setup guide
+    window.toggleSetupGuide = function() {
+        const content = document.getElementById('setup-guide-content');
+        const icon = document.getElementById('guide-toggle-icon');
+
+        if (content.style.display === 'none' || content.style.display === '') {
+            content.style.display = 'block';
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        } else {
+            content.style.display = 'none';
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        }
+    };
+
+    // Function to copy code to clipboard
+    window.copyCodeToClipboard = function(button) {
+        const codeBlock = button.parentElement.querySelector('code');
+        const text = codeBlock.textContent;
+
+        navigator.clipboard.writeText(text).then(function() {
+            // Show success feedback
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            button.style.backgroundColor = '#4caf50';
+
+            setTimeout(function() {
+                button.innerHTML = originalText;
+                button.style.backgroundColor = '';
+            }, 2000);
+        }).catch(function(err) {
+            console.error('Failed to copy text: ', err);
+            showErrorToast('Failed to copy code to clipboard', 'Copy Error');
+        });
+    };
+
     // Function to load initialization status
     function loadInitializationStatus() {
         fetch('/api/localizations/status')

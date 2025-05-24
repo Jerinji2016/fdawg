@@ -58,6 +58,12 @@
                             <span>Localizations</span>
                         </a>
                     </li>
+                    <li class="nav-item {{if eq .ActivePage "namer"}}active{{end}}">
+                        <a href="/namer" title="App Namer" data-tooltip="App Namer">
+                            <i class="fas fa-tag"></i>
+                            <span>App Namer</span>
+                        </a>
+                    </li>
                     <li class="nav-item {{if eq .ActivePage "fastlane"}}active{{end}}">
                         <a href="/fastlane" title="Fastlane" data-tooltip="Fastlane">
                             <i class="fas fa-rocket"></i>
@@ -93,6 +99,9 @@
     {{end}}
     {{if eq .ActivePage "localizations"}}
     <script src="/static/js/localizations.js"></script>
+    {{end}}
+    {{if eq .ActivePage "namer"}}
+    <script src="/static/js/namer.js"></script>
     {{end}}
 </body>
 </html>

@@ -2026,4 +2026,134 @@ footer {
   font-size: 0.9rem;
 }
 
+/* Setup Guide Panel Styles */
+.setup-guide-panel {
+  margin-bottom: 25px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid #333333;
+  overflow: hidden;
+}
+
+.guide-header {
+  padding: 15px 20px;
+  background-color: rgba(1, 117, 194, 0.1);
+  border-bottom: 1px solid #333333;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.guide-header:hover {
+  background-color: rgba(1, 117, 194, 0.15);
+}
+
+.guide-header h4 {
+  margin: 0;
+  color: #f0f0f0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.guide-header h4 i {
+  margin-right: 10px;
+  color: #0175C2;
+}
+
+.guide-toggle-icon {
+  color: #0175C2;
+  transition: transform 0.3s ease;
+}
+
+.guide-content {
+  padding: 20px;
+  display: none; /* Start collapsed by default */
+}
+
+.guide-content p {
+  color: #b0b0b0;
+  margin: 0 0 20px 0;
+  line-height: 1.6;
+}
+
+.setup-step {
+  margin-bottom: 25px;
+}
+
+.setup-step h5,
+.setup-step h6 {
+  color: #f0f0f0;
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.code-block {
+  background-color: #1a1a1a;
+  border: 1px solid #333333;
+  border-radius: 6px;
+  padding: 15px;
+  margin: 10px 0;
+  overflow-x: auto;
+  position: relative;
+}
+
+.code-block code {
+  color: #f8f8f2;
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  white-space: pre;
+  display: block;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Enhanced code styling for better readability */
+.code-block code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* Syntax highlighting colors */
+.code-block code .keyword {
+  color: #66d9ef;
+}
+
+.code-block code .string {
+  color: #a6e22e;
+}
+
+.code-block code .comment {
+  color: #75715e;
+  font-style: italic;
+}
+
+/* Copy button styles */
+.copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(1, 117, 194, 0.8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.copy-btn:hover {
+  background-color: rgba(1, 117, 194, 1);
+  transform: translateY(-1px);
+}
+
+.copy-btn i {
+  margin-right: 5px;
+}
+
 /*# sourceMappingURL=style.css.map */

@@ -35,14 +35,64 @@
                 <div class="manual-setup-guide">
                     <h5><i class="fas fa-wrench"></i> Manual Setup Required</h5>
                     <p>After initialization, you'll need to manually configure your main.dart file:</p>
-                    <div class="setup-steps">
-                        <ol>
-                            <li>Import easy_localization in your main.dart</li>
-                            <li>Wrap your app with EasyLocalization widget</li>
-                            <li>Add localization delegates to MaterialApp</li>
-                            <li>Run <code>flutter pub get</code> to install dependencies</li>
-                        </ol>
+
+                    <div class="setup-step">
+                        <h6>1. Import easy_localization</h6>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCodeToClipboard(this)">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <code>import 'package:easy_localization/easy_localization.dart';</code>
+                        </div>
                     </div>
+
+                    <div class="setup-step">
+                        <h6>2. Update your main function</h6>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCodeToClipboard(this)">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <code>void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
+  runApp(
+    EasyLocalization(
+      supportedLocales: [Locale('en', 'US')],
+      path: 'assets/translations',
+      fallbackLocale: Locale('en', 'US'),
+      child: MyApp(),
+    ),
+  );
+}</code>
+                        </div>
+                    </div>
+
+                    <div class="setup-step">
+                        <h6>3. Configure MaterialApp</h6>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCodeToClipboard(this)">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <code>MaterialApp(
+  localizationsDelegates: context.localizationDelegates,
+  supportedLocales: context.supportedLocales,
+  locale: context.locale,
+  // ... other properties
+)</code>
+                        </div>
+                    </div>
+
+                    <div class="setup-step">
+                        <h6>4. Run pub get</h6>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCodeToClipboard(this)">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <code>flutter pub get</code>
+                        </div>
+                    </div>
+
                     <div class="help-link">
                         <a href="https://pub.dev/packages/easy_localization#-configuration-app" target="_blank" class="help-btn">
                             <i class="fas fa-external-link-alt"></i> View Complete Setup Guide
@@ -54,6 +104,80 @@
 
         <div class="localizations-management">
             <p class="section-description">Manage localizations for your Flutter project using easy_localizations. Add, edit, and organize translations for different languages.</p>
+
+            <!-- Setup Guide Panel -->
+            <div class="setup-guide-panel">
+                <div class="guide-header" onclick="toggleSetupGuide()">
+                    <h4><i class="fas fa-book"></i> Main.dart Setup Guide</h4>
+                    <i class="fas fa-chevron-down guide-toggle-icon" id="guide-toggle-icon"></i>
+                </div>
+                <div class="guide-content" id="setup-guide-content">
+                    <p>Configure your main.dart file with the following steps:</p>
+
+                    <div class="setup-step">
+                        <h5>1. Import easy_localization</h5>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCodeToClipboard(this)">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <code>import 'package:easy_localization/easy_localization.dart';</code>
+                        </div>
+                    </div>
+
+                    <div class="setup-step">
+                        <h5>2. Update your main function</h5>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCodeToClipboard(this)">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <code>void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
+  runApp(
+    EasyLocalization(
+      supportedLocales: [Locale('en', 'US'), Locale('es'), Locale('fr')],
+      path: 'assets/translations',
+      fallbackLocale: Locale('en', 'US'),
+      child: MyApp(),
+    ),
+  );
+}</code>
+                        </div>
+                    </div>
+
+                    <div class="setup-step">
+                        <h5>3. Configure MaterialApp</h5>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCodeToClipboard(this)">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <code>MaterialApp(
+  localizationsDelegates: context.localizationDelegates,
+  supportedLocales: context.supportedLocales,
+  locale: context.locale,
+  // ... other properties
+)</code>
+                        </div>
+                    </div>
+
+                    <div class="setup-step">
+                        <h5>4. Run pub get</h5>
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCodeToClipboard(this)">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <code>flutter pub get</code>
+                        </div>
+                    </div>
+
+                    <div class="help-link">
+                        <a href="https://pub.dev/packages/easy_localization#-configuration-app" target="_blank" class="help-btn">
+                            <i class="fas fa-external-link-alt"></i> View Complete Documentation
+                        </a>
+                    </div>
+                </div>
+            </div>
 
             <!-- Localization Summary Container -->
             <div class="localization-summary">
