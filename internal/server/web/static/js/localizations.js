@@ -328,7 +328,94 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showEditTranslationModal(key) {
-        showInfoToast('Edit functionality coming soon!', 'Feature in Development');
+        const keyData = localizationData.translationKeys.find(k => k.key === key);
+        if (!keyData) {
+            showErrorToast('Translation key not found', 'Error');
+            return;
+        }
+
+        // Create modal HTML for editing translations
+        const languages = localizationData.languages;
+        let languageInputsHTML = '';
+
+        languages.forEach(language => {
+            const value = keyData.translations[language.code] || '';
+            languageInputsHTML += `
+                <div class="form-group">
+                    <label for="translation-${language.code}">${language.name} (${language.code}):</label>
+                    <input type="text" id="translation-${language.code}" value="${value}" placeholder="Enter translation for ${language.name}">
+                </div>
+            `;
+        });
+
+        const modalHTML = `
+            <div class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Edit Translations for "${key}"</h3>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-translation-form">
+                            ${languageInputsHTML}
+                            <div class="form-actions">
+                                <button type="button" class="secondary-btn cancel-btn">Cancel</button>
+                                <button type="submit" class="primary-btn">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Add modal to the DOM
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // Get modal elements
+        const modal = document.querySelector('.modal-overlay');
+        const closeBtn = modal.querySelector('.modal-close');
+        const cancelBtn = modal.querySelector('.cancel-btn');
+        const form = modal.querySelector('#edit-translation-form');
+
+        // Close modal function
+        function closeModal() {
+            modal.remove();
+        }
+
+        // Handle close events
+        closeBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+
+        // Handle form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Collect translation values
+            const translations = {};
+            languages.forEach(language => {
+                const input = document.getElementById(`translation-${language.code}`);
+                translations[language.code] = input.value.trim();
+            });
+
+            // Update translations
+            updateTranslations(key, translations);
+            closeModal();
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Handle Escape key
+        document.addEventListener('keydown', function escapeHandler(e) {
+            if (e.key === 'Escape') {
+                document.removeEventListener('keydown', escapeHandler);
+                closeModal();
+            }
+        });
     }
 
     function showDeleteLanguageConfirmation(languageCode) {
@@ -470,6 +557,30 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error deleting translation key:', error);
             showErrorToast('Failed to delete translation key', 'Error');
+        });
+    }
+
+    function updateTranslations(key, translations) {
+        const formData = new FormData();
+        formData.append('translation_key', key);
+        formData.append('translations', JSON.stringify(translations));
+
+        fetch('/api/localizations/update-translations', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessToast(`Translations for "${key}" updated successfully`, 'Success');
+                loadLocalizationData(); // Reload data
+            } else {
+                showErrorToast(data.error || 'Failed to update translations', 'Error');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating translations:', error);
+            showErrorToast('Failed to update translations', 'Error');
         });
     }
 });

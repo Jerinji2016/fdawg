@@ -358,6 +358,112 @@ func setupLocalizationAPIRoutes(project *flutter.ValidationResult) {
 		// Serve the file
 		http.ServeFile(w, r, filePath)
 	})
+
+	// Add translation key endpoint
+	http.HandleFunc("/api/localizations/add-key", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		translationKey := r.FormValue("translation_key")
+		if translationKey == "" {
+			http.Error(w, "Translation key is required", http.StatusBadRequest)
+			return
+		}
+
+		// Add translation key using the localization package
+		err := localization.InsertTranslationKey(project.ProjectPath, translationKey, make(map[string]string))
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   fmt.Sprintf("Failed to add translation key: %v", err),
+			})
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": true,
+			"message": fmt.Sprintf("Translation key %s added successfully", translationKey),
+		})
+	})
+
+	// Delete translation key endpoint
+	http.HandleFunc("/api/localizations/delete-key", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		translationKey := r.FormValue("translation_key")
+		if translationKey == "" {
+			http.Error(w, "Translation key is required", http.StatusBadRequest)
+			return
+		}
+
+		// Delete translation key using the localization package
+		err := localization.DeleteTranslationKey(project.ProjectPath, translationKey)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   fmt.Sprintf("Failed to delete translation key: %v", err),
+			})
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": true,
+			"message": fmt.Sprintf("Translation key %s deleted successfully", translationKey),
+		})
+	})
+
+	// Update translations endpoint
+	http.HandleFunc("/api/localizations/update-translations", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		translationKey := r.FormValue("translation_key")
+		if translationKey == "" {
+			http.Error(w, "Translation key is required", http.StatusBadRequest)
+			return
+		}
+
+		translationsJSON := r.FormValue("translations")
+		if translationsJSON == "" {
+			http.Error(w, "Translations data is required", http.StatusBadRequest)
+			return
+		}
+
+		// Parse translations JSON
+		var translations map[string]string
+		if err := json.Unmarshal([]byte(translationsJSON), &translations); err != nil {
+			http.Error(w, "Invalid translations JSON", http.StatusBadRequest)
+			return
+		}
+
+		// Update translations using the localization package
+		err := localization.InsertTranslationKey(project.ProjectPath, translationKey, translations)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   fmt.Sprintf("Failed to update translations: %v", err),
+			})
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": true,
+			"message": fmt.Sprintf("Translations for %s updated successfully", translationKey),
+		})
+	})
 }
 
 // LocalizationData represents the data structure for localization API responses

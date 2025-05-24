@@ -215,3 +215,105 @@ function showConfirmationToast(message, title, options = {}) {
 
     return toastId;
 }
+
+/**
+ * Show an input dialog modal
+ * @param {string} title - The title for the dialog
+ * @param {string} message - The message to display
+ * @param {string} defaultValue - Default value for the input
+ * @param {string} placeholder - Placeholder text for the input
+ * @param {Function} onConfirm - Callback function when confirmed with the input value
+ * @param {Function} onCancel - Callback function when canceled
+ */
+function showInputDialog(title, message, defaultValue = '', placeholder = '', onConfirm = () => {}, onCancel = () => {}) {
+    // Create modal HTML
+    const modalHTML = `
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>${title}</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>${message}</p>
+                    <div class="form-group">
+                        <input type="text" id="dialog-input" value="${defaultValue}" placeholder="${placeholder}" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="secondary-btn cancel-btn">Cancel</button>
+                        <button type="button" class="primary-btn confirm-btn">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Add modal to the DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Get modal elements
+    const modal = document.querySelector('.modal-overlay');
+    const closeBtn = modal.querySelector('.modal-close');
+    const cancelBtn = modal.querySelector('.cancel-btn');
+    const confirmBtn = modal.querySelector('.confirm-btn');
+    const input = modal.querySelector('#dialog-input');
+
+    // Focus the input
+    setTimeout(() => {
+        input.focus();
+        input.select();
+    }, 100);
+
+    // Close modal function
+    function closeModal() {
+        modal.remove();
+    }
+
+    // Handle close events
+    closeBtn.addEventListener('click', () => {
+        closeModal();
+        onCancel();
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        closeModal();
+        onCancel();
+    });
+
+    // Handle confirm
+    confirmBtn.addEventListener('click', () => {
+        const value = input.value.trim();
+        if (value) {
+            closeModal();
+            onConfirm(value);
+        }
+    });
+
+    // Handle Enter key
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const value = input.value.trim();
+            if (value) {
+                closeModal();
+                onConfirm(value);
+            }
+        }
+    });
+
+    // Handle Escape key
+    document.addEventListener('keydown', function escapeHandler(e) {
+        if (e.key === 'Escape') {
+            document.removeEventListener('keydown', escapeHandler);
+            closeModal();
+            onCancel();
+        }
+    });
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+            onCancel();
+        }
+    });
+}
