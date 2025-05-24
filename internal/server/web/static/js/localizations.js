@@ -20,6 +20,15 @@ document.addEventListener('DOMContentLoaded', function() {
         hasApiKey: false
     };
 
+    // Initialization status
+    let initializationStatus = {
+        isInitialized: false,
+        hasTranslationsDir: false,
+        hasTranslationFiles: false,
+        hasEasyLocalization: false,
+        hasMainDartSetup: false
+    };
+
     // Toggle localization summary section
     const toggleSummaryBtn = document.getElementById('toggle-localization-summary');
     const summaryContent = document.getElementById('localization-summary-content');
@@ -56,9 +65,125 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Load initial data
-    loadLocalizationData();
-    loadTranslationConfig();
-    updateConfigurationUI();
+    loadInitializationStatus();
+
+    // Function to load initialization status
+    function loadInitializationStatus() {
+        fetch('/api/localizations/status')
+            .then(response => response.json())
+            .then(data => {
+                initializationStatus = data;
+                console.log('Initialization status:', initializationStatus);
+
+                if (initializationStatus.isInitialized) {
+                    // Localization is initialized, load normal data
+                    showMainInterface();
+                    loadLocalizationData();
+                    loadTranslationConfig();
+                    updateConfigurationUI();
+                } else {
+                    // Localization is not initialized, show initialization prompt
+                    showInitializationPrompt();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading initialization status:', error);
+                showErrorToast('Failed to check localization status', 'Error');
+                // Show main interface as fallback
+                showMainInterface();
+            });
+    }
+
+    // Function to show the main localization interface
+    function showMainInterface() {
+        const mainInterface = document.querySelector('.localizations-management');
+        const initPrompt = document.getElementById('initialization-prompt');
+
+        if (mainInterface) {
+            mainInterface.style.display = 'block';
+        }
+        if (initPrompt) {
+            initPrompt.style.display = 'none';
+        }
+    }
+
+    // Function to show the initialization prompt
+    function showInitializationPrompt() {
+        const mainInterface = document.querySelector('.localizations-management');
+        const initPrompt = document.getElementById('initialization-prompt');
+
+        if (mainInterface) {
+            mainInterface.style.display = 'none';
+        }
+        if (initPrompt) {
+            initPrompt.style.display = 'block';
+            updateInitializationStatus();
+        }
+    }
+
+    // Function to update initialization status display
+    function updateInitializationStatus() {
+        const statusList = document.getElementById('init-status-list');
+        if (!statusList) return;
+
+        const statusItems = [
+            { key: 'hasTranslationsDir', label: 'Translations directory created' },
+            { key: 'hasTranslationFiles', label: 'Translation files exist' },
+            { key: 'hasEasyLocalization', label: 'easy_localization dependency added' },
+            { key: 'hasMainDartSetup', label: 'main.dart configured for localization' }
+        ];
+
+        let statusHTML = '';
+        statusItems.forEach(item => {
+            const isComplete = initializationStatus[item.key];
+            const iconClass = isComplete ? 'fas fa-check-circle text-success' : 'fas fa-times-circle text-error';
+            statusHTML += `
+                <li class="status-item ${isComplete ? 'complete' : 'incomplete'}">
+                    <i class="${iconClass}"></i>
+                    <span>${item.label}</span>
+                </li>
+            `;
+        });
+
+        statusList.innerHTML = statusHTML;
+    }
+
+    // Function to initialize localization
+    window.initializeLocalization = function() {
+        const initBtn = document.getElementById('init-localization-btn');
+        if (initBtn) {
+            initBtn.disabled = true;
+            initBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing...';
+        }
+
+        fetch('/api/localizations/init', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessToast('Localization initialized successfully! Please run "flutter pub get" to install dependencies.', 'Initialization Complete');
+                // Reload the page to show the main interface
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                showErrorToast(data.error || 'Failed to initialize localization', 'Initialization Failed');
+                if (initBtn) {
+                    initBtn.disabled = false;
+                    initBtn.innerHTML = '<i class="fas fa-cog"></i> Initialize Localization';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error initializing localization:', error);
+            showErrorToast('Failed to initialize localization', 'Error');
+            if (initBtn) {
+                initBtn.disabled = false;
+                initBtn.innerHTML = '<i class="fas fa-cog"></i> Initialize Localization';
+            }
+        });
+    }
 
     // Function to load localization data from the server
     function loadLocalizationData() {

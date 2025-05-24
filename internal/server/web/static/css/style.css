@@ -1844,4 +1844,109 @@ footer {
   }
 }
 
+/* Initialization Prompt Styles */
+.initialization-prompt {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.init-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  border: 2px solid #333333;
+  transition: all 0.3s ease;
+}
+
+.init-header {
+  margin-bottom: 30px;
+}
+
+.init-icon {
+  font-size: 3rem;
+  color: #0175C2;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.init-header h4 {
+  font-size: 1.5rem;
+  color: #f0f0f0;
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+
+.init-header p {
+  color: #b0b0b0;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.init-status {
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.init-status h5 {
+  color: #f0f0f0;
+  margin: 0 0 15px 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.status-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  color: #b0b0b0;
+}
+
+.status-item i {
+  margin-right: 12px;
+  font-size: 1.1rem;
+  width: 20px;
+  text-align: center;
+}
+
+.status-item.complete {
+  color: #4caf50;
+}
+
+.status-item.incomplete {
+  color: #f44336;
+}
+
+.text-success {
+  color: #4caf50 !important;
+}
+
+.text-error {
+  color: #f44336 !important;
+}
+
+.init-actions {
+  text-align: center;
+}
+
+.init-note {
+  margin: 15px 0 0 0;
+  color: #888;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.init-note i {
+  margin-right: 8px;
+  color: #0175C2;
+}
+
 /*# sourceMappingURL=style.css.map */

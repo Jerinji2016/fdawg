@@ -28,6 +28,16 @@ type TranslationFile struct {
 	Data     map[string]interface{} // Translation data
 }
 
+// InitializationStatus represents the localization initialization status
+type InitializationStatus struct {
+	IsInitialized       bool   `json:"isInitialized"`
+	HasTranslationsDir  bool   `json:"hasTranslationsDir"`
+	HasTranslationFiles bool   `json:"hasTranslationFiles"`
+	HasEasyLocalization bool   `json:"hasEasyLocalization"`
+	HasMainDartSetup    bool   `json:"hasMainDartSetup"`
+	ErrorMessage        string `json:"errorMessage,omitempty"`
+}
+
 // InitLocalization initializes localization in a Flutter project
 func InitLocalization(projectPath string) error {
 	// Create translations directory
@@ -67,6 +77,54 @@ func InitLocalization(projectPath string) error {
 	}
 
 	return nil
+}
+
+// IsInitialized checks if localization is properly initialized in the project
+func IsInitialized(projectPath string) InitializationStatus {
+	status := InitializationStatus{}
+
+	// Check if translations directory exists
+	translationsPath := filepath.Join(projectPath, TranslationsDir)
+	if _, err := os.Stat(translationsPath); err == nil {
+		status.HasTranslationsDir = true
+	}
+
+	// Check if translation files exist
+	if status.HasTranslationsDir {
+		translationFiles, err := ListTranslationFiles(projectPath)
+		if err == nil && len(translationFiles) > 0 {
+			status.HasTranslationFiles = true
+		}
+	}
+
+	// Check if pubspec.yaml has easy_localization dependency
+	pubspecPath := filepath.Join(projectPath, "pubspec.yaml")
+	if pubspecData, err := os.ReadFile(pubspecPath); err == nil {
+		pubspecContent := string(pubspecData)
+		if strings.Contains(pubspecContent, "easy_localization:") {
+			status.HasEasyLocalization = true
+		}
+	}
+
+	// Check if main.dart has EasyLocalization setup (only if dependency exists)
+	if status.HasEasyLocalization {
+		mainDartPath := filepath.Join(projectPath, "lib", "main.dart")
+		if mainDartData, err := os.ReadFile(mainDartPath); err == nil {
+			mainDartContent := string(mainDartData)
+			if strings.Contains(mainDartContent, "EasyLocalization(") &&
+				strings.Contains(mainDartContent, "import 'package:easy_localization/easy_localization.dart';") {
+				status.HasMainDartSetup = true
+			}
+		}
+	}
+
+	// Determine if fully initialized
+	status.IsInitialized = status.HasTranslationsDir &&
+		status.HasTranslationFiles &&
+		status.HasEasyLocalization &&
+		status.HasMainDartSetup
+
+	return status
 }
 
 // AddLanguage adds a new language to the project

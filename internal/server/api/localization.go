@@ -46,6 +46,44 @@ type LocalizationStats struct {
 
 // SetupLocalizationAPIRoutes sets up the localization API routes
 func SetupLocalizationAPIRoutes(project *flutter.ValidationResult) {
+	// Check initialization status
+	http.HandleFunc("/api/localizations/status", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		status := localization.IsInitialized(project.ProjectPath)
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(status)
+	})
+
+	// Initialize localization
+	http.HandleFunc("/api/localizations/init", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		// Initialize localization
+		err := localization.InitLocalization(project.ProjectPath)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   fmt.Sprintf("Failed to initialize localization: %v", err),
+			})
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": true,
+			"message": "Localization initialized successfully",
+		})
+	})
+
 	// Get localization data
 	http.HandleFunc("/api/localizations/data", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {

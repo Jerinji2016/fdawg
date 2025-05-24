@@ -5,6 +5,35 @@
             <span><i class="fas fa-language"></i> Localizations</span>
             <i class="fas fa-ellipsis-h"></i>
         </h3>
+
+        <!-- Initialization Prompt (shown when localization is not initialized) -->
+        <div id="initialization-prompt" class="initialization-prompt" style="display: none;">
+            <div class="init-card">
+                <div class="init-header">
+                    <i class="fas fa-language init-icon"></i>
+                    <h4>Initialize Localization</h4>
+                    <p>Localization is not set up for this Flutter project. Initialize it to start managing translations.</p>
+                </div>
+
+                <div class="init-status">
+                    <h5>Setup Requirements:</h5>
+                    <ul id="init-status-list" class="status-list">
+                        <!-- Status items will be populated by JavaScript -->
+                    </ul>
+                </div>
+
+                <div class="init-actions">
+                    <button id="init-localization-btn" class="primary-btn" onclick="initializeLocalization()">
+                        <i class="fas fa-cog"></i> Initialize Localization
+                    </button>
+                    <p class="init-note">
+                        <i class="fas fa-info-circle"></i>
+                        This will add easy_localization dependency, create translation files, and configure your Flutter app.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <div class="localizations-management">
             <p class="section-description">Manage localizations for your Flutter project using easy_localizations. Add, edit, and organize translations for different languages.</p>
 
