@@ -291,8 +291,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const keyInput = cell.querySelector('.key-input');
             const saveBtn = cell.querySelector('.save-key-btn');
 
-            // Double-click to edit key
-            keyText.addEventListener('dblclick', function() {
+            // Double-click to edit key (whole cell clickable)
+            cell.addEventListener('dblclick', function(e) {
+                // Prevent editing if already in edit mode or clicking on save button
+                if (cell.classList.contains('editing') || e.target.classList.contains('save-key-btn')) {
+                    return;
+                }
                 enterEditMode(cell, keyText, keyInput, saveBtn);
             });
 
@@ -329,8 +333,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const translationInput = cell.querySelector('.translation-input');
             const saveBtn = cell.querySelector('.save-translation-btn');
 
-            // Double-click to edit translation
-            translationText.addEventListener('dblclick', function() {
+            // Double-click to edit translation (whole cell clickable)
+            cell.addEventListener('dblclick', function(e) {
+                // Prevent editing if already in edit mode or clicking on save button
+                if (cell.classList.contains('editing') || e.target.classList.contains('save-translation-btn')) {
+                    return;
+                }
                 enterEditMode(cell, translationText, translationInput, saveBtn);
             });
 

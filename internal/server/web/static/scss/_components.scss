@@ -496,6 +496,12 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         white-space: nowrap; // Prevent text wrapping to maintain table structure
         min-width: 120px; // Minimum width for each column
+        vertical-align: top; // Align content to top for better text wrapping
+      }
+
+      // Allow text wrapping for editable cells
+      .editable-key, .editable-translation {
+        white-space: normal !important;
       }
 
       th {
@@ -605,9 +611,32 @@
 .editable-key, .editable-translation {
   position: relative;
   cursor: pointer;
+  max-width: 200px;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
 
   &:hover:not(.editing) {
     background-color: rgba(255, 255, 255, 0.03);
+
+    // Add hover hint
+    &::after {
+      content: "Double-click to edit";
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      animation: fadeInTooltip 0.3s ease forwards;
+    }
   }
 
   &.editing {
@@ -640,6 +669,28 @@
         transform: translateY(-1px);
       }
     }
+  }
+}
+
+// Special styling for key column
+.editable-key {
+  max-width: 250px;
+
+  .key-text {
+    word-wrap: break-word;
+    word-break: break-word;
+  }
+}
+
+// Tooltip fade-in animation
+@keyframes fadeInTooltip {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 }
 
