@@ -28,8 +28,26 @@
                     </button>
                     <p class="init-note">
                         <i class="fas fa-info-circle"></i>
-                        This will add easy_localization dependency, create translation files, and configure your Flutter app.
+                        This will add easy_localization dependency, create translation files, and configure iOS Info.plist.
                     </p>
+                </div>
+
+                <div class="manual-setup-guide">
+                    <h5><i class="fas fa-wrench"></i> Manual Setup Required</h5>
+                    <p>After initialization, you'll need to manually configure your main.dart file:</p>
+                    <div class="setup-steps">
+                        <ol>
+                            <li>Import easy_localization in your main.dart</li>
+                            <li>Wrap your app with EasyLocalization widget</li>
+                            <li>Add localization delegates to MaterialApp</li>
+                            <li>Run <code>flutter pub get</code> to install dependencies</li>
+                        </ol>
+                    </div>
+                    <div class="help-link">
+                        <a href="https://pub.dev/packages/easy_localization#-configuration-app" target="_blank" class="help-btn">
+                            <i class="fas fa-external-link-alt"></i> View Complete Setup Guide
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

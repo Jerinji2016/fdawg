@@ -34,7 +34,7 @@ type InitializationStatus struct {
 	HasTranslationsDir  bool   `json:"hasTranslationsDir"`
 	HasTranslationFiles bool   `json:"hasTranslationFiles"`
 	HasEasyLocalization bool   `json:"hasEasyLocalization"`
-	HasMainDartSetup    bool   `json:"hasMainDartSetup"`
+	HasIOSConfig        bool   `json:"hasIOSConfig"`
 	ErrorMessage        string `json:"errorMessage,omitempty"`
 }
 
@@ -71,9 +71,10 @@ func InitLocalization(projectPath string) error {
 		return fmt.Errorf("failed to update pubspec.yaml: %v", err)
 	}
 
-	// Update main.dart to initialize easy_localization
-	if err := updateMainDartForLocalization(projectPath, defaultLang); err != nil {
-		return fmt.Errorf("failed to update main.dart: %v", err)
+	// Update iOS Info.plist for localization
+	if err := updateIOSInfoPlistForLocalization(projectPath, defaultLang); err != nil {
+		utils.Info("Warning: Failed to update iOS Info.plist: %v", err)
+		// Don't fail the initialization if iOS config fails
 	}
 
 	return nil
@@ -106,23 +107,19 @@ func IsInitialized(projectPath string) InitializationStatus {
 		}
 	}
 
-	// Check if main.dart has EasyLocalization setup (only if dependency exists)
-	if status.HasEasyLocalization {
-		mainDartPath := filepath.Join(projectPath, "lib", "main.dart")
-		if mainDartData, err := os.ReadFile(mainDartPath); err == nil {
-			mainDartContent := string(mainDartData)
-			if strings.Contains(mainDartContent, "EasyLocalization(") &&
-				strings.Contains(mainDartContent, "import 'package:easy_localization/easy_localization.dart';") {
-				status.HasMainDartSetup = true
-			}
+	// Check if iOS Info.plist has localization configuration
+	iosInfoPlistPath := filepath.Join(projectPath, "ios", "Runner", "Info.plist")
+	if infoPlistData, err := os.ReadFile(iosInfoPlistPath); err == nil {
+		infoPlistContent := string(infoPlistData)
+		if strings.Contains(infoPlistContent, "CFBundleLocalizations") {
+			status.HasIOSConfig = true
 		}
 	}
 
-	// Determine if fully initialized
+	// Determine if fully initialized (iOS config is optional)
 	status.IsInitialized = status.HasTranslationsDir &&
 		status.HasTranslationFiles &&
-		status.HasEasyLocalization &&
-		status.HasMainDartSetup
+		status.HasEasyLocalization
 
 	return status
 }
@@ -175,9 +172,10 @@ func AddLanguage(projectPath, languageCode string) error {
 		return fmt.Errorf("failed to create translation file: %v", err)
 	}
 
-	// Update main.dart to add the new language
-	if err := addLanguageToMainDart(projectPath, formattedCode); err != nil {
-		return fmt.Errorf("failed to update main.dart: %v", err)
+	// Update iOS Info.plist to add the new language
+	if err := addLanguageToIOSInfoPlist(projectPath, formattedCode); err != nil {
+		utils.Info("Warning: Failed to update iOS Info.plist: %v", err)
+		// Don't fail if iOS config fails
 	}
 
 	return nil
@@ -218,10 +216,14 @@ func RemoveLanguage(projectPath, languageCode string) error {
 		return fmt.Errorf("failed to remove translation file: %v", err)
 	}
 
-	// Update main.dart to remove the language
-	if err := removeLanguageFromMainDart(projectPath, formattedCode); err != nil {
-		return fmt.Errorf("failed to update main.dart: %v", err)
+	// Update iOS Info.plist to remove the language
+	if err := removeLanguageFromIOSInfoPlist(projectPath, formattedCode); err != nil {
+		utils.Info("Warning: Failed to update iOS Info.plist: %v", err)
+		// Don't fail if iOS config fails
 	}
+
+	utils.Info("Language %s removed from translation files", formattedCode)
+	utils.Info("Note: You may want to manually remove the language from main.dart if no longer needed")
 
 	return nil
 }
@@ -622,295 +624,214 @@ func updatePubspecForLocalization(projectPath string) error {
 	return nil
 }
 
-// updateMainDartForLocalization updates the main.dart file to initialize easy_localization
-func updateMainDartForLocalization(projectPath, defaultLang string) error {
-	mainDartPath := filepath.Join(projectPath, "lib", "main.dart")
+// updateIOSInfoPlistForLocalization updates the iOS Info.plist file to add localization support
+func updateIOSInfoPlistForLocalization(projectPath, defaultLang string) error {
+	iosInfoPlistPath := filepath.Join(projectPath, "ios", "Runner", "Info.plist")
 
-	// Read the main.dart file
-	mainDartData, err := os.ReadFile(mainDartPath)
+	// Check if iOS directory exists
+	if _, err := os.Stat(filepath.Join(projectPath, "ios")); os.IsNotExist(err) {
+		return fmt.Errorf("iOS directory not found")
+	}
+
+	// Read the Info.plist file
+	infoPlistData, err := os.ReadFile(iosInfoPlistPath)
 	if err != nil {
-		return fmt.Errorf("failed to read main.dart: %v", err)
+		return fmt.Errorf("failed to read Info.plist: %v", err)
 	}
 
-	mainDartContent := string(mainDartData)
+	infoPlistContent := string(infoPlistData)
 
-	// Check if easy_localization is already imported
-	if strings.Contains(mainDartContent, "import 'package:easy_localization/easy_localization.dart';") {
-		utils.Info("easy_localization is already imported in main.dart")
-	} else {
-		// Add import statement
-		importIndex := strings.LastIndex(mainDartContent, "import ")
-		if importIndex == -1 {
-			// No imports found, add at the beginning
-			mainDartContent = "import 'package:easy_localization/easy_localization.dart';\n" + mainDartContent
-		} else {
-			// Find the end of the import section
-			endOfImports := strings.Index(mainDartContent[importIndex:], "\n\n")
-			if endOfImports == -1 {
-				// No clear end of imports, add after the last import
-				endOfLine := strings.Index(mainDartContent[importIndex:], "\n")
-				if endOfLine == -1 {
-					mainDartContent = mainDartContent + "\nimport 'package:easy_localization/easy_localization.dart';\n"
-				} else {
-					insertPos := importIndex + endOfLine + 1
-					mainDartContent = mainDartContent[:insertPos] + "import 'package:easy_localization/easy_localization.dart';\n" + mainDartContent[insertPos:]
-				}
-			} else {
-				// Add at the end of the import section
-				insertPos := importIndex + endOfImports + 1
-				mainDartContent = mainDartContent[:insertPos] + "import 'package:easy_localization/easy_localization.dart';\n" + mainDartContent[insertPos:]
-			}
-		}
+	// Check if CFBundleLocalizations is already present
+	if strings.Contains(infoPlistContent, "CFBundleLocalizations") {
+		utils.Info("CFBundleLocalizations already exists in Info.plist")
+		return nil
 	}
 
-	// Check if EasyLocalization is already wrapped around the app
-	if strings.Contains(mainDartContent, "EasyLocalization(") {
-		utils.Info("EasyLocalization is already initialized in main.dart")
-	} else {
-		// Find the MaterialApp or similar widget
-		appIndex := strings.Index(mainDartContent, "MaterialApp(")
-		if appIndex == -1 {
-			appIndex = strings.Index(mainDartContent, "CupertinoApp(")
-		}
-		if appIndex == -1 {
-			appIndex = strings.Index(mainDartContent, "WidgetsApp(")
-		}
-
-		if appIndex == -1 {
-			return fmt.Errorf("could not find app widget in main.dart")
-		}
-
-		// Find the beginning of the widget tree
-		runAppIndex := strings.LastIndex(mainDartContent[:appIndex], "runApp(")
-		if runAppIndex == -1 {
-			return fmt.Errorf("could not find runApp in main.dart")
-		}
-
-		// Find the widget being passed to runApp
-		openParenCount := 1
-		closeParenIndex := -1
-		for i := runAppIndex + 7; i < len(mainDartContent); i++ {
-			if mainDartContent[i] == '(' {
-				openParenCount++
-			} else if mainDartContent[i] == ')' {
-				openParenCount--
-				if openParenCount == 0 {
-					closeParenIndex = i
-					break
-				}
-			}
-		}
-
-		if closeParenIndex == -1 {
-			return fmt.Errorf("could not find matching parenthesis for runApp in main.dart")
-		}
-
-		// Extract the widget being passed to runApp
-		widgetCode := mainDartContent[runAppIndex+7 : closeParenIndex]
-
-		// Wrap with EasyLocalization
-		easyLocalizationCode := fmt.Sprintf("EasyLocalization(\n      supportedLocales: [Locale('%s')],\n      path: 'assets/translations',\n      fallbackLocale: Locale('%s'),\n      child: %s\n    )", defaultLang, defaultLang, widgetCode)
-
-		// Replace the original widget with the wrapped one
-		mainDartContent = mainDartContent[:runAppIndex+7] + easyLocalizationCode + mainDartContent[closeParenIndex:]
-
-		// Add localization delegate to the app widget
-		localizationDelegates := "localizationsDelegates: context.localizationDelegates,\n      supportedLocales: context.supportedLocales,\n      locale: context.locale,"
-
-		// Find where to insert the localization delegates
-		appWidgetStart := strings.Index(mainDartContent, "MaterialApp(")
-		if appWidgetStart == -1 {
-			appWidgetStart = strings.Index(mainDartContent, "CupertinoApp(")
-		}
-		if appWidgetStart == -1 {
-			appWidgetStart = strings.Index(mainDartContent, "WidgetsApp(")
-		}
-
-		if appWidgetStart != -1 {
-			// Find the first property of the app widget
-			appWidgetOpenParen := appWidgetStart + strings.Index(mainDartContent[appWidgetStart:], "(") + 1
-			insertPos := appWidgetOpenParen
-
-			// Insert after the opening parenthesis
-			mainDartContent = mainDartContent[:insertPos] + "\n      " + localizationDelegates + mainDartContent[insertPos:]
-		}
+	// Find the closing </dict> tag before </plist>
+	plistEndIndex := strings.LastIndex(infoPlistContent, "</plist>")
+	if plistEndIndex == -1 {
+		return fmt.Errorf("could not find </plist> tag in Info.plist")
 	}
 
-	// Update the main function to be async if it's not already
-	mainFuncIndex := strings.Index(mainDartContent, "void main(")
-	if mainFuncIndex != -1 {
-		// Check if it's already async
-		if !strings.Contains(mainDartContent[mainFuncIndex:mainFuncIndex+50], "async") {
-			// Find the opening brace of the main function
-			openBraceIndex := strings.Index(mainDartContent[mainFuncIndex:], "{")
-			if openBraceIndex != -1 {
-				insertPos := mainFuncIndex + openBraceIndex
-
-				// Add async keyword and await EasyLocalization.ensureInitialized()
-				asyncCode := " async {\n  await EasyLocalization.ensureInitialized();\n"
-				mainDartContent = mainDartContent[:insertPos] + asyncCode + mainDartContent[insertPos+1:]
-			}
-		} else if !strings.Contains(mainDartContent, "await EasyLocalization.ensureInitialized()") {
-			// If it's already async but doesn't have the initialization
-			openBraceIndex := strings.Index(mainDartContent[mainFuncIndex:], "{")
-			if openBraceIndex != -1 {
-				insertPos := mainFuncIndex + openBraceIndex + 1
-
-				// Add await EasyLocalization.ensureInitialized()
-				initCode := "\n  await EasyLocalization.ensureInitialized();\n"
-				mainDartContent = mainDartContent[:insertPos] + initCode + mainDartContent[insertPos:]
-			}
-		}
+	dictEndIndex := strings.LastIndex(infoPlistContent[:plistEndIndex], "</dict>")
+	if dictEndIndex == -1 {
+		return fmt.Errorf("could not find </dict> tag in Info.plist")
 	}
 
-	// Write the updated main.dart file
-	if err := os.WriteFile(mainDartPath, []byte(mainDartContent), 0644); err != nil {
-		return fmt.Errorf("failed to write main.dart: %v", err)
+	// Extract language code from defaultLang (e.g., "en_US" -> "en")
+	langCode := strings.Split(defaultLang, "_")[0]
+
+	// Create the CFBundleLocalizations entry
+	localizationsEntry := fmt.Sprintf("\t<key>CFBundleLocalizations</key>\n\t<array>\n\t\t<string>%s</string>\n\t</array>\n", langCode)
+
+	// Insert before the closing </dict> tag
+	infoPlistContent = infoPlistContent[:dictEndIndex] + localizationsEntry + infoPlistContent[dictEndIndex:]
+
+	// Write the updated Info.plist file
+	if err := os.WriteFile(iosInfoPlistPath, []byte(infoPlistContent), 0644); err != nil {
+		return fmt.Errorf("failed to write Info.plist: %v", err)
 	}
 
 	return nil
 }
 
-// addLanguageToMainDart adds a language to the main.dart file
-func addLanguageToMainDart(projectPath, langCode string) error {
-	mainDartPath := filepath.Join(projectPath, "lib", "main.dart")
+// addLanguageToIOSInfoPlist adds a language to the iOS Info.plist file
+func addLanguageToIOSInfoPlist(projectPath, langCode string) error {
+	iosInfoPlistPath := filepath.Join(projectPath, "ios", "Runner", "Info.plist")
 
-	// Read the main.dart file
-	mainDartData, err := os.ReadFile(mainDartPath)
+	// Check if iOS directory exists
+	if _, err := os.Stat(filepath.Join(projectPath, "ios")); os.IsNotExist(err) {
+		return fmt.Errorf("iOS directory not found")
+	}
+
+	// Read the Info.plist file
+	infoPlistData, err := os.ReadFile(iosInfoPlistPath)
 	if err != nil {
-		return fmt.Errorf("failed to read main.dart: %v", err)
+		return fmt.Errorf("failed to read Info.plist: %v", err)
 	}
 
-	mainDartContent := string(mainDartData)
+	infoPlistContent := string(infoPlistData)
 
-	// Find the supportedLocales property
-	supportedLocalesIndex := strings.Index(mainDartContent, "supportedLocales: [")
-	if supportedLocalesIndex == -1 {
-		return fmt.Errorf("could not find supportedLocales in main.dart")
+	// Extract language code from langCode (e.g., "en_US" -> "en")
+	langCodeParts := strings.Split(langCode, "_")
+	localeCode := langCodeParts[0]
+
+	// Check if CFBundleLocalizations exists
+	if !strings.Contains(infoPlistContent, "CFBundleLocalizations") {
+		// If it doesn't exist, create it with the new language
+		return updateIOSInfoPlistForLocalization(projectPath, langCode)
 	}
-
-	// Find the end of the supportedLocales array
-	endBracketIndex := strings.Index(mainDartContent[supportedLocalesIndex:], "]")
-	if endBracketIndex == -1 {
-		return fmt.Errorf("could not find end of supportedLocales array in main.dart")
-	}
-
-	// Extract the current supportedLocales
-	supportedLocalesArray := mainDartContent[supportedLocalesIndex+18 : supportedLocalesIndex+endBracketIndex]
 
 	// Check if the language is already in the array
-	langCodeParts := strings.Split(langCode, "_")
-	localeCode := langCodeParts[0]
-	countryCode := ""
-	if len(langCodeParts) > 1 {
-		countryCode = langCodeParts[1]
-	}
-
-	localeStr := fmt.Sprintf("Locale('%s'", localeCode)
-	if countryCode != "" {
-		localeStr += fmt.Sprintf(", '%s'", countryCode)
-	}
-	localeStr += ")"
-
-	if strings.Contains(supportedLocalesArray, localeStr) {
-		utils.Info("Language %s is already in supportedLocales", langCode)
+	if strings.Contains(infoPlistContent, fmt.Sprintf("<string>%s</string>", localeCode)) {
+		utils.Info("Language %s is already in CFBundleLocalizations", localeCode)
 		return nil
 	}
 
-	// Add the new locale to the array
-	if strings.TrimSpace(supportedLocalesArray) == "" {
-		// Empty array
-		newSupportedLocales := localeStr
-		mainDartContent = mainDartContent[:supportedLocalesIndex+18] + newSupportedLocales + mainDartContent[supportedLocalesIndex+endBracketIndex:]
-	} else {
-		// Add to existing array
-		newSupportedLocales := supportedLocalesArray + ", " + localeStr
-		mainDartContent = mainDartContent[:supportedLocalesIndex+18] + newSupportedLocales + mainDartContent[supportedLocalesIndex+endBracketIndex:]
+	// Find the CFBundleLocalizations array
+	arrayStartIndex := strings.Index(infoPlistContent, "<key>CFBundleLocalizations</key>")
+	if arrayStartIndex == -1 {
+		return fmt.Errorf("could not find CFBundleLocalizations key in Info.plist")
 	}
 
-	// Write the updated main.dart file
-	if err := os.WriteFile(mainDartPath, []byte(mainDartContent), 0644); err != nil {
-		return fmt.Errorf("failed to write main.dart: %v", err)
+	arrayStartIndex = strings.Index(infoPlistContent[arrayStartIndex:], "<array>") + arrayStartIndex
+	if arrayStartIndex == -1 {
+		return fmt.Errorf("could not find CFBundleLocalizations array in Info.plist")
+	}
+
+	arrayEndIndex := strings.Index(infoPlistContent[arrayStartIndex:], "</array>") + arrayStartIndex
+	if arrayEndIndex == -1 {
+		return fmt.Errorf("could not find end of CFBundleLocalizations array in Info.plist")
+	}
+
+	// Add the new language before the closing </array> tag
+	newLanguageEntry := fmt.Sprintf("\t\t<string>%s</string>\n\t", localeCode)
+	infoPlistContent = infoPlistContent[:arrayEndIndex] + newLanguageEntry + infoPlistContent[arrayEndIndex:]
+
+	// Write the updated Info.plist file
+	if err := os.WriteFile(iosInfoPlistPath, []byte(infoPlistContent), 0644); err != nil {
+		return fmt.Errorf("failed to write Info.plist: %v", err)
 	}
 
 	return nil
 }
 
-// removeLanguageFromMainDart removes a language from the main.dart file
-func removeLanguageFromMainDart(projectPath, langCode string) error {
-	mainDartPath := filepath.Join(projectPath, "lib", "main.dart")
+// removeLanguageFromIOSInfoPlist removes a language from the iOS Info.plist file
+func removeLanguageFromIOSInfoPlist(projectPath, langCode string) error {
+	iosInfoPlistPath := filepath.Join(projectPath, "ios", "Runner", "Info.plist")
 
-	// Read the main.dart file
-	mainDartData, err := os.ReadFile(mainDartPath)
+	// Check if iOS directory exists
+	if _, err := os.Stat(filepath.Join(projectPath, "ios")); os.IsNotExist(err) {
+		return fmt.Errorf("iOS directory not found")
+	}
+
+	// Read the Info.plist file
+	infoPlistData, err := os.ReadFile(iosInfoPlistPath)
 	if err != nil {
-		return fmt.Errorf("failed to read main.dart: %v", err)
+		return fmt.Errorf("failed to read Info.plist: %v", err)
 	}
 
-	mainDartContent := string(mainDartData)
+	infoPlistContent := string(infoPlistData)
 
-	// Find the supportedLocales property
-	supportedLocalesIndex := strings.Index(mainDartContent, "supportedLocales: [")
-	if supportedLocalesIndex == -1 {
-		return fmt.Errorf("could not find supportedLocales in main.dart")
-	}
-
-	// Find the end of the supportedLocales array
-	endBracketIndex := strings.Index(mainDartContent[supportedLocalesIndex:], "]")
-	if endBracketIndex == -1 {
-		return fmt.Errorf("could not find end of supportedLocales array in main.dart")
-	}
-
-	// Calculate the absolute position of the end bracket
-	endBracketAbsIndex := supportedLocalesIndex + endBracketIndex
-
-	// Extract the current supportedLocales
-	supportedLocalesArray := mainDartContent[supportedLocalesIndex+18 : endBracketAbsIndex]
-
-	// Parse the language code
+	// Extract language code from langCode (e.g., "en_US" -> "en")
 	langCodeParts := strings.Split(langCode, "_")
 	localeCode := langCodeParts[0]
-	countryCode := ""
-	if len(langCodeParts) > 1 {
-		countryCode = langCodeParts[1]
-	}
 
-	// Create the locale string to remove
-	localeStr := fmt.Sprintf("Locale('%s'", localeCode)
-	if countryCode != "" {
-		localeStr += fmt.Sprintf(", '%s'", countryCode)
-	}
-	localeStr += ")"
-
-	// Check if the language is in the array
-	if !strings.Contains(supportedLocalesArray, localeStr) {
-		utils.Info("Language %s is not in supportedLocales", langCode)
+	// Check if CFBundleLocalizations exists
+	if !strings.Contains(infoPlistContent, "CFBundleLocalizations") {
+		utils.Info("CFBundleLocalizations not found in Info.plist")
 		return nil
 	}
 
-	// A more robust approach: split the array by commas, remove the locale, and join back
-	locales := strings.Split(supportedLocalesArray, ",")
-	var newLocales []string
+	// Check if the language is in the array
+	languageEntry := fmt.Sprintf("<string>%s</string>", localeCode)
+	if !strings.Contains(infoPlistContent, languageEntry) {
+		utils.Info("Language %s is not in CFBundleLocalizations", localeCode)
+		return nil
+	}
 
-	for _, locale := range locales {
-		trimmedLocale := strings.TrimSpace(locale)
-		if trimmedLocale != localeStr {
-			newLocales = append(newLocales, locale)
+	// Find and remove the language entry
+	// Look for the entry with proper indentation and newlines
+	patterns := []string{
+		fmt.Sprintf("\t\t\t<string>%s</string>\n", localeCode),
+		fmt.Sprintf("\t\t<string>%s</string>\n", localeCode),
+		fmt.Sprintf("\t<string>%s</string>\n", localeCode),
+		fmt.Sprintf("		<string>%s</string>\n", localeCode),  // tab characters
+		fmt.Sprintf("			<string>%s</string>\n", localeCode), // more tabs
+	}
+
+	removed := false
+	for _, pattern := range patterns {
+		if strings.Contains(infoPlistContent, pattern) {
+			infoPlistContent = strings.Replace(infoPlistContent, pattern, "", 1)
+			removed = true
+			break
 		}
 	}
 
-	// Join the remaining locales
-	var newSupportedLocales string
-	if len(newLocales) > 0 {
-		newSupportedLocales = strings.Join(newLocales, ",")
+	// If none of the patterns matched, try a more flexible approach
+	if !removed {
+		// Find the CFBundleLocalizations array
+		arrayStartIndex := strings.Index(infoPlistContent, "<key>CFBundleLocalizations</key>")
+		if arrayStartIndex == -1 {
+			return fmt.Errorf("could not find CFBundleLocalizations key in Info.plist")
+		}
+
+		arrayStartIndex = strings.Index(infoPlistContent[arrayStartIndex:], "<array>") + arrayStartIndex
+		if arrayStartIndex == -1 {
+			return fmt.Errorf("could not find CFBundleLocalizations array in Info.plist")
+		}
+
+		arrayEndIndex := strings.Index(infoPlistContent[arrayStartIndex:], "</array>") + arrayStartIndex
+		if arrayEndIndex == -1 {
+			return fmt.Errorf("could not find end of CFBundleLocalizations array in Info.plist")
+		}
+
+		// Extract the array content
+		arrayContent := infoPlistContent[arrayStartIndex+7 : arrayEndIndex] // +7 for "<array>"
+
+		// Split by lines and filter out the language
+		lines := strings.Split(arrayContent, "\n")
+		var newLines []string
+
+		for _, line := range lines {
+			if !strings.Contains(line, fmt.Sprintf("<string>%s</string>", localeCode)) {
+				newLines = append(newLines, line)
+			}
+		}
+
+		// Reconstruct the array content
+		newArrayContent := strings.Join(newLines, "\n")
+
+		// Replace the old array content with the new one
+		infoPlistContent = infoPlistContent[:arrayStartIndex+7] + newArrayContent + infoPlistContent[arrayEndIndex:]
 	}
 
-	// Replace the old array with the new one
-	mainDartContent = mainDartContent[:supportedLocalesIndex+18] + newSupportedLocales + mainDartContent[endBracketAbsIndex:]
-
-	// Write the updated main.dart file
-	if err := os.WriteFile(mainDartPath, []byte(mainDartContent), 0644); err != nil {
-		return fmt.Errorf("failed to write main.dart: %v", err)
+	// Write the updated Info.plist file
+	if err := os.WriteFile(iosInfoPlistPath, []byte(infoPlistContent), 0644); err != nil {
+		return fmt.Errorf("failed to write Info.plist: %v", err)
 	}
 
+	utils.Info("Language %s removed from iOS Info.plist", localeCode)
 	return nil
 }

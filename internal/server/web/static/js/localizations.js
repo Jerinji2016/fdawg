@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hasTranslationsDir: false,
         hasTranslationFiles: false,
         hasEasyLocalization: false,
-        hasMainDartSetup: false
+        hasIOSConfig: false
     };
 
     // Toggle localization summary section
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
             { key: 'hasTranslationsDir', label: 'Translations directory created' },
             { key: 'hasTranslationFiles', label: 'Translation files exist' },
             { key: 'hasEasyLocalization', label: 'easy_localization dependency added' },
-            { key: 'hasMainDartSetup', label: 'main.dart configured for localization' }
+            { key: 'hasIOSConfig', label: 'iOS Info.plist configured (optional)' }
         ];
 
         let statusHTML = '';
