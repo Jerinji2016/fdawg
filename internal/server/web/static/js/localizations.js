@@ -110,7 +110,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to update language cards
     function updateLanguageCards() {
         const languageCardsContainer = document.getElementById('language-cards');
-        const languages = localizationData.languages;
+
+        // Sort languages alphabetically by name
+        const languages = [...localizationData.languages].sort((a, b) => a.name.localeCompare(b.name));
 
         if (languages.length === 0) {
             languageCardsContainer.innerHTML = `
@@ -196,8 +198,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const table = document.getElementById('translation-table');
         const tbody = document.getElementById('translation-table-body');
         const noDataMessage = document.getElementById('no-translations-message');
-        const languages = localizationData.languages;
-        const translationKeys = localizationData.translationKeys;
+
+        // Sort languages alphabetically by name
+        const languages = [...localizationData.languages].sort((a, b) => a.name.localeCompare(b.name));
+
+        // Sort translation keys alphabetically by key
+        const translationKeys = [...localizationData.translationKeys].sort((a, b) => a.key.localeCompare(b.key));
 
         // Update table headers
         updateTableHeaders(table, languages);
@@ -217,10 +223,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 <tr data-key="${keyData.key}">
                     <td class="editable-key" data-original-key="${keyData.key}" title="Double-click to edit key">
                         <span class="key-text">${keyData.key}</span>
-                        <input type="text" class="key-input" value="${keyData.key}" style="display: none;">
-                        <button class="table-btn save-key-btn" style="display: none;" title="Save key">
-                            <i class="fas fa-check"></i>
-                        </button>
+                        <button class="expand-btn" style="display: none;">...</button>
+                        <div class="edit-container" style="display: none;">
+                            <textarea class="key-input" rows="3">${keyData.key}</textarea>
+                            <button class="table-btn save-key-btn" title="Save key">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
                     </td>
             `;
 
@@ -234,10 +243,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         data-language="${language.code}"
                         title="Double-click to edit translation">
                         <span class="translation-text">${isEmpty ? '<em>Missing</em>' : value}</span>
-                        <input type="text" class="translation-input" value="${value}" style="display: none;">
-                        <button class="table-btn save-translation-btn" style="display: none;" title="Save translation">
-                            <i class="fas fa-check"></i>
-                        </button>
+                        <button class="expand-btn" style="display: none;">...</button>
+                        <div class="edit-container" style="display: none;">
+                            <textarea class="translation-input" rows="3">${value}</textarea>
+                            <button class="table-btn save-translation-btn" title="Save translation">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
             });
@@ -256,6 +268,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Add event listeners to table elements
         addTableEventListeners();
+
+        // Check for text overflow and add expand buttons (with delay to ensure DOM is rendered)
+        setTimeout(() => {
+            checkTextOverflow();
+        }, 100);
     }
 
     // Function to update table headers
@@ -288,16 +305,20 @@ document.addEventListener('DOMContentLoaded', function() {
         // Editable key cells
         document.querySelectorAll('.editable-key').forEach(cell => {
             const keyText = cell.querySelector('.key-text');
+            const editContainer = cell.querySelector('.edit-container');
             const keyInput = cell.querySelector('.key-input');
             const saveBtn = cell.querySelector('.save-key-btn');
+            const expandBtn = cell.querySelector('.expand-btn');
 
             // Double-click to edit key (whole cell clickable)
             cell.addEventListener('dblclick', function(e) {
-                // Prevent editing if already in edit mode or clicking on save button
-                if (cell.classList.contains('editing') || e.target.classList.contains('save-key-btn')) {
+                // Prevent editing if already in edit mode or clicking on buttons
+                if (cell.classList.contains('editing') ||
+                    e.target.classList.contains('save-key-btn') ||
+                    e.target.classList.contains('expand-btn')) {
                     return;
                 }
-                enterEditMode(cell, keyText, keyInput, saveBtn);
+                enterEditMode(cell, keyText, editContainer, keyInput, saveBtn);
             });
 
             // Save key button
@@ -305,9 +326,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const originalKey = cell.getAttribute('data-original-key');
                 const newKey = keyInput.value.trim();
                 if (newKey && newKey !== originalKey) {
-                    updateTranslationKey(originalKey, newKey, cell, keyText, keyInput, saveBtn);
+                    updateTranslationKey(originalKey, newKey, cell, keyText, editContainer, keyInput, saveBtn);
                 } else {
-                    exitEditMode(cell, keyText, keyInput, saveBtn, originalKey);
+                    exitEditMode(cell, keyText, editContainer, keyInput, saveBtn, originalKey);
                 }
             });
 
@@ -322,24 +343,36 @@ document.addEventListener('DOMContentLoaded', function() {
             keyInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     const originalKey = cell.getAttribute('data-original-key');
-                    exitEditMode(cell, keyText, keyInput, saveBtn, originalKey);
+                    exitEditMode(cell, keyText, editContainer, keyInput, saveBtn, originalKey);
                 }
             });
+
+            // Expand/collapse button
+            if (expandBtn) {
+                expandBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleRowExpansion(cell);
+                });
+            }
         });
 
         // Editable translation cells
         document.querySelectorAll('.editable-translation').forEach(cell => {
             const translationText = cell.querySelector('.translation-text');
+            const editContainer = cell.querySelector('.edit-container');
             const translationInput = cell.querySelector('.translation-input');
             const saveBtn = cell.querySelector('.save-translation-btn');
+            const expandBtn = cell.querySelector('.expand-btn');
 
             // Double-click to edit translation (whole cell clickable)
             cell.addEventListener('dblclick', function(e) {
-                // Prevent editing if already in edit mode or clicking on save button
-                if (cell.classList.contains('editing') || e.target.classList.contains('save-translation-btn')) {
+                // Prevent editing if already in edit mode or clicking on buttons
+                if (cell.classList.contains('editing') ||
+                    e.target.classList.contains('save-translation-btn') ||
+                    e.target.classList.contains('expand-btn')) {
                     return;
                 }
-                enterEditMode(cell, translationText, translationInput, saveBtn);
+                enterEditMode(cell, translationText, editContainer, translationInput, saveBtn);
             });
 
             // Save translation button
@@ -347,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const key = cell.getAttribute('data-key');
                 const language = cell.getAttribute('data-language');
                 const newValue = translationInput.value.trim();
-                updateSingleTranslation(key, language, newValue, cell, translationText, translationInput, saveBtn);
+                updateSingleTranslation(key, language, newValue, cell, translationText, editContainer, translationInput, saveBtn);
             });
 
             // Enter key to save
@@ -361,9 +394,17 @@ document.addEventListener('DOMContentLoaded', function() {
             translationInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     const originalValue = translationInput.getAttribute('data-original-value') || '';
-                    exitEditMode(cell, translationText, translationInput, saveBtn, originalValue);
+                    exitEditMode(cell, translationText, editContainer, translationInput, saveBtn, originalValue);
                 }
             });
+
+            // Expand/collapse button
+            if (expandBtn) {
+                expandBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleRowExpansion(cell);
+                });
+            }
         });
     }
 
@@ -380,7 +421,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Helper function to enter edit mode
-    function enterEditMode(cell, textElement, inputElement, saveBtn) {
+    function enterEditMode(cell, textElement, editContainer, inputElement, saveBtn) {
         // Store original value for cancellation
         let originalValue;
         if (textElement.innerHTML.includes('<em>Missing</em>')) {
@@ -390,10 +431,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         inputElement.setAttribute('data-original-value', originalValue);
 
-        // Hide text, show input and save button
+        // Hide text and expand button, show edit container
         textElement.style.display = 'none';
-        inputElement.style.display = 'inline-block';
-        saveBtn.style.display = 'inline-flex';
+        const expandBtn = cell.querySelector('.expand-btn');
+        if (expandBtn) {
+            expandBtn.style.display = 'none';
+        }
+        editContainer.style.display = 'flex';
 
         // Focus and select input
         setTimeout(() => {
@@ -406,11 +450,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Helper function to exit edit mode
-    function exitEditMode(cell, textElement, inputElement, saveBtn, displayValue) {
-        // Show text, hide input and save button
-        textElement.style.display = 'inline';
-        inputElement.style.display = 'none';
-        saveBtn.style.display = 'none';
+    function exitEditMode(cell, textElement, editContainer, inputElement, saveBtn, displayValue) {
+        // Show text, hide edit container
+        textElement.style.display = 'block';
+        editContainer.style.display = 'none';
+
+        // Show expand button if needed
+        const expandBtn = cell.querySelector('.expand-btn');
+        if (expandBtn && cell.classList.contains('has-overflow')) {
+            expandBtn.style.display = 'block';
+        }
 
         // Update display value
         if (displayValue !== undefined) {
@@ -426,17 +475,103 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Remove editing class
         cell.classList.remove('editing');
+
+        // Recheck text overflow after update
+        checkCellOverflow(cell);
+    }
+
+    // Function to check text overflow and show expand buttons
+    function checkTextOverflow() {
+        document.querySelectorAll('.editable-key, .editable-translation').forEach(cell => {
+            checkCellOverflow(cell);
+        });
+    }
+
+    // Function to check if a single cell has text overflow
+    function checkCellOverflow(cell) {
+        const textElement = cell.querySelector('.key-text, .translation-text');
+        const expandBtn = cell.querySelector('.expand-btn');
+
+        if (!textElement || !expandBtn) return;
+
+        // Skip if text is empty or just "Missing"
+        const textContent = textElement.textContent.trim();
+        if (!textContent || textContent === 'Missing') {
+            cell.classList.remove('has-overflow');
+            expandBtn.style.display = 'none';
+            return;
+        }
+
+        // Create a temporary element to measure text height
+        const tempElement = textElement.cloneNode(true);
+        tempElement.style.position = 'absolute';
+        tempElement.style.visibility = 'hidden';
+        tempElement.style.height = 'auto';
+        tempElement.style.maxHeight = 'none';
+        tempElement.style.webkitLineClamp = 'unset';
+        tempElement.style.overflow = 'visible';
+        tempElement.style.width = textElement.offsetWidth + 'px';
+
+        document.body.appendChild(tempElement);
+        const fullHeight = tempElement.offsetHeight;
+        document.body.removeChild(tempElement);
+
+        // Get the height when clamped to 2 lines
+        const lineHeight = parseFloat(getComputedStyle(textElement).lineHeight) || 20;
+        const maxHeight = lineHeight * 2;
+
+        // Show expand button if text exceeds 2 lines
+        if (fullHeight > maxHeight + 5) { // Add small tolerance
+            cell.classList.add('has-overflow');
+            expandBtn.style.display = 'block';
+            expandBtn.textContent = textElement.classList.contains('expanded') ? '−' : '...';
+        } else {
+            cell.classList.remove('has-overflow');
+            expandBtn.style.display = 'none';
+        }
+    }
+
+    // Function to toggle expansion for entire row
+    function toggleRowExpansion(clickedCell) {
+        const row = clickedCell.closest('tr');
+        if (!row) return;
+
+        // Find all cells in this row that have expandable content
+        const expandableCells = row.querySelectorAll('.editable-key, .editable-translation');
+        const isCurrentlyExpanded = clickedCell.querySelector('.key-text, .translation-text').classList.contains('expanded');
+
+        // Toggle expansion for all cells in the row
+        expandableCells.forEach(cell => {
+            const textElement = cell.querySelector('.key-text, .translation-text');
+            const expandBtn = cell.querySelector('.expand-btn');
+
+            if (!textElement || !expandBtn) return;
+
+            if (isCurrentlyExpanded) {
+                // Collapse all
+                textElement.classList.remove('expanded');
+                expandBtn.textContent = '...';
+            } else {
+                // Expand all
+                textElement.classList.add('expanded');
+                expandBtn.textContent = '−';
+            }
+        });
     }
 
     // Function to update a single translation
-    function updateSingleTranslation(key, language, newValue, cell, textElement, inputElement, saveBtn) {
+    function updateSingleTranslation(key, language, newValue, cell, textElement, editContainer, inputElement, saveBtn) {
         const formData = new FormData();
         formData.append('translation_key', key);
 
-        // Create translations object with just this language
-        const translations = {};
-        translations[language] = newValue;
-        formData.append('translations', JSON.stringify(translations));
+        // Get existing translations for this key to preserve them
+        const keyData = localizationData.translationKeys.find(k => k.key === key);
+        const existingTranslations = keyData ? { ...keyData.translations } : {};
+
+        // Update only the specific language
+        existingTranslations[language] = newValue;
+
+        formData.append('translations', JSON.stringify(existingTranslations));
 
         fetch('/api/localizations/update-translations', {
             method: 'POST',
@@ -445,21 +580,21 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Update the local data
+                // Update the local data for this specific language only
                 const keyData = localizationData.translationKeys.find(k => k.key === key);
                 if (keyData) {
                     keyData.translations[language] = newValue;
                 }
 
                 // Exit edit mode with new value
-                exitEditMode(cell, textElement, inputElement, saveBtn, newValue);
+                exitEditMode(cell, textElement, editContainer, inputElement, saveBtn, newValue);
 
-                showSuccessToast(`Translation updated successfully`, 'Success');
+                showSuccessToast(`Translation for "${language}" updated successfully`, 'Success');
             } else {
                 showErrorToast(data.error || 'Failed to update translation', 'Error');
                 // Exit edit mode with original value
                 const originalValue = inputElement.getAttribute('data-original-value') || '';
-                exitEditMode(cell, textElement, inputElement, saveBtn, originalValue);
+                exitEditMode(cell, textElement, editContainer, inputElement, saveBtn, originalValue);
             }
         })
         .catch(error => {
@@ -467,17 +602,17 @@ document.addEventListener('DOMContentLoaded', function() {
             showErrorToast('Failed to update translation', 'Error');
             // Exit edit mode with original value
             const originalValue = inputElement.getAttribute('data-original-value') || '';
-            exitEditMode(cell, textElement, inputElement, saveBtn, originalValue);
+            exitEditMode(cell, textElement, editContainer, inputElement, saveBtn, originalValue);
         });
     }
 
     // Function to update a translation key
-    function updateTranslationKey(originalKey, newKey, cell, textElement, inputElement, saveBtn) {
+    function updateTranslationKey(originalKey, newKey, cell, textElement, editContainer, inputElement, saveBtn) {
         // First, get all current translations for this key
         const keyData = localizationData.translationKeys.find(k => k.key === originalKey);
         if (!keyData) {
             showErrorToast('Translation key not found', 'Error');
-            exitEditMode(cell, textElement, inputElement, saveBtn, originalKey);
+            exitEditMode(cell, textElement, editContainer, inputElement, saveBtn, originalKey);
             return;
         }
 
@@ -526,7 +661,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Exit edit mode with new key
-                exitEditMode(cell, textElement, inputElement, saveBtn, newKey);
+                exitEditMode(cell, textElement, editContainer, inputElement, saveBtn, newKey);
 
                 showSuccessToast(`Translation key updated successfully`, 'Success');
 
@@ -540,7 +675,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error updating translation key:', error);
             showErrorToast('Failed to update translation key', 'Error');
             // Exit edit mode with original key
-            exitEditMode(cell, textElement, inputElement, saveBtn, originalKey);
+            exitEditMode(cell, textElement, editContainer, inputElement, saveBtn, originalKey);
         });
     }
 
