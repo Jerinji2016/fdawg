@@ -2,7 +2,6 @@ package translate
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/Jerinji2016/fdawg/pkg/config"
 )
@@ -13,26 +12,28 @@ type Config struct {
 	Enabled bool
 }
 
-// LoadConfig loads the translation configuration from project config or environment variables
+// LoadConfig loads the translation configuration from project config only
 func LoadConfig(projectPath string) (*Config, error) {
-	// First try to load from project config
-	if projectPath != "" {
-		projectConfig, err := config.GetTranslationConfig(projectPath)
-		if err == nil && projectConfig.GoogleTranslateAPIKey != "" {
-			return &Config{
-				APIKey:  projectConfig.GoogleTranslateAPIKey,
-				Enabled: projectConfig.Enabled,
-			}, nil
-		}
+	// Load from project config only
+	if projectPath == "" {
+		return &Config{
+			APIKey:  "",
+			Enabled: false,
+		}, nil
 	}
 
-	// Fallback to environment variable
-	apiKey := os.Getenv("GOOGLE_TRANSLATE_API_KEY")
-	enabled := apiKey != ""
+	projectConfig, err := config.GetTranslationConfig(projectPath)
+	if err != nil {
+		// If config doesn't exist or has error, return disabled config
+		return &Config{
+			APIKey:  "",
+			Enabled: false,
+		}, nil
+	}
 
 	return &Config{
-		APIKey:  apiKey,
-		Enabled: enabled,
+		APIKey:  projectConfig.GoogleTranslateAPIKey,
+		Enabled: projectConfig.Enabled,
 	}, nil
 }
 

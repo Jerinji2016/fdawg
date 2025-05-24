@@ -949,7 +949,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleCellTranslation(key, targetLanguage) {
         if (!translationConfig.enabled) {
-            showErrorToast('Translation service is not enabled. Please set GOOGLE_TRANSLATE_API_KEY environment variable.', 'Translation Error');
+            showErrorToast('Translation service is not enabled. Please configure Google Translate API key in the Web UI.', 'Translation Error');
             return;
         }
 
@@ -979,7 +979,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleRowTranslation(key) {
         if (!translationConfig.enabled) {
-            showErrorToast('Translation service is not enabled. Please set GOOGLE_TRANSLATE_API_KEY environment variable.', 'Translation Error');
+            showErrorToast('Translation service is not enabled. Please configure Google Translate API key in the Web UI.', 'Translation Error');
             return;
         }
 
@@ -1268,13 +1268,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showTranslationConfigModal() {
+        const isUpdate = translationConfig.enabled && translationConfig.hasApiKey;
+        const modalTitle = isUpdate ? 'Update Translation Configuration' : 'Translation Configuration';
+        const buttonText = isUpdate ? 'Update API Key' : 'Save API Key';
+        const placeholderText = isUpdate ? 'Enter new Google Translate API key' : 'Enter your Google Translate API key';
+
         const modalContent = `
             <div class="translation-config-modal">
                 <div class="form-group">
                     <label for="api-key-input">Google Translate API Key:</label>
-                    <input type="password" id="api-key-input" placeholder="Enter your Google Translate API key" />
+                    <input type="password" id="api-key-input" placeholder="${placeholderText}" />
                     <div class="form-hint">
                         Your API key will be saved securely in the project's .fdawg-config file.
+                        ${isUpdate ? 'Leave empty to keep current API key.' : ''}
                     </div>
                 </div>
                 <div class="config-help">
@@ -1290,12 +1296,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="form-actions">
                     <button class="secondary-btn" onclick="closeConfigModal()">Cancel</button>
-                    <button class="primary-btn" onclick="saveApiKey()">Save API Key</button>
+                    <button class="primary-btn" onclick="saveApiKey()">${buttonText}</button>
                 </div>
             </div>
         `;
 
-        showCustomDialog('Translation Configuration', modalContent);
+        showCustomDialog(modalTitle, modalContent);
     }
 
     function closeConfigModal() {
@@ -1308,16 +1314,19 @@ document.addEventListener('DOMContentLoaded', function() {
     function saveApiKey() {
         const apiKeyInput = document.getElementById('api-key-input');
         const apiKey = apiKeyInput.value.trim();
+        const isUpdate = translationConfig.enabled && translationConfig.hasApiKey;
 
-        if (!apiKey) {
+        // For updates, allow empty API key (keeps current one)
+        if (!isUpdate && !apiKey) {
             showErrorToast('Please enter a valid API key', 'Configuration Error');
             return;
         }
 
         // Show loading state
-        const saveBtn = document.querySelector('.primary-btn');
+        const saveBtn = document.querySelector('.modal-overlay .primary-btn');
         const originalText = saveBtn.innerHTML;
-        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        const loadingText = isUpdate ? '<i class="fas fa-spinner fa-spin"></i> Updating...' : '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        saveBtn.innerHTML = loadingText;
         saveBtn.disabled = true;
 
         const formData = new FormData();
@@ -1341,7 +1350,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Close modal
                 closeConfigModal();
 
-                showSuccessToast('Google Translate API key saved successfully', 'Configuration Updated');
+                const successMessage = isUpdate ? 'Google Translate API key updated successfully' : 'Google Translate API key saved successfully';
+                showSuccessToast(successMessage, 'Configuration Updated');
             } else {
                 showErrorToast(data.error || 'Failed to save API key', 'Configuration Error');
                 saveBtn.innerHTML = originalText;

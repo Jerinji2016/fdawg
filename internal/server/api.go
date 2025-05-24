@@ -506,7 +506,7 @@ func setupLocalizationAPIRoutes(project *flutter.ValidationResult) {
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"success": false,
-				"error":   "Translation service is not enabled. Please set GOOGLE_TRANSLATE_API_KEY environment variable.",
+				"error":   "Translation service is not enabled. Please configure Google Translate API key in the Web UI.",
 			})
 			return
 		}
@@ -586,7 +586,7 @@ func setupLocalizationAPIRoutes(project *flutter.ValidationResult) {
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"success": false,
-				"error":   "Translation service is not enabled. Please set GOOGLE_TRANSLATE_API_KEY environment variable.",
+				"error":   "Translation service is not enabled. Please configure Google Translate API key in the Web UI.",
 			})
 			return
 		}
@@ -667,13 +667,25 @@ func setupLocalizationAPIRoutes(project *flutter.ValidationResult) {
 		}
 
 		apiKey := r.FormValue("api_key")
-		if apiKey == "" {
+
+		// Check if this is an update (config already exists)
+		existingConfig, err := config.GetTranslationConfig(project.ProjectPath)
+		isUpdate := err == nil && existingConfig.GoogleTranslateAPIKey != ""
+
+		// For new configurations, API key is required
+		// For updates, empty API key means keep the existing one
+		if !isUpdate && apiKey == "" {
 			http.Error(w, "API key is required", http.StatusBadRequest)
 			return
 		}
 
+		// If updating and API key is empty, keep the existing one
+		if isUpdate && apiKey == "" {
+			apiKey = existingConfig.GoogleTranslateAPIKey
+		}
+
 		// Update the API key in the project config
-		err := config.UpdateTranslationAPIKey(project.ProjectPath, apiKey)
+		err = config.UpdateTranslationAPIKey(project.ProjectPath, apiKey)
 		if err != nil {
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(map[string]interface{}{
@@ -683,10 +695,15 @@ func setupLocalizationAPIRoutes(project *flutter.ValidationResult) {
 			return
 		}
 
+		message := "Google Translate API key saved successfully"
+		if isUpdate {
+			message = "Google Translate API key updated successfully"
+		}
+
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success": true,
-			"message": "Google Translate API key updated successfully",
+			"message": message,
 		})
 	})
 }
