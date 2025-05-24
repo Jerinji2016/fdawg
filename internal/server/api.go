@@ -800,11 +800,10 @@ func buildLocalizationData(translationFiles []localization.TranslationFile) Loca
 			found := false
 			for _, file := range translationFiles {
 				if file.Language == langInfo.Code {
+					found = true
 					value := getValueFromData(file.Data, key)
 					if strings.TrimSpace(value) == "" {
 						missingCount++
-					} else {
-						found = true
 					}
 					break
 				}
