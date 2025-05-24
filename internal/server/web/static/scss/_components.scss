@@ -63,7 +63,7 @@
 
 .card-actions-header {
   display: flex;
-  gap: 5px;
+  gap: 8px;
 }
 
 .card-label {
@@ -75,26 +75,34 @@
 }
 
 .icon-btn {
-  background: none;
+  background-color: rgba(255, 255, 255, 0.1);
   border: none;
   color: $text-light;
   font-size: 0.9rem;
   cursor: pointer;
-  padding: 3px 5px;
-  border-radius: 3px;
+  padding: 8px;
+  border-radius: 8px;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
   }
 
   &.download-btn:hover {
     color: $primary-color;
+    background-color: rgba(1, 117, 194, 0.2);
   }
 
   &.delete-env-btn:hover,
   &.delete-language-btn:hover {
     color: #f44336;
+    background-color: rgba(244, 67, 54, 0.2);
   }
 }
 
@@ -347,7 +355,7 @@
 
       .language-actions {
         display: flex;
-        gap: 5px;
+        gap: 8px;
       }
     }
 
@@ -1107,24 +1115,11 @@
 
   .asset-actions {
     display: flex;
-    gap: 5px;
+    gap: 8px;
     justify-content: flex-end;
 
     .table-btn {
-      padding: 6px;
-      background-color: rgba(255, 255, 255, 0.1);
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.2);
-      }
-
-      &.delete-btn {
-        color: #f44336;
-
-        &:hover {
-          background-color: rgba(244, 67, 54, 0.2);
-        }
-      }
+      // Inherits from global .table-btn styling above
     }
   }
 }
@@ -1186,22 +1181,42 @@
 }
 
 .table-btn {
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0.1);
   color: $text-light;
-  padding: 5px;
+  padding: 8px;
   font-size: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
 
   &:hover {
     color: $text-color;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
   }
 
-  &.edit-var-btn:hover {
+  &.download-btn:hover {
     color: $primary-color;
+    background-color: rgba(1, 117, 194, 0.2);
   }
 
-  &.delete-var-btn:hover {
+  &.edit-var-btn:hover,
+  &.edit-key-btn:hover {
+    color: $primary-color;
+    background-color: rgba(1, 117, 194, 0.2);
+  }
+
+  &.delete-var-btn:hover,
+  &.delete-key-btn:hover,
+  &.delete-btn:hover {
     color: #f44336;
+    background-color: rgba(244, 67, 54, 0.2);
   }
 }
 

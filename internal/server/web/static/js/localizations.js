@@ -341,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {
                 confirmText: 'Delete',
                 cancelText: 'Cancel',
-                confirmButtonClass: 'danger-btn',
+                confirmButtonClass: 'primary-btn',
                 onConfirm: () => {
                     deleteLanguage(languageCode);
                 }
@@ -356,7 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {
                 confirmText: 'Delete',
                 cancelText: 'Cancel',
-                confirmButtonClass: 'danger-btn',
+                confirmButtonClass: 'primary-btn',
                 onConfirm: () => {
                     deleteTranslationKey(key);
                 }
