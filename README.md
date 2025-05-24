@@ -1,6 +1,6 @@
 # FDAWG - Flutter Development Assistant with Go
 
-FDAWG is a CLI tool designed to help manage Flutter projects. It provides various commands to streamline Flutter development workflows and includes a web interface for project management.
+FDAWG is a CLI tool designed to help manage Flutter projects. It provides various commands to streamline Flutter development workflows including asset management, environment configuration, localization, app naming across platforms, and includes a modern web interface for project management.
 
 ## Installation
 
@@ -46,6 +46,9 @@ fdawg [command] [options]
 | `lang insert <key>` | Add a new translation key to all languages |
 | `lang delete <key>` | Delete a translation key from all languages |
 | `lang list` | List all supported languages in the project |
+| `namer get` | Get current app names from all or specific platforms |
+| `namer set` | Set app names universally or for specific platforms |
+| `namer list` | List current app names for all available platforms |
 
 ### Environment Command Options
 
@@ -255,6 +258,100 @@ List all supported languages:
 fdawg lang list
 ```
 
+### App Namer Command Options
+
+The `namer` command manages your Flutter app's display name across all platforms. It supports both universal naming (same name for all platforms) and platform-specific naming.
+
+- `namer get`:
+  - `--platforms, -p`: Specify platforms to get names from (android, ios, macos, linux, windows, web)
+  - If no platforms specified, gets names from all available platforms
+
+- `namer set`:
+  - `--value, -v`: App name to set universally across all platforms
+  - `--platforms, -p`: Limit universal setting to specific platforms
+  - `--android`: App name for Android platform only
+  - `--ios`: App name for iOS platform only
+  - `--macos`: App name for macOS platform only
+  - `--linux`: App name for Linux platform only
+  - `--windows`: App name for Windows platform only
+  - `--web`: App name for Web platform only
+
+- `namer list`:
+  - Lists current app names for all available platforms (alias for `namer get`)
+
+### App Namer Command Examples
+
+Get current app names for all platforms:
+
+```bash
+fdawg namer list
+# or
+fdawg namer get
+```
+
+Get app names for specific platforms:
+
+```bash
+fdawg namer get --platforms android,ios,web
+```
+
+Set the same name for all platforms:
+
+```bash
+fdawg namer set --value "My Awesome App"
+```
+
+Set the same name for specific platforms only:
+
+```bash
+fdawg namer set --value "My App" --platforms android,ios
+```
+
+Set different names for different platforms:
+
+```bash
+fdawg namer set --android "Android App" --ios "iOS App" --web "Web App"
+```
+
+Mix universal and platform-specific naming:
+
+```bash
+# Set "My App" for most platforms, but use custom names for Android and iOS
+fdawg namer set --value "My App" --android "Android Version" --ios "iOS Version"
+```
+
+### Platform Configuration Details
+
+The `namer` command updates the following files for each platform:
+
+- **Android**: `android/app/src/main/AndroidManifest.xml`
+  - Updates the `android:label` attribute in the `<application>` tag
+
+- **iOS**: `ios/Runner/Info.plist`
+  - Updates both `CFBundleDisplayName` and `CFBundleName` properties
+
+- **macOS**: `macos/Runner/Configs/AppInfo.xcconfig`
+  - Updates the `PRODUCT_NAME` configuration variable
+
+- **Linux**: `linux/CMakeLists.txt`
+  - Updates the `BINARY_NAME` variable
+
+- **Windows**: `windows/CMakeLists.txt`
+  - Updates both the `project()` name and `BINARY_NAME` variable
+
+- **Web**: `web/manifest.json` and `web/index.html`
+  - Updates `name` and `short_name` in manifest.json
+  - Updates `<title>` and `apple-mobile-web-app-title` in index.html
+
+### Safety Features
+
+The namer command includes several safety features:
+
+- **Automatic backups**: Creates backups of all modified files before making changes
+- **Rollback capability**: Automatically restores from backups if any errors occur
+- **Platform validation**: Only attempts to update platforms that exist in your project
+- **Flutter project validation**: Ensures you're running the command in a valid Flutter project
+
 ## Server and Init Command Examples
 
 Start the web server for the current directory:
@@ -302,6 +399,26 @@ Check if a specific directory is a Flutter project:
 fdawg init /path/to/my/flutter/project
 ```
 
+### Web Interface Features
+
+The web server provides a modern, responsive interface for managing your Flutter project with the following features:
+
+- **Overview**: Project information and quick stats
+- **Environment**: Manage environment variables with a visual interface
+- **Assets**: Upload, organize, and manage project assets with drag-and-drop support
+- **Localizations**: Manage translations with inline editing and Google Translate integration
+- **App Namer**: Set app display names across all platforms with real-time preview
+- **Fastlane**: (Coming soon) Fastlane configuration management
+- **Run Configs**: (Coming soon) Run configuration management
+
+All web interface features include:
+
+- Real-time updates and validation
+- Toast notifications for user feedback
+- Confirmation dialogs for destructive actions
+- Responsive design for mobile and desktop
+- Auto-dismissing notifications
+
 ## Project Structure
 
 ```text
@@ -318,6 +435,13 @@ fdawg/
 │       │   │   └── scss/ # SASS source files
 │       │   └── templates/# HTML templates
 ├── pkg/                  # Reusable packages
+│   ├── asset/            # Asset management functionality
+│   ├── config/           # Configuration management
+│   ├── environment/      # Environment variables management
+│   ├── flutter/          # Flutter project utilities
+│   ├── localization/     # Localization management
+│   ├── namer/            # App name management across platforms
+│   ├── translate/        # Translation services
 │   └── utils/            # Utility functions
 ```
 
