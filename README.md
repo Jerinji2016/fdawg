@@ -142,6 +142,7 @@ fdawg env generate-dart
   - Creates a backup of all assets in assets.backup directory
   - Automatically categorizes assets based on file type and content
   - Recursively processes all files in nested directories
+  - Excludes the translations directory to avoid conflicts with localization
   - Removes empty directories after migration
 
 ### Asset Command Examples

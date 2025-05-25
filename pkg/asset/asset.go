@@ -285,8 +285,14 @@ func MigrateAssets(projectPath string) error {
 			return err
 		}
 
-		// If it's a directory, check if it's one of our asset type directories
+		// If it's a directory, check if it's one of our asset type directories or translations directory
 		if info.IsDir() {
+			// Skip translations directory to avoid conflicts with localization
+			if relPath == "translations" {
+				return filepath.SkipDir
+			}
+
+			// Skip asset type directories
 			for _, assetType := range []AssetType{
 				ImageAsset,
 				AnimationAsset,
