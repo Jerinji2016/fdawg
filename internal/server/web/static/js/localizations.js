@@ -72,14 +72,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const content = document.getElementById('setup-guide-content');
         const icon = document.getElementById('guide-toggle-icon');
 
-        if (content.style.display === 'none' || content.style.display === '') {
-            content.style.display = 'block';
-            icon.classList.remove('fa-chevron-down');
-            icon.classList.add('fa-chevron-up');
-        } else {
+        if (content.classList.contains('expanded')) {
+            content.classList.remove('expanded');
             content.style.display = 'none';
             icon.classList.remove('fa-chevron-up');
             icon.classList.add('fa-chevron-down');
+        } else {
+            content.classList.add('expanded');
+            content.style.display = 'block';
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
         }
     };
 
