@@ -603,8 +603,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Reload assets
                 loadAssets();
 
-                // Show success message
-                showSuccessToast('Assets migrated successfully!');
+                // Show appropriate success message based on migration result
+                if (data.no_files_to_migrate) {
+                    showSuccessToast('No assets to migrate - all assets are already organized!');
+                } else {
+                    showSuccessToast(`Assets migrated successfully! ${data.files_processed} files processed.`);
+                }
             } else {
                 console.error('Failed to migrate assets:', data);
                 showErrorToast('Failed to migrate assets. Please try again.');

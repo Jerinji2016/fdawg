@@ -315,7 +315,7 @@ func (api *AssetAPI) handleMigrateAssets(w http.ResponseWriter, r *http.Request)
 	}
 
 	// Migrate assets
-	err := asset.MigrateAssets(api.project.ProjectPath)
+	result, err := asset.MigrateAssets(api.project.ProjectPath)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -336,7 +336,9 @@ func (api *AssetAPI) handleMigrateAssets(w http.ResponseWriter, r *http.Request)
 	// Return success response
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
+		"success":             true,
+		"files_processed":     result.FilesProcessed,
+		"no_files_to_migrate": result.NoFilesToMigrate,
 	})
 }
 

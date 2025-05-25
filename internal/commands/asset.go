@@ -260,13 +260,17 @@ func migrateAssets(c *cli.Context) error {
 	// Migrate assets
 	utils.Info("Migrating assets to organized folders...")
 
-	err = asset.MigrateAssets(project.ProjectPath)
+	result, err := asset.MigrateAssets(project.ProjectPath)
 	if err != nil {
 		utils.Error("Failed to migrate assets: %v", err)
 		return err
 	}
 
-	utils.Success("Assets migrated successfully")
+	if result.NoFilesToMigrate {
+		utils.Success("No assets to migrate - all assets are already organized")
+	} else {
+		utils.Success("Assets migrated successfully - %d files processed", result.FilesProcessed)
+	}
 
 	// Generate the Dart asset file
 	utils.Info("Generating Dart asset file...")

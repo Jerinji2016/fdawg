@@ -252,19 +252,25 @@ func ListAssets(projectPath string) (map[AssetType][]string, error) {
 	return assets, nil
 }
 
+// MigrationResult represents the result of asset migration
+type MigrationResult struct {
+	FilesProcessed   int
+	NoFilesToMigrate bool
+}
+
 // MigrateAssets migrates assets from a flat structure to organized folders
-func MigrateAssets(projectPath string) error {
+func MigrateAssets(projectPath string) (*MigrationResult, error) {
 	assetDir := GetAssetDir(projectPath)
 	backupDir := GetAssetBackupDir(projectPath)
 
 	// Check if the asset directory exists
 	if _, err := os.Stat(assetDir); os.IsNotExist(err) {
-		return fmt.Errorf("asset directory does not exist")
+		return nil, fmt.Errorf("asset directory does not exist")
 	}
 
 	// Create backup directory
 	if err := os.MkdirAll(backupDir, 0755); err != nil {
-		return fmt.Errorf("failed to create backup directory: %v", err)
+		return nil, fmt.Errorf("failed to create backup directory: %v", err)
 	}
 
 	// Find all files in the asset directory (including in subdirectories)
@@ -315,11 +321,14 @@ func MigrateAssets(projectPath string) error {
 	})
 
 	if err != nil {
-		return fmt.Errorf("failed to walk asset directory: %v", err)
+		return nil, fmt.Errorf("failed to walk asset directory: %v", err)
 	}
 
 	if len(filesToMigrate) == 0 {
-		return fmt.Errorf("no files to migrate")
+		return &MigrationResult{
+			FilesProcessed:   0,
+			NoFilesToMigrate: true,
+		}, nil
 	}
 
 	// Move all files to the backup directory
@@ -327,7 +336,7 @@ func MigrateAssets(projectPath string) error {
 		// Get the relative path from the asset directory
 		relPath, err := filepath.Rel(assetDir, filePath)
 		if err != nil {
-			return fmt.Errorf("failed to get relative path: %v", err)
+			return nil, fmt.Errorf("failed to get relative path: %v", err)
 		}
 
 		// Create the backup path
@@ -335,7 +344,7 @@ func MigrateAssets(projectPath string) error {
 
 		// Copy the file to the backup directory
 		if err := copyFile(filePath, destPath); err != nil {
-			return fmt.Errorf("failed to backup file %s: %v", relPath, err)
+			return nil, fmt.Errorf("failed to backup file %s: %v", relPath, err)
 		}
 	}
 
@@ -346,7 +355,7 @@ func MigrateAssets(projectPath string) error {
 
 		// Ensure the asset type directory exists
 		if err := EnsureAssetTypeDirExists(projectPath, assetType); err != nil {
-			return fmt.Errorf("failed to create asset type directory: %v", err)
+			return nil, fmt.Errorf("failed to create asset type directory: %v", err)
 		}
 
 		// Get the file name
@@ -355,12 +364,12 @@ func MigrateAssets(projectPath string) error {
 		// Copy the file to the appropriate directory
 		destPath := filepath.Join(assetDir, string(assetType), fileName)
 		if err := copyFile(filePath, destPath); err != nil {
-			return fmt.Errorf("failed to copy file %s to %s: %v", fileName, assetType, err)
+			return nil, fmt.Errorf("failed to copy file %s to %s: %v", fileName, assetType, err)
 		}
 
 		// Remove the original file
 		if err := os.Remove(filePath); err != nil {
-			return fmt.Errorf("failed to remove original file %s: %v", filePath, err)
+			return nil, fmt.Errorf("failed to remove original file %s: %v", filePath, err)
 		}
 	}
 
@@ -385,16 +394,19 @@ func MigrateAssets(projectPath string) error {
 		}
 
 		if err := updatePubspecWithAsset(projectPath, assetType); err != nil {
-			return fmt.Errorf("failed to update pubspec.yaml for %s: %v", assetType, err)
+			return nil, fmt.Errorf("failed to update pubspec.yaml for %s: %v", assetType, err)
 		}
 	}
 
 	// Generate the Dart asset file
 	if err := GenerateDartAssetFile(projectPath); err != nil {
-		return fmt.Errorf("failed to generate Dart asset file: %v", err)
+		return nil, fmt.Errorf("failed to generate Dart asset file: %v", err)
 	}
 
-	return nil
+	return &MigrationResult{
+		FilesProcessed:   len(filesToMigrate),
+		NoFilesToMigrate: false,
+	}, nil
 }
 
 // removeEmptyDirs removes empty directories recursively
