@@ -11,11 +11,15 @@ import (
 )
 
 // NamerAPI handles namer-related API endpoints
-type NamerAPI struct{}
+type NamerAPI struct {
+	project *flutter.ValidationResult
+}
 
 // NewNamerAPI creates a new NamerAPI instance
-func NewNamerAPI() *NamerAPI {
-	return &NamerAPI{}
+func NewNamerAPI(project *flutter.ValidationResult) *NamerAPI {
+	return &NamerAPI{
+		project: project,
+	}
 }
 
 // RegisterRoutes registers namer API routes
@@ -57,13 +61,6 @@ func (api *NamerAPI) handleGetAppNames(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate Flutter project
-	result, err := flutter.ValidateProject(".")
-	if err != nil || !result.IsValid {
-		http.Error(w, "Not a valid Flutter project", http.StatusBadRequest)
-		return
-	}
-
 	// Parse request body
 	var req GetAppNamesRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -81,7 +78,7 @@ func (api *NamerAPI) handleGetAppNames(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get app names
-	appNamesResult, err := namer.GetAppNames(result.ProjectPath, platforms)
+	appNamesResult, err := namer.GetAppNames(api.project.ProjectPath, platforms)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -99,13 +96,6 @@ func (api *NamerAPI) handleSetAppNames(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate Flutter project
-	result, err := flutter.ValidateProject(".")
-	if err != nil || !result.IsValid {
-		http.Error(w, "Not a valid Flutter project", http.StatusBadRequest)
-		return
-	}
-
 	// Parse request body
 	var req SetAppNamesAPIRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -115,7 +105,7 @@ func (api *NamerAPI) handleSetAppNames(w http.ResponseWriter, r *http.Request) {
 
 	// Convert to namer request format
 	namerRequest := &namer.SetAppNameRequest{
-		ProjectPath: result.ProjectPath,
+		ProjectPath: api.project.ProjectPath,
 		Universal:   req.Universal,
 		Platforms:   make(map[namer.Platform]string),
 	}
@@ -133,7 +123,7 @@ func (api *NamerAPI) handleSetAppNames(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get updated app names to return
-	updatedResult, err := namer.GetAppNames(result.ProjectPath, nil)
+	updatedResult, err := namer.GetAppNames(api.project.ProjectPath, nil)
 	if err != nil {
 		// Still return success even if we can't get updated names
 		w.Header().Set("Content-Type", "application/json")
@@ -153,13 +143,6 @@ func (api *NamerAPI) handleSetAppNames(w http.ResponseWriter, r *http.Request) {
 func (api *NamerAPI) handleGetPlatforms(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Validate Flutter project
-	result, err := flutter.ValidateProject(".")
-	if err != nil || !result.IsValid {
-		http.Error(w, "Not a valid Flutter project", http.StatusBadRequest)
 		return
 	}
 
@@ -199,13 +182,13 @@ func (api *NamerAPI) handleGetPlatforms(w http.ResponseWriter, r *http.Request) 
 
 	// Check availability for each platform
 	var availablePlatforms []PlatformInfo
-	for _, platform := range allPlatforms {
+	for i, platform := range allPlatforms {
 		// Check if platform directory exists
-		available := helpers.IsPlatformDirectoryAvailable(result.ProjectPath, platform.ID)
-		platform.Available = available
+		available := helpers.IsPlatformDirectoryAvailable(api.project.ProjectPath, platform.ID)
+		allPlatforms[i].Available = available
 
 		if available {
-			availablePlatforms = append(availablePlatforms, platform)
+			availablePlatforms = append(availablePlatforms, allPlatforms[i])
 		}
 	}
 
@@ -220,6 +203,6 @@ func (api *NamerAPI) handleGetPlatforms(w http.ResponseWriter, r *http.Request) 
 
 // SetupNamerAPIRoutes sets up namer API routes
 func SetupNamerAPIRoutes(project *flutter.ValidationResult) {
-	namerAPI := NewNamerAPI()
+	namerAPI := NewNamerAPI(project)
 	namerAPI.RegisterRoutes(http.DefaultServeMux)
 }
