@@ -303,12 +303,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // Process each asset type
                     for (const [type, files] of Object.entries(data.assets)) {
+                        // Handle null or undefined files arrays
+                        const fileArray = files || [];
+
                         // Update asset counts
-                        assetCounts[type] = files.length;
-                        totalAssets += files.length;
+                        assetCounts[type] = fileArray.length;
+                        totalAssets += fileArray.length;
 
                         // Add rows for each asset
-                        files.forEach(file => {
+                        fileArray.forEach(file => {
                             const row = createAssetRow(file, type);
                             tableBody.appendChild(row);
                         });
