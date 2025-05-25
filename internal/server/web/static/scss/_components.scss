@@ -266,6 +266,147 @@
   @extend .assets-summary;
 }
 
+// Setup Guide Panel
+.setup-guide-panel {
+  margin-bottom: 30px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .guide-header {
+    padding: 15px 20px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid $border-color;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    h4 {
+      margin: 0;
+      color: $text-color;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      i {
+        color: $primary-color;
+      }
+    }
+
+    .guide-toggle-icon {
+      color: $text-light;
+      transition: transform 0.3s ease;
+      font-size: 0.9rem;
+    }
+  }
+
+  .guide-content {
+    padding: 20px;
+    display: none;
+
+    &.expanded {
+      display: block;
+    }
+
+    p {
+      margin: 0 0 15px 0;
+      color: $text-light;
+      line-height: 1.5;
+    }
+
+    .setup-step {
+      margin-bottom: 20px;
+
+      h5, h6 {
+        margin: 0 0 10px 0;
+        color: $text-color;
+        font-weight: 500;
+      }
+
+      .code-block {
+        position: relative;
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 10px 0;
+        overflow-x: auto;
+
+        .copy-btn {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background-color: rgba(255, 255, 255, 0.1);
+          border: 1px solid $border-color;
+          color: $text-light;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: $text-color;
+          }
+
+          i {
+            margin-right: 4px;
+          }
+        }
+
+        code {
+          display: block;
+          color: #e6e6e6;
+          font-family: $font-mono;
+          font-size: 0.85rem;
+          line-height: 1.4;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          max-width: 100%;
+          padding-right: 80px; // Space for copy button
+        }
+      }
+    }
+
+    .help-link {
+      margin-top: 20px;
+      text-align: center;
+
+      .help-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background-color: rgba(1, 117, 194, 0.2);
+        color: $primary-color;
+        text-decoration: none;
+        border-radius: 6px;
+        border: 1px solid rgba(1, 117, 194, 0.3);
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: rgba(1, 117, 194, 0.3);
+          color: white;
+        }
+
+        i {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
 // Localization Management Container
 .localizations-management {
   width: 100%;
@@ -1464,6 +1605,473 @@
 
 .add-variable {
   margin-top: 20px;
+}
+
+// Namer components
+.namer-section {
+  margin-bottom: 30px;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h4 {
+      margin: 0;
+      color: $text-color;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      i {
+        color: $primary-color;
+      }
+
+      .toggle-btn {
+        background: none;
+        border: none;
+        color: $text-light;
+        margin-left: 10px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: $text-color;
+        }
+
+        i {
+          font-size: 0.9rem;
+          transition: transform 0.3s ease;
+        }
+      }
+    }
+  }
+}
+
+.namer-form-group {
+  margin-bottom: 20px;
+
+  .universal-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    .namer-input {
+      flex: 1;
+      padding: 10px 15px;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      background-color: rgba(255, 255, 255, 0.05);
+      color: $text-color;
+      font-family: $font-primary;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      &::placeholder {
+        color: $text-light;
+      }
+    }
+  }
+
+  .form-help {
+    font-size: 0.85rem;
+    color: $text-light;
+    margin-top: 5px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+  }
+}
+
+.platform-forms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+
+  .platform-form-card {
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    padding: 15px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: rgba(1, 117, 194, 0.5);
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    &.unavailable {
+      opacity: 0.6;
+      background-color: rgba(255, 255, 255, 0.01);
+
+      .platform-input {
+        background-color: rgba(255, 255, 255, 0.02);
+        cursor: not-allowed;
+      }
+    }
+
+    .platform-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+
+      .platform-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        color: $text-color;
+
+        i {
+          color: $primary-color;
+          font-size: 1.1rem;
+        }
+      }
+
+      .platform-status {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+        border-radius: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+
+        &.available {
+          background-color: rgba(76, 175, 80, 0.2);
+          color: #4caf50;
+        }
+
+        &.unavailable {
+          background-color: rgba(255, 152, 0, 0.2);
+          color: #ff9800;
+        }
+      }
+    }
+
+    .platform-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      background-color: rgba(255, 255, 255, 0.05);
+      color: $text-color;
+      font-family: $font-primary;
+      font-size: 0.9rem;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      &::placeholder {
+        color: $text-light;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+    }
+  }
+}
+
+.platform-card {
+  .platform-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+    .platform-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      color: $text-color;
+
+      i {
+        color: $primary-color;
+        font-size: 1.2rem;
+      }
+    }
+
+    .platform-status {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+
+      &.available {
+        background-color: rgba(76, 175, 80, 0.2);
+        color: #4caf50;
+      }
+
+      &.unavailable {
+        background-color: rgba(255, 152, 0, 0.2);
+        color: #ff9800;
+      }
+    }
+  }
+
+  .platform-names {
+    .name-item {
+      margin-bottom: 8px;
+
+      .name-label {
+        font-size: 0.8rem;
+        color: $text-light;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 3px;
+      }
+
+      .name-value {
+        font-family: $font-mono;
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: $text-color;
+        border: 1px solid $border-color;
+      }
+    }
+  }
+
+  &.unavailable {
+    opacity: 0.6;
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+}
+
+.platform-info-content {
+  p {
+    margin: 8px 0;
+    font-size: 0.85rem;
+    color: $text-light;
+    line-height: 1.4;
+
+    code {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: $font-mono;
+      font-size: 0.8rem;
+      color: $text-color;
+      word-break: break-all;
+      white-space: pre-wrap;
+      max-width: 100%;
+      display: inline-block;
+      overflow-wrap: break-word;
+    }
+  }
+}
+
+// Current names summary styles
+.current-names-summary {
+  .current-names-table-container {
+    overflow-x: auto;
+    margin-top: 15px;
+  }
+
+  .current-names-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+
+    th {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: $text-light;
+      font-weight: 500;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      padding: 12px 15px;
+      border-bottom: 2px solid $border-color;
+      text-align: left;
+
+      &.status-column {
+        text-align: center;
+        width: 120px;
+      }
+    }
+
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      vertical-align: top;
+
+      &.empty-state {
+        text-align: center;
+        color: $text-light;
+        padding: 30px;
+        font-style: italic;
+
+        i {
+          margin-right: 8px;
+          color: $primary-color;
+        }
+      }
+
+      &.platform-cell {
+        width: 150px;
+
+        i {
+          color: $primary-color;
+          font-size: 1.1rem;
+          margin-right: 8px;
+          width: 20px;
+          text-align: center;
+        }
+
+        .platform-name {
+          font-weight: 500;
+          color: $text-color;
+        }
+      }
+
+      &.app-name-cell {
+        .app-name-cell {
+          .name-display {
+            font-family: $font-mono;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: $text-color;
+            border: 1px solid $border-color;
+            display: inline-block;
+            max-width: 100%;
+            word-break: break-word;
+          }
+
+          .name-internal {
+            font-size: 0.75rem;
+            color: $text-light;
+            margin-top: 4px;
+            font-style: italic;
+          }
+
+          .error-text {
+            font-size: 0.75rem;
+            color: #ff6b6b;
+            margin-top: 4px;
+
+            i {
+              margin-right: 4px;
+            }
+          }
+        }
+
+        .not-available-text {
+          color: $text-light;
+          font-style: italic;
+        }
+      }
+
+      &.status-cell {
+        text-align: center;
+        width: 120px;
+
+        .status-badge {
+          font-size: 0.75rem;
+          padding: 4px 8px;
+          border-radius: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-weight: 500;
+          white-space: nowrap;
+          display: inline-block;
+
+          &.available {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+          }
+
+          &.unavailable {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+          }
+        }
+      }
+    }
+
+    tr {
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.02);
+      }
+
+      &.unavailable-row {
+        opacity: 0.6;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.01);
+        }
+      }
+    }
+  }
+}
+
+// Namer-specific modal styles
+.confirmation-details {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border-left: 3px solid $primary-color;
+  font-family: $font-primary;
+  font-size: 0.9rem;
+  color: $text-color;
+  line-height: 1.5;
+}
+
+.loading-spinner {
+  background-color: $card-background;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid $border-color;
+
+  i {
+    font-size: 2rem;
+    color: $primary-color;
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  p {
+    margin: 0;
+    color: $text-color;
+    font-family: $font-primary;
+  }
+}
+
+.error-message {
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background-color: rgba(255, 107, 107, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid #ff6b6b;
 }
 
 // Status badges

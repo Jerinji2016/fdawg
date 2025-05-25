@@ -18,6 +18,11 @@ class NamerManager {
             this.loadCurrentNames();
         });
 
+        // Toggle current names section
+        document.getElementById('toggle-current-names').addEventListener('click', () => {
+            this.toggleCurrentNamesSection();
+        });
+
         // Universal name setting
         document.getElementById('set-universal-btn').addEventListener('click', () => {
             this.setUniversalName();
@@ -32,15 +37,6 @@ class NamerManager {
         document.getElementById('clear-platform-forms-btn').addEventListener('click', () => {
             this.clearPlatformForms();
         });
-
-        // Confirmation dialog
-        document.getElementById('confirm-yes-btn').addEventListener('click', () => {
-            this.executeConfirmedAction();
-        });
-
-        document.getElementById('confirm-no-btn').addEventListener('click', () => {
-            this.hideConfirmationDialog();
-        });
     }
 
     async loadPlatforms() {
@@ -49,7 +45,7 @@ class NamerManager {
             if (!response.ok) {
                 throw new Error('Failed to load platforms');
             }
-            
+
             const data = await response.json();
             this.platforms = data.all || [];
             this.renderPlatformForms();
@@ -61,7 +57,7 @@ class NamerManager {
 
     async loadCurrentNames() {
         this.showLoading();
-        
+
         try {
             const response = await fetch('/api/namer/get', {
                 method: 'POST',
@@ -88,9 +84,9 @@ class NamerManager {
 
     renderCurrentNames() {
         const container = document.getElementById('current-names-container');
-        
+
         if (!this.currentNames.app_names || this.currentNames.app_names.length === 0) {
-            container.innerHTML = '<p class="text-muted">No app names found</p>';
+            container.innerHTML = '<tr><td colspan="3" class="empty-state"><i class="fas fa-info-circle"></i> No app names found</td></tr>';
             return;
         }
 
@@ -99,66 +95,65 @@ class NamerManager {
             const statusClass = appName.available ? 'available' : 'unavailable';
             const statusText = appName.available ? 'Available' : 'Not Available';
 
-            return `
-                <div class="platform-card ${appName.available ? '' : 'unavailable'}">
-                    <div class="platform-header">
-                        <i class="${platformIcon}"></i>
-                        <h3>${this.capitalizeFirst(appName.platform)}</h3>
-                        <span class="platform-status ${statusClass}">${statusText}</span>
+            let appNameDisplay = '';
+            if (!appName.available) {
+                appNameDisplay = '<span class="not-available-text">Not Available</span>';
+            } else {
+                const displayName = appName.display_name || 'Not set';
+                const hasInternalName = appName.internal_name && appName.internal_name !== appName.display_name;
+
+                appNameDisplay = `
+                    <div class="app-name-cell">
+                        <div class="name-display">${displayName}</div>
+                        ${hasInternalName ? `<div class="name-internal">(Internal: ${appName.internal_name})</div>` : ''}
+                        ${appName.error ? `<div class="error-text" title="${appName.error}"><i class="fas fa-exclamation-triangle"></i> ${appName.error}</div>` : ''}
                     </div>
-                    ${appName.available ? this.renderPlatformNames(appName) : ''}
-                    ${appName.error ? `<p class="text-error">${appName.error}</p>` : ''}
-                </div>
+                `;
+            }
+
+            return `
+                <tr class="${appName.available ? '' : 'unavailable-row'}">
+                    <td class="platform-cell">
+                        <i class="${platformIcon}"></i>
+                        <span class="platform-name">${this.capitalizeFirst(appName.platform)}</span>
+                    </td>
+                    <td class="app-name-cell">
+                        ${appNameDisplay}
+                    </td>
+                    <td class="status-cell">
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </td>
+                </tr>
             `;
         }).join('');
 
         container.innerHTML = html;
     }
 
-    renderPlatformNames(appName) {
-        let html = '<div class="platform-names">';
-        
-        if (appName.display_name) {
-            html += `
-                <div class="name-item">
-                    <div class="name-label">Display Name:</div>
-                    <div class="name-value">${appName.display_name}</div>
-                </div>
-            `;
-        }
 
-        if (appName.internal_name && appName.internal_name !== appName.display_name) {
-            html += `
-                <div class="name-item">
-                    <div class="name-label">Internal Name:</div>
-                    <div class="name-value">${appName.internal_name}</div>
-                </div>
-            `;
-        }
-
-        html += '</div>';
-        return html;
-    }
 
     renderPlatformForms() {
         const container = document.getElementById('platform-forms');
-        
+
         const html = this.platforms.map(platform => {
             const platformIcon = this.getPlatformIcon(platform.id);
             const isAvailable = platform.available;
 
             return `
-                <div class="platform-form ${isAvailable ? '' : 'unavailable'}">
+                <div class="platform-form-card ${isAvailable ? '' : 'unavailable'}">
                     <div class="platform-header">
-                        <i class="${platformIcon}"></i>
-                        <h4>${platform.name}</h4>
+                        <div class="platform-title">
+                            <i class="${platformIcon}"></i>
+                            ${platform.name}
+                        </div>
                         <span class="platform-status ${isAvailable ? 'available' : 'unavailable'}">
                             ${isAvailable ? 'Available' : 'Not Available'}
                         </span>
                     </div>
-                    <input 
-                        type="text" 
-                        id="platform-${platform.id}" 
+                    <input
+                        type="text"
+                        id="platform-${platform.id}"
+                        class="platform-input"
                         placeholder="Enter app name for ${platform.name}"
                         ${isAvailable ? '' : 'disabled'}
                     >
@@ -171,7 +166,7 @@ class NamerManager {
 
     async setUniversalName() {
         const universalName = document.getElementById('universal-name').value.trim();
-        
+
         if (!universalName) {
             showToast('Please enter an app name', 'warning');
             return;
@@ -184,8 +179,8 @@ class NamerManager {
         }
 
         const message = `Set "${universalName}" as the app name for all available platforms?`;
-        const details = availablePlatforms.map(p => `• ${p.name}`).join('\n');
-        
+        const details = availablePlatforms.map(p => `• ${p.name}`).join('<br>');
+
         this.showConfirmationDialog(message, details, async () => {
             await this.executeSetNames({ universal: universalName });
         });
@@ -214,7 +209,7 @@ class NamerManager {
         const message = 'Set the following platform-specific app names?';
         const details = Object.entries(platformNames)
             .map(([platform, name]) => `• ${this.capitalizeFirst(platform)}: "${name}"`)
-            .join('\n');
+            .join('<br>');
 
         this.showConfirmationDialog(message, details, async () => {
             await this.executeSetNames({ platforms: platformNames });
@@ -238,12 +233,12 @@ class NamerManager {
                 throw new Error(errorText || 'Failed to set app names');
             }
 
-            const result = await response.json();
+            await response.json();
             showToast('App names updated successfully!', 'success');
-            
+
             // Refresh the current names display
             await this.loadCurrentNames();
-            
+
             // Clear forms
             this.clearAllForms();
 
@@ -270,31 +265,92 @@ class NamerManager {
         this.clearPlatformForms();
     }
 
+    toggleCurrentNamesSection() {
+        const summary = document.getElementById('current-names-summary');
+        const toggleBtn = document.getElementById('toggle-current-names');
+        const icon = toggleBtn.querySelector('i');
+
+        if (summary.style.display === 'none') {
+            summary.style.display = 'block';
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        } else {
+            summary.style.display = 'none';
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        }
+    }
+
     showConfirmationDialog(message, details, action) {
-        document.getElementById('confirmation-message').textContent = message;
-        document.getElementById('confirmation-details').textContent = details;
-        document.getElementById('confirmation-dialog').style.display = 'flex';
-        this.pendingAction = action;
+        const modalHTML = `
+            <div class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-question-circle"></i> Confirm Action</h3>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>${message}</p>
+                        <div class="confirmation-details">${details}</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="primary-btn confirm-yes-btn">
+                            <i class="fas fa-check"></i> Yes, Continue
+                        </button>
+                        <button class="secondary-btn confirm-no-btn">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        const modal = document.querySelector('.modal-overlay:last-child');
+
+        // Add event listeners
+        modal.querySelector('.modal-close').addEventListener('click', () => this.hideConfirmationDialog(modal));
+        modal.querySelector('.confirm-no-btn').addEventListener('click', () => this.hideConfirmationDialog(modal));
+        modal.querySelector('.confirm-yes-btn').addEventListener('click', async () => {
+            this.hideConfirmationDialog(modal);
+            await action();
+        });
+
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.hideConfirmationDialog(modal);
+            }
+        });
     }
 
-    hideConfirmationDialog() {
-        document.getElementById('confirmation-dialog').style.display = 'none';
-        this.pendingAction = null;
-    }
-
-    async executeConfirmedAction() {
-        this.hideConfirmationDialog();
-        if (this.pendingAction) {
-            await this.pendingAction();
+    hideConfirmationDialog(modal) {
+        if (modal) {
+            modal.remove();
         }
     }
 
     showLoading() {
-        document.getElementById('loading-overlay').style.display = 'flex';
+        if (!document.getElementById('loading-overlay')) {
+            const loadingHTML = `
+                <div id="loading-overlay" class="modal-overlay">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Processing...</p>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', loadingHTML);
+        } else {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
     }
 
     hideLoading() {
-        document.getElementById('loading-overlay').style.display = 'none';
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+        }
     }
 
     getPlatformIcon(platform) {
