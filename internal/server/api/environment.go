@@ -87,7 +87,7 @@ func SetupEnvironmentAPIRoutes(project *flutter.ValidationResult) {
 		// Validate key format (must start with letter or underscore, and contain only letters, numbers, and underscores)
 		keyRegex := regexp.MustCompile("^[A-Za-z_][A-Za-z0-9_]*$")
 		if !keyRegex.MatchString(key) {
-			if regexp.MustCompile("^\\d").MatchString(key) {
+			if regexp.MustCompile(`^\d`).MatchString(key) {
 				http.Error(w, "Key must not start with a number (Dart variable naming convention)", http.StatusBadRequest)
 			} else {
 				http.Error(w, "Key must contain only letters, numbers, and underscores (no spaces or special characters)", http.StatusBadRequest)

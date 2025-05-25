@@ -565,9 +565,6 @@ function validateKey(inputElement, errorElement) {
             errorElement.style.display = "block";
         }
 
-        // Also show a toast notification
-        showWarningToast(errorMessage, "Invalid Key Format");
-
         if (inputElement) {
             inputElement.classList.add("input-error");
         }
