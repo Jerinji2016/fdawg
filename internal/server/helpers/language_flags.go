@@ -1,9 +1,9 @@
-package api
+package helpers
 
 import "strings"
 
-// getLanguageFlag returns the flag emoji for a language code
-func getLanguageFlag(code string) string {
+// GetLanguageFlag returns the flag emoji for a language code
+func GetLanguageFlag(code string) string {
 	languageFlags := map[string]string{
 		"en":    "🇺🇸", // Default to US flag for English
 		"en_US": "🇺🇸",

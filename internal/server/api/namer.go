@@ -3,9 +3,9 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 	"strings"
 
+	"github.com/Jerinji2016/fdawg/internal/server/helpers"
 	"github.com/Jerinji2016/fdawg/pkg/flutter"
 	"github.com/Jerinji2016/fdawg/pkg/namer"
 )
@@ -201,7 +201,7 @@ func (api *NamerAPI) handleGetPlatforms(w http.ResponseWriter, r *http.Request) 
 	var availablePlatforms []PlatformInfo
 	for _, platform := range allPlatforms {
 		// Check if platform directory exists
-		available := isPlatformDirectoryAvailable(result.ProjectPath, platform.ID)
+		available := helpers.IsPlatformDirectoryAvailable(result.ProjectPath, platform.ID)
 		platform.Available = available
 
 		if available {
@@ -216,36 +216,6 @@ func (api *NamerAPI) handleGetPlatforms(w http.ResponseWriter, r *http.Request) 
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
-}
-
-// isPlatformDirectoryAvailable checks if a platform directory exists
-func isPlatformDirectoryAvailable(projectPath, platformID string) bool {
-	// This is a simplified check - the actual namer package has more sophisticated logic
-	switch platformID {
-	case "android":
-		return dirExists(projectPath + "/android")
-	case "ios":
-		return dirExists(projectPath + "/ios")
-	case "macos":
-		return dirExists(projectPath + "/macos")
-	case "linux":
-		return dirExists(projectPath + "/linux")
-	case "windows":
-		return dirExists(projectPath + "/windows")
-	case "web":
-		return dirExists(projectPath + "/web")
-	default:
-		return false
-	}
-}
-
-// dirExists checks if a directory exists
-func dirExists(path string) bool {
-	info, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return info.IsDir()
 }
 
 // SetupNamerAPIRoutes sets up namer API routes

@@ -8,39 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Jerinji2016/fdawg/internal/server/helpers"
 	"github.com/Jerinji2016/fdawg/pkg/flutter"
 	"github.com/Jerinji2016/fdawg/pkg/localization"
 )
-
-// LocalizationData represents the data structure for localization API responses
-type LocalizationData struct {
-	Languages       []LanguageInfo    `json:"languages"`
-	TranslationKeys []TranslationKey  `json:"translationKeys"`
-	Stats           LocalizationStats `json:"stats"`
-}
-
-// LanguageInfo represents information about a supported language
-type LanguageInfo struct {
-	Code           string `json:"code"`
-	Name           string `json:"name"`
-	Flag           string `json:"flag"`
-	CompletionRate int    `json:"completionRate"`
-	MissingKeys    int    `json:"missingKeys"`
-}
-
-// TranslationKey represents a translation key with its values in different languages
-type TranslationKey struct {
-	Key          string            `json:"key"`
-	Translations map[string]string `json:"translations"`
-}
-
-// LocalizationStats represents statistics about the localization
-type LocalizationStats struct {
-	SupportedLanguages  int `json:"supportedLanguages"`
-	TranslationKeys     int `json:"translationKeys"`
-	MissingTranslations int `json:"missingTranslations"`
-	CompletionRate      int `json:"completionRate"`
-}
 
 // SetupLocalizationAPIRoutes sets up the localization API routes
 func SetupLocalizationAPIRoutes(project *flutter.ValidationResult) {
@@ -97,7 +68,7 @@ func SetupLocalizationAPIRoutes(project *flutter.ValidationResult) {
 		}
 
 		// Build response data
-		data := buildLocalizationData(translationFiles)
+		data := helpers.BuildLocalizationData(translationFiles)
 
 		// Set content type
 		w.Header().Set("Content-Type", "application/json")

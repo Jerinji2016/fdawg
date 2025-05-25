@@ -1,4 +1,4 @@
-package api
+package helpers
 
 import (
 	"fmt"
@@ -7,8 +7,38 @@ import (
 	"github.com/Jerinji2016/fdawg/pkg/localization"
 )
 
-// buildLocalizationData builds the localization data from translation files
-func buildLocalizationData(translationFiles []localization.TranslationFile) LocalizationData {
+// LocalizationData represents the data structure for localization API responses
+type LocalizationData struct {
+	Languages       []LanguageInfo    `json:"languages"`
+	TranslationKeys []TranslationKey  `json:"translationKeys"`
+	Stats           LocalizationStats `json:"stats"`
+}
+
+// LanguageInfo represents information about a supported language
+type LanguageInfo struct {
+	Code           string `json:"code"`
+	Name           string `json:"name"`
+	Flag           string `json:"flag"`
+	CompletionRate int    `json:"completionRate"`
+	MissingKeys    int    `json:"missingKeys"`
+}
+
+// TranslationKey represents a translation key with its values across languages
+type TranslationKey struct {
+	Key          string            `json:"key"`
+	Translations map[string]string `json:"translations"`
+}
+
+// LocalizationStats represents overall localization statistics
+type LocalizationStats struct {
+	SupportedLanguages   int `json:"supportedLanguages"`
+	TranslationKeys      int `json:"translationKeys"`
+	MissingTranslations  int `json:"missingTranslations"`
+	CompletionRate       int `json:"completionRate"`
+}
+
+// BuildLocalizationData builds the localization data from translation files
+func BuildLocalizationData(translationFiles []localization.TranslationFile) LocalizationData {
 	data := LocalizationData{
 		Languages:       []LanguageInfo{},
 		TranslationKeys: []TranslationKey{},
@@ -27,8 +57,8 @@ func buildLocalizationData(translationFiles []localization.TranslationFile) Loca
 	for _, file := range translationFiles {
 		langInfo := &LanguageInfo{
 			Code:           file.Language,
-			Name:           getLanguageName(file.Language),
-			Flag:           getLanguageFlag(file.Language),
+			Name:           GetLanguageName(file.Language),
+			Flag:           GetLanguageFlag(file.Language),
 			CompletionRate: 0,
 			MissingKeys:    0,
 		}
@@ -156,8 +186,8 @@ func getValueFromData(data map[string]interface{}, key string) string {
 	return ""
 }
 
-// getLanguageName returns the display name for a language code
-func getLanguageName(code string) string {
+// GetLanguageName returns the display name for a language code
+func GetLanguageName(code string) string {
 	languageNames := map[string]string{
 		"en":    "English",
 		"en_US": "English (US)",
