@@ -1,0 +1,7 @@
+# Guidelines
+
+- Always run `make clean` before building
+- Use `npm run sass` to compile sass
+- Use `make build` to build the go binary
+- The `main.go` is located at `cmd/flutter-manager/main.go`
+- Use `dawgs_test` for testing the fdawg commands
