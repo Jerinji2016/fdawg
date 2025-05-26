@@ -23,6 +23,11 @@ class NamerManager {
             this.toggleCurrentNamesSection();
         });
 
+        // Toggle platform information section
+        document.getElementById('toggle-platform-info').addEventListener('click', () => {
+            this.togglePlatformInfoSection();
+        });
+
         // Universal name setting
         document.getElementById('set-universal-btn').addEventListener('click', () => {
             this.setUniversalName();
@@ -276,6 +281,22 @@ class NamerManager {
             icon.classList.add('fa-chevron-up');
         } else {
             summary.style.display = 'none';
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        }
+    }
+
+    togglePlatformInfoSection() {
+        const container = document.getElementById('platform-info-container');
+        const toggleBtn = document.getElementById('toggle-platform-info');
+        const icon = toggleBtn.querySelector('i');
+
+        if (container.style.display === 'none') {
+            container.style.display = 'grid';
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        } else {
+            container.style.display = 'none';
             icon.classList.remove('fa-chevron-up');
             icon.classList.add('fa-chevron-down');
         }

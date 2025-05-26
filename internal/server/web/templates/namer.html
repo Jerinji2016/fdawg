@@ -82,17 +82,26 @@
         <!-- Platform Information Section -->
         <div class="namer-section">
             <div class="section-header">
-                <h4><i class="fas fa-info-circle"></i> Platform Information</h4>
+                <h4><i class="fas fa-info-circle"></i> Platform Information <button id="toggle-platform-info" class="toggle-btn"><i class="fas fa-chevron-down"></i></button></h4>
             </div>
 
-            <div class="card-grid">
+            <div id="platform-info-container" class="card-grid" style="display: none;">
                 <div class="info-card">
                     <div class="card-header">
                         <span class="card-label"><i class="fab fa-android"></i> Android</span>
                     </div>
                     <div class="platform-info-content">
-                        <p>App name is configured in <code>android/app/src/main/AndroidManifest.xml</code></p>
-                        <p>Property: <code>android:label</code></p>
+                        <div class="info-item">
+                            <div class="info-label">Configuration File</div>
+                            <div class="info-value">android/app/src/main/AndroidManifest.xml</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Property</div>
+                            <div class="info-value">android:label</div>
+                        </div>
+                        <div class="info-description">
+                            The app name appears in the app launcher and system settings.
+                        </div>
                     </div>
                 </div>
 
@@ -101,8 +110,18 @@
                         <span class="card-label"><i class="fab fa-apple"></i> iOS</span>
                     </div>
                     <div class="platform-info-content">
-                        <p>App name is configured in <code>ios/Runner/Info.plist</code></p>
-                        <p>Properties: <code>CFBundleDisplayName</code> and <code>CFBundleName</code></p>
+                        <div class="info-item">
+                            <div class="info-label">Configuration File</div>
+                            <div class="info-value">ios/Runner/Info.plist</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Properties</div>
+                            <div class="info-value">CFBundleDisplayName
+CFBundleName</div>
+                        </div>
+                        <div class="info-description">
+                            CFBundleDisplayName is shown on the home screen, CFBundleName is the internal identifier.
+                        </div>
                     </div>
                 </div>
 
@@ -111,8 +130,17 @@
                         <span class="card-label"><i class="fab fa-apple"></i> macOS</span>
                     </div>
                     <div class="platform-info-content">
-                        <p>App name is configured in <code>macos/Runner/Configs/AppInfo.xcconfig</code></p>
-                        <p>Property: <code>PRODUCT_NAME</code></p>
+                        <div class="info-item">
+                            <div class="info-label">Configuration File</div>
+                            <div class="info-value">macos/Runner/Configs/AppInfo.xcconfig</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Property</div>
+                            <div class="info-value">PRODUCT_NAME</div>
+                        </div>
+                        <div class="info-description">
+                            The app name appears in the dock, menu bar, and Applications folder.
+                        </div>
                     </div>
                 </div>
 
@@ -121,8 +149,17 @@
                         <span class="card-label"><i class="fab fa-linux"></i> Linux</span>
                     </div>
                     <div class="platform-info-content">
-                        <p>App name is configured in <code>linux/CMakeLists.txt</code></p>
-                        <p>Property: <code>BINARY_NAME</code></p>
+                        <div class="info-item">
+                            <div class="info-label">Configuration File</div>
+                            <div class="info-value">linux/CMakeLists.txt</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Property</div>
+                            <div class="info-value">BINARY_NAME</div>
+                        </div>
+                        <div class="info-description">
+                            The binary name used for the executable file and desktop entry.
+                        </div>
                     </div>
                 </div>
 
@@ -131,8 +168,18 @@
                         <span class="card-label"><i class="fab fa-windows"></i> Windows</span>
                     </div>
                     <div class="platform-info-content">
-                        <p>App name is configured in <code>windows/CMakeLists.txt</code></p>
-                        <p>Properties: <code>project()</code> and <code>BINARY_NAME</code></p>
+                        <div class="info-item">
+                            <div class="info-label">Configuration File</div>
+                            <div class="info-value">windows/CMakeLists.txt</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Properties</div>
+                            <div class="info-value">project()
+BINARY_NAME</div>
+                        </div>
+                        <div class="info-description">
+                            The project name and binary name for the Windows executable.
+                        </div>
                     </div>
                 </div>
 
@@ -141,8 +188,19 @@
                         <span class="card-label"><i class="fas fa-globe"></i> Web</span>
                     </div>
                     <div class="platform-info-content">
-                        <p>App name is configured in <code>web/manifest.json</code> and <code>web/index.html</code></p>
-                        <p>Properties: <code>name</code>, <code>short_name</code>, and <code>&lt;title&gt;</code></p>
+                        <div class="info-item">
+                            <div class="info-label">Configuration Files</div>
+                            <div class="info-value">web/manifest.json
+web/index.html</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Properties</div>
+                            <div class="info-value">name, short_name
+&lt;title&gt;</div>
+                        </div>
+                        <div class="info-description">
+                            The app name appears in the browser tab, PWA installation, and web app manifest.
+                        </div>
                     </div>
                 </div>
             </div>

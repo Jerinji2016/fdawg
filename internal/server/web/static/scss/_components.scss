@@ -1764,6 +1764,8 @@
 
     .platform-input {
       width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
       padding: 8px 12px;
       border: 1px solid $border-color;
       border-radius: 6px;
@@ -1771,6 +1773,8 @@
       color: $text-color;
       font-family: $font-primary;
       font-size: 0.9rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       &:focus {
         outline: none;
@@ -1861,6 +1865,56 @@
 }
 
 .platform-info-content {
+  padding: 15px 0;
+
+  .info-item {
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .info-label {
+      font-size: 0.75rem;
+      color: $text-light;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    .info-value {
+      background-color: rgba(0, 0, 0, 0.3);
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: $font-mono;
+      font-size: 0.8rem;
+      color: $text-color;
+      word-break: break-all;
+      white-space: pre-wrap;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      line-height: 1.3;
+      position: relative;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+    }
+  }
+
+  .info-description {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.85rem;
+    color: $text-light;
+    line-height: 1.4;
+    font-style: italic;
+  }
+
+  // Legacy support for old format
   p {
     margin: 8px 0;
     font-size: 0.85rem;
@@ -1868,9 +1922,10 @@
     line-height: 1.4;
 
     code {
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 2px 6px;
-      border-radius: 3px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border: 1px solid $border-color;
+      padding: 4px 8px;
+      border-radius: 4px;
       font-family: $font-mono;
       font-size: 0.8rem;
       color: $text-color;
@@ -2072,6 +2127,141 @@
   background-color: rgba(255, 107, 107, 0.1);
   border-radius: 4px;
   border-left: 3px solid #ff6b6b;
+}
+
+// Modal dialog button fixes
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+
+  .modal-content {
+    background: $card-background;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    border: 1px solid $border-color;
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid $border-color;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      h3 {
+        margin: 0;
+        color: $text-color;
+        font-family: $font-primary;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        i {
+          color: $primary-color;
+        }
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        color: $text-light;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: $text-color;
+        }
+      }
+    }
+
+    .modal-body {
+      padding: 20px;
+
+      p {
+        margin: 0 0 15px 0;
+        color: $text-color;
+        font-family: $font-primary;
+        line-height: 1.5;
+      }
+    }
+
+    .modal-footer {
+      padding: 20px;
+      border-top: 1px solid $border-color;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+
+      .primary-btn,
+      .secondary-btn,
+      .confirm-yes-btn,
+      .confirm-no-btn {
+        padding: 10px 20px !important;
+        font-size: 0.9rem !important;
+        border-radius: 6px !important;
+        border: none !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        font-family: $font-primary !important;
+        font-weight: 500 !important;
+        text-decoration: none !important;
+        min-width: auto !important;
+        box-sizing: border-box !important;
+
+        i {
+          font-size: 0.85rem !important;
+        }
+
+        &:hover {
+          transform: translateY(-1px) !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        &:active {
+          transform: translateY(0) !important;
+        }
+      }
+
+      .primary-btn,
+      .confirm-yes-btn {
+        background-color: $primary-color !important;
+        color: white !important;
+
+        &:hover {
+          background-color: #0175c2 !important;
+        }
+      }
+
+      .secondary-btn,
+      .confirm-no-btn {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: $text-color !important;
+        border: 1px solid $border-color !important;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.15) !important;
+          border-color: rgba(255, 255, 255, 0.3) !important;
+        }
+      }
+    }
+  }
 }
 
 // Status badges
