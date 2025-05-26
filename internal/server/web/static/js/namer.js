@@ -16,11 +16,7 @@ class NamerManager {
         // Refresh button
         document.getElementById('refresh-names-btn').addEventListener('click', () => {
             this.loadCurrentNames();
-        });
-
-        // Toggle current names section
-        document.getElementById('toggle-current-names').addEventListener('click', () => {
-            this.toggleCurrentNamesSection();
+            this.loadPlatforms();
         });
 
         // Toggle platform information section
@@ -31,16 +27,6 @@ class NamerManager {
         // Universal name setting
         document.getElementById('set-universal-btn').addEventListener('click', () => {
             this.setUniversalName();
-        });
-
-        // Platform-specific name setting
-        document.getElementById('set-platform-specific-btn').addEventListener('click', () => {
-            this.setPlatformSpecificNames();
-        });
-
-        // Clear platform forms
-        document.getElementById('clear-platform-forms-btn').addEventListener('click', () => {
-            this.clearPlatformForms();
         });
     }
 
@@ -78,61 +64,14 @@ class NamerManager {
 
             const data = await response.json();
             this.currentNames = data;
-            this.renderCurrentNames();
+            // Re-render platform forms with updated current names
+            this.renderPlatformForms();
         } catch (error) {
             console.error('Error loading current names:', error);
             showToast('Failed to load current app names', 'error');
         } finally {
             this.hideLoading();
         }
-    }
-
-    renderCurrentNames() {
-        const container = document.getElementById('current-names-container');
-
-        if (!this.currentNames.app_names || this.currentNames.app_names.length === 0) {
-            container.innerHTML = '<tr><td colspan="3" class="empty-state"><i class="fas fa-info-circle"></i> No app names found</td></tr>';
-            return;
-        }
-
-        const html = this.currentNames.app_names.map(appName => {
-            const platformIcon = this.getPlatformIcon(appName.platform);
-            const statusClass = appName.available ? 'available' : 'unavailable';
-            const statusText = appName.available ? 'Available' : 'Not Available';
-
-            let appNameDisplay = '';
-            if (!appName.available) {
-                appNameDisplay = '<span class="not-available-text">Not Available</span>';
-            } else {
-                const displayName = appName.display_name || 'Not set';
-                const hasInternalName = appName.internal_name && appName.internal_name !== appName.display_name;
-
-                appNameDisplay = `
-                    <div class="app-name-cell">
-                        <div class="name-display">${displayName}</div>
-                        ${hasInternalName ? `<div class="name-internal">(Internal: ${appName.internal_name})</div>` : ''}
-                        ${appName.error ? `<div class="error-text" title="${appName.error}"><i class="fas fa-exclamation-triangle"></i> ${appName.error}</div>` : ''}
-                    </div>
-                `;
-            }
-
-            return `
-                <tr class="${appName.available ? '' : 'unavailable-row'}">
-                    <td class="platform-cell">
-                        <i class="${platformIcon}"></i>
-                        <span class="platform-name">${this.capitalizeFirst(appName.platform)}</span>
-                    </td>
-                    <td class="app-name-cell">
-                        ${appNameDisplay}
-                    </td>
-                    <td class="status-cell">
-                        <span class="status-badge ${statusClass}">${statusText}</span>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-
-        container.innerHTML = html;
     }
 
 
@@ -143,6 +82,14 @@ class NamerManager {
         const html = this.platforms.map(platform => {
             const platformIcon = this.getPlatformIcon(platform.id);
             const isAvailable = platform.available;
+
+            // Find current app name for this platform
+            const currentAppName = this.currentNames.app_names ?
+                this.currentNames.app_names.find(app => app.platform === platform.id) : null;
+
+            const currentDisplayName = currentAppName ? currentAppName.display_name || 'Not set' : 'Loading...';
+            const hasInternalName = currentAppName && currentAppName.internal_name &&
+                currentAppName.internal_name !== currentAppName.display_name;
 
             return `
                 <div class="platform-form-card ${isAvailable ? '' : 'unavailable'}">
@@ -155,13 +102,42 @@ class NamerManager {
                             ${isAvailable ? 'Available' : 'Not Available'}
                         </span>
                     </div>
-                    <input
-                        type="text"
-                        id="platform-${platform.id}"
-                        class="platform-input"
-                        placeholder="Enter app name for ${platform.name}"
-                        ${isAvailable ? '' : 'disabled'}
-                    >
+
+                    ${isAvailable ? `
+                        <div class="current-name-display">
+                            <div class="current-name-header">
+                                <div class="current-name-label">Current Name:</div>
+                                <button class="edit-toggle-btn" onclick="namerManager.toggleEdit('${platform.id}')" title="Edit app name">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                            <div class="current-name-value">${currentDisplayName}</div>
+                            ${hasInternalName ? `<div class="current-internal-name">(Internal: ${currentAppName.internal_name})</div>` : ''}
+                            ${currentAppName && currentAppName.error ? `<div class="error-text"><i class="fas fa-exclamation-triangle"></i> ${currentAppName.error}</div>` : ''}
+                        </div>
+
+                        <div class="edit-name-section" id="edit-section-${platform.id}" style="display: none;">
+                            <input
+                                type="text"
+                                id="platform-${platform.id}"
+                                class="platform-input"
+                                placeholder="Enter new app name for ${platform.name}"
+                                value=""
+                            >
+                            <div class="edit-buttons">
+                                <button class="save-platform-btn" onclick="namerManager.savePlatformName('${platform.id}')">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                                <button class="cancel-edit-btn" onclick="namerManager.cancelEdit('${platform.id}')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="unavailable-message">
+                            <i class="fas fa-info-circle"></i> Platform not available in this project
+                        </div>
+                    `}
                 </div>
             `;
         }).join('');
@@ -191,33 +167,52 @@ class NamerManager {
         });
     }
 
-    async setPlatformSpecificNames() {
-        const platformNames = {};
-        let hasNames = false;
+    toggleEdit(platformId) {
+        const editSection = document.getElementById(`edit-section-${platformId}`);
+        const isVisible = editSection.style.display !== 'none';
 
-        this.platforms.forEach(platform => {
-            if (platform.available) {
-                const input = document.getElementById(`platform-${platform.id}`);
-                const value = input.value.trim();
-                if (value) {
-                    platformNames[platform.id] = value;
-                    hasNames = true;
-                }
+        if (isVisible) {
+            editSection.style.display = 'none';
+        } else {
+            editSection.style.display = 'block';
+            // Focus on the input field
+            const input = document.getElementById(`platform-${platformId}`);
+            if (input) {
+                input.focus();
             }
-        });
+        }
+    }
 
-        if (!hasNames) {
-            showToast('Please enter at least one app name', 'warning');
+    cancelEdit(platformId) {
+        const editSection = document.getElementById(`edit-section-${platformId}`);
+        const input = document.getElementById(`platform-${platformId}`);
+
+        // Hide edit section and clear input
+        editSection.style.display = 'none';
+        if (input) {
+            input.value = '';
+        }
+    }
+
+    async savePlatformName(platformId) {
+        const input = document.getElementById(`platform-${platformId}`);
+        const newName = input.value.trim();
+
+        if (!newName) {
+            showToast('Please enter an app name', 'warning');
             return;
         }
 
-        const message = 'Set the following platform-specific app names?';
-        const details = Object.entries(platformNames)
-            .map(([platform, name]) => `• ${this.capitalizeFirst(platform)}: "${name}"`)
-            .join('<br>');
+        const platform = this.platforms.find(p => p.id === platformId);
+        const platformName = platform ? platform.name : this.capitalizeFirst(platformId);
+
+        const message = `Set "${newName}" as the app name for ${platformName}?`;
+        const details = `Platform: ${platformName}<br>New Name: "${newName}"`;
 
         this.showConfirmationDialog(message, details, async () => {
-            await this.executeSetNames({ platforms: platformNames });
+            await this.executeSetNames({ platforms: { [platformId]: newName } });
+            // Hide edit section and clear input after successful save
+            this.cancelEdit(platformId);
         });
     }
 
@@ -255,35 +250,16 @@ class NamerManager {
         }
     }
 
-    clearPlatformForms() {
+    clearAllForms() {
+        document.getElementById('universal-name').value = '';
+        // Clear all platform inputs
         this.platforms.forEach(platform => {
             const input = document.getElementById(`platform-${platform.id}`);
             if (input) {
                 input.value = '';
             }
         });
-        showToast('Platform forms cleared', 'info');
-    }
-
-    clearAllForms() {
-        document.getElementById('universal-name').value = '';
-        this.clearPlatformForms();
-    }
-
-    toggleCurrentNamesSection() {
-        const summary = document.getElementById('current-names-summary');
-        const toggleBtn = document.getElementById('toggle-current-names');
-        const icon = toggleBtn.querySelector('i');
-
-        if (summary.style.display === 'none') {
-            summary.style.display = 'block';
-            icon.classList.remove('fa-chevron-down');
-            icon.classList.add('fa-chevron-up');
-        } else {
-            summary.style.display = 'none';
-            icon.classList.remove('fa-chevron-up');
-            icon.classList.add('fa-chevron-down');
-        }
+        showToast('All forms cleared', 'info');
     }
 
     togglePlatformInfoSection() {
@@ -391,7 +367,10 @@ class NamerManager {
     }
 }
 
+// Global instance for onclick handlers
+let namerManager;
+
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new NamerManager();
+    namerManager = new NamerManager();
 });

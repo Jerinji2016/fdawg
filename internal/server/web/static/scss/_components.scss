@@ -1762,33 +1762,175 @@
       }
     }
 
-    .platform-input {
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
-      padding: 8px 12px;
-      border: 1px solid $border-color;
+    .current-name-display {
+      margin-bottom: 15px;
+      padding: 15px;
+      background-color: rgba(255, 255, 255, 0.03);
       border-radius: 6px;
-      background-color: rgba(255, 255, 255, 0.05);
-      color: $text-color;
-      font-family: $font-primary;
-      font-size: 0.9rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      border: 1px solid rgba(255, 255, 255, 0.05);
 
-      &:focus {
-        outline: none;
-        border-color: $primary-color;
-        background-color: rgba(255, 255, 255, 0.1);
+      .current-name-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+
+        .current-name-label {
+          font-size: 0.75rem;
+          color: $text-light;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-weight: 500;
+        }
+
+        .edit-toggle-btn {
+          background: none;
+          border: none;
+          color: $text-light;
+          cursor: pointer;
+          padding: 6px 8px;
+          border-radius: 4px;
+          transition: all 0.3s ease;
+          font-size: 0.85rem;
+
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: $primary-color;
+          }
+
+          i {
+            font-size: 0.8rem;
+          }
+        }
       }
 
-      &::placeholder {
+      .current-name-value {
+        font-family: $font-mono;
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: $text-color;
+        border: 1px solid $border-color;
+        margin-bottom: 6px;
+      }
+
+      .current-internal-name {
+        font-size: 0.8rem;
         color: $text-light;
+        font-style: italic;
+        margin-top: 4px;
       }
 
-      &:disabled {
-        cursor: not-allowed;
-        opacity: 0.5;
+      .error-text {
+        font-size: 0.75rem;
+        color: #ff6b6b;
+        margin-top: 6px;
+
+        i {
+          margin-right: 4px;
+        }
+      }
+    }
+
+    .edit-name-section {
+      padding: 15px;
+      background-color: rgba(255, 255, 255, 0.02);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 10px;
+
+      .platform-input {
+        width: 100%;
+        max-width: none;
+        box-sizing: border-box;
+        padding: 10px 15px;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        background-color: rgba(255, 255, 255, 0.05);
+        color: $text-color;
+        font-family: $font-primary;
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        &::placeholder {
+          color: $text-light;
+        }
+      }
+
+      .edit-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+
+        .save-platform-btn,
+        .cancel-edit-btn {
+          padding: 8px 16px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-family: $font-primary;
+          font-size: 0.85rem;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          transition: all 0.3s ease;
+          white-space: nowrap;
+
+          &:hover {
+            transform: translateY(-1px);
+          }
+
+          &:active {
+            transform: translateY(0);
+          }
+
+          i {
+            font-size: 0.8rem;
+          }
+        }
+
+        .save-platform-btn {
+          background-color: $primary-color;
+          color: white;
+
+          &:hover {
+            background-color: #0175c2;
+          }
+        }
+
+        .cancel-edit-btn {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: $text-light;
+          border: 1px solid $border-color;
+
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: $text-color;
+          }
+        }
+      }
+    }
+
+    .unavailable-message {
+      padding: 15px;
+      text-align: center;
+      color: $text-light;
+      font-style: italic;
+      background-color: rgba(255, 255, 255, 0.02);
+      border-radius: 6px;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+
+      i {
+        margin-right: 8px;
+        color: $text-light;
       }
     }
   }
