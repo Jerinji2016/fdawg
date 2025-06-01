@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/Jerinji2016/fdawg/discussions
+    about: Ask questions, share ideas, and discuss FDAWG with the community
+  - name: 📖 Documentation
+    url: https://jerinji2016.github.io/fdawg/
+    about: Read the comprehensive documentation for FDAWG
+  - name: 🚀 Quick Start Guide
+    url: https://jerinji2016.github.io/fdawg/installation
+    about: Get started with FDAWG installation and basic usage

@@ -1,0 +1,178 @@
+name: 🐛 Bug Report
+description: Report a bug or unexpected behavior in FDAWG
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the information below to help us understand and reproduce the issue.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following before submitting
+      options:
+        - label: I have searched existing issues to ensure this bug hasn't been reported
+          required: true
+        - label: I have read the [documentation](https://jerinji2016.github.io/fdawg/)
+          required: true
+        - label: I am using the latest version of FDAWG
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: Describe what happened and what you expected to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the behavior
+      placeholder: |
+        1. Navigate to '...'
+        2. Run command '...'
+        3. Click on '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen
+      placeholder: Describe the expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened
+      placeholder: Describe what actually happened
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-output
+    attributes:
+      label: Error Output
+      description: If applicable, paste any error messages or logs
+      placeholder: Paste error messages, stack traces, or relevant log output here
+      render: shell
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is affected?
+      options:
+        - CLI Commands
+        - Web Interface
+        - Environment Management
+        - Asset Management
+        - Localization
+        - App Namer
+        - Server/Web Server
+        - Build System
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: FDAWG Version
+      description: What version of FDAWG are you using?
+      placeholder: "v1.0.0 (run 'fdawg --version')"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      options:
+        - macOS
+        - Linux
+        - Windows
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: os-version
+    attributes:
+      label: OS Version
+      description: What version of your operating system?
+      placeholder: "e.g., macOS 14.0, Ubuntu 22.04, Windows 11"
+
+  - type: input
+    id: go-version
+    attributes:
+      label: Go Version
+      description: What version of Go are you using?
+      placeholder: "e.g., go1.23.2 (run 'go version')"
+
+  - type: input
+    id: flutter-version
+    attributes:
+      label: Flutter Version
+      description: What version of Flutter are you using?
+      placeholder: "e.g., Flutter 3.16.0 (run 'flutter --version')"
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser (if web interface issue)
+      description: Which browser are you using for the web interface?
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - Other
+        - Not applicable
+
+  - type: textarea
+    id: project-info
+    attributes:
+      label: Flutter Project Information
+      description: Information about the Flutter project you're working with
+      placeholder: |
+        - Project type: (app, package, plugin)
+        - Platforms: (android, ios, web, desktop)
+        - Any special configuration or dependencies
+      render: markdown
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here
+      placeholder: |
+        - Screenshots (if applicable)
+        - Workarounds you've tried
+        - Related issues or discussions
+        - Any other relevant information
+
+  - type: textarea
+    id: config-files
+    attributes:
+      label: Configuration Files
+      description: If relevant, paste contents of configuration files
+      placeholder: |
+        pubspec.yaml, environment files, or other relevant configuration
+      render: yaml

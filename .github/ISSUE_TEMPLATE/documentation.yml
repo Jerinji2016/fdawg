@@ -1,0 +1,174 @@
+name: 📚 Documentation Issue
+description: Report issues with documentation or suggest improvements
+title: "[Docs]: "
+labels: ["documentation", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve our documentation! Please provide details about the documentation issue or improvement.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following before submitting
+      options:
+        - label: I have searched existing issues to ensure this hasn't been reported
+          required: true
+        - label: I have checked the latest documentation at [jerinji2016.github.io/fdawg](https://jerinji2016.github.io/fdawg/)
+          required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Documentation Issue Type
+      description: What type of documentation issue is this?
+      options:
+        - Incorrect information
+        - Missing information
+        - Unclear explanation
+        - Broken links
+        - Formatting issues
+        - Typos/grammar
+        - Outdated content
+        - Missing examples
+        - Suggestion for improvement
+        - New documentation needed
+    validations:
+      required: true
+
+  - type: input
+    id: page-url
+    attributes:
+      label: Page URL
+      description: Link to the documentation page with the issue
+      placeholder: "https://jerinji2016.github.io/fdawg/..."
+
+  - type: textarea
+    id: section
+    attributes:
+      label: Section/Content
+      description: Which section or specific content has the issue?
+      placeholder: |
+        - Page title: "Installation Guide"
+        - Section: "Prerequisites"
+        - Specific paragraph or code block
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-content
+    attributes:
+      label: Current Content
+      description: What does the current documentation say? (copy/paste if applicable)
+      placeholder: Paste the current content that has issues
+      render: markdown
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: Issue Description
+      description: Describe what's wrong or unclear about the current documentation
+      placeholder: |
+        - What is incorrect or confusing?
+        - What information is missing?
+        - How could it be improved?
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-improvement
+    attributes:
+      label: Suggested Improvement
+      description: How should the documentation be improved?
+      placeholder: |
+        - Suggested new content
+        - Corrections to make
+        - Additional examples needed
+        - Better explanations
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this documentation fix?
+      options:
+        - Low - Minor improvement
+        - Medium - Affects user experience
+        - High - Causes confusion or errors
+        - Critical - Blocks users from using FDAWG
+    validations:
+      required: true
+
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Target Audience
+      description: Who would benefit most from this documentation improvement?
+      options:
+        - New users/beginners
+        - Experienced users
+        - Contributors/developers
+        - All users
+        - Specific use case
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-impact
+    attributes:
+      label: User Impact
+      description: How does this documentation issue affect users?
+      placeholder: |
+        - What problems does it cause?
+        - How does it impact the user experience?
+        - What workflows are affected?
+
+  - type: checkboxes
+    id: help-offer
+    attributes:
+      label: Contribution Offer
+      description: Are you willing to help improve this documentation?
+      options:
+        - label: I can write the improved content
+        - label: I can review proposed changes
+        - label: I can provide additional examples
+        - label: I can test the documentation with real use cases
+        - label: I prefer someone else handles this
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context about this documentation issue
+      placeholder: |
+        - Screenshots of confusing sections
+        - Links to related documentation
+        - Examples of good documentation for reference
+        - User feedback you've received
+
+  - type: dropdown
+    id: documentation-section
+    attributes:
+      label: Documentation Section
+      description: Which section of the documentation is affected?
+      options:
+        - README
+        - Installation Guide
+        - Command Reference
+        - Environment Commands
+        - Asset Commands
+        - Localization Commands
+        - App Namer Commands
+        - Server Commands
+        - Web Interface Guide
+        - Development Guide
+        - API Documentation
+        - Examples/Tutorials
+        - FAQ
+        - Other

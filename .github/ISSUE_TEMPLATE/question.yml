@@ -1,0 +1,137 @@
+name: ❓ Question
+description: Ask a question about using FDAWG
+title: "[Question]: "
+labels: ["question", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question about using FDAWG? We're here to help! Please provide as much context as possible.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following before submitting
+      options:
+        - label: I have searched existing issues and discussions for similar questions
+          required: true
+        - label: I have read the [documentation](https://jerinji2016.github.io/fdawg/)
+          required: true
+        - label: This is not a bug report (use the bug report template for bugs)
+          required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know about FDAWG?
+      placeholder: Ask your question here. Be as specific as possible.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Question Category
+      description: What category does your question fall into?
+      options:
+        - Installation and Setup
+        - CLI Usage
+        - Web Interface
+        - Environment Management
+        - Asset Management
+        - Localization
+        - App Naming
+        - Integration with Flutter
+        - Best Practices
+        - Troubleshooting
+        - Performance
+        - Contributing
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Provide context about what you're trying to achieve
+      placeholder: |
+        - What are you trying to accomplish?
+        - What's your current setup?
+        - What have you tried so far?
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-approach
+    attributes:
+      label: What You've Tried
+      description: What approaches have you already attempted?
+      placeholder: |
+        - Commands you've run
+        - Documentation you've consulted
+        - Solutions you've attempted
+        - Error messages you've encountered
+
+  - type: input
+    id: fdawg-version
+    attributes:
+      label: FDAWG Version
+      description: What version of FDAWG are you using?
+      placeholder: "v1.0.0 (run 'fdawg --version')"
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      options:
+        - macOS
+        - Linux
+        - Windows
+        - Other
+
+  - type: textarea
+    id: project-details
+    attributes:
+      label: Flutter Project Details
+      description: Information about your Flutter project (if relevant)
+      placeholder: |
+        - Project type: (app, package, plugin)
+        - Platforms: (android, ios, web, desktop)
+        - Flutter version
+        - Any special configuration
+
+  - type: textarea
+    id: expected-outcome
+    attributes:
+      label: Expected Outcome
+      description: What outcome are you hoping to achieve?
+      placeholder: Describe what you want to accomplish or what result you're expecting
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: Urgency
+      description: How urgent is this question for you?
+      options:
+        - Low - Just curious
+        - Medium - Would help my workflow
+        - High - Blocking my current work
+        - Critical - Urgent project deadline
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other relevant information
+      placeholder: |
+        - Screenshots (if helpful)
+        - Configuration files
+        - Error messages
+        - Links to related resources
+        - Specific use case details

@@ -1,0 +1,185 @@
+name: ✨ Feature Request
+description: Suggest a new feature or enhancement for FDAWG
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please provide as much detail as possible to help us understand your request.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following before submitting
+      options:
+        - label: I have searched existing issues to ensure this feature hasn't been requested
+          required: true
+        - label: I have read the [documentation](https://jerinji2016.github.io/fdawg/) to confirm this feature doesn't exist
+          required: true
+        - label: This feature would benefit the broader Flutter development community
+          required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature Summary
+      description: A clear and concise description of the feature you'd like to see
+      placeholder: Briefly describe the feature you're requesting
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve?
+      placeholder: |
+        Describe the problem or pain point this feature would address.
+        Is your feature request related to a problem? Please describe.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see
+      placeholder: |
+        A clear and concise description of what you want to happen.
+        How should this feature work?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component should this feature be added to?
+      options:
+        - CLI Commands
+        - Web Interface
+        - Environment Management
+        - Asset Management
+        - Localization
+        - App Namer
+        - Server/Web Server
+        - Build System
+        - Documentation
+        - New Component
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Low - Nice to have
+        - Medium - Would improve workflow
+        - High - Significantly impacts productivity
+        - Critical - Blocking current work
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: Use Cases
+      description: Describe specific use cases for this feature
+      placeholder: |
+        1. As a Flutter developer, I want to...
+        2. When working on large projects, I need to...
+        3. During deployment, it would be helpful to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered
+      placeholder: |
+        - Alternative approach 1: ...
+        - Alternative approach 2: ...
+        - Why these alternatives don't work as well
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples and Mockups
+      description: Provide examples, mockups, or references to similar features
+      placeholder: |
+        - Screenshots or mockups of the desired UI
+        - Examples from other tools
+        - Code examples of how the feature might work
+        - Links to similar implementations
+
+  - type: dropdown
+    id: interface
+    attributes:
+      label: Interface Preference
+      description: How should this feature be accessible?
+      options:
+        - CLI only
+        - Web interface only
+        - Both CLI and web interface
+        - API/programmatic access
+        - No preference
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-considerations
+    attributes:
+      label: Technical Considerations
+      description: Any technical aspects to consider for implementation
+      placeholder: |
+        - Performance implications
+        - Compatibility requirements
+        - Dependencies needed
+        - Platform-specific considerations
+        - Security considerations
+
+  - type: checkboxes
+    id: implementation
+    attributes:
+      label: Implementation Willingness
+      description: Are you willing to help implement this feature?
+      options:
+        - label: I would like to implement this feature myself
+        - label: I can help with testing and feedback
+        - label: I can help with documentation
+        - label: I can provide design/UX input
+        - label: I prefer someone else implements this
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or examples about the feature request
+      placeholder: |
+        - Links to related discussions
+        - Screenshots or diagrams
+        - References to similar tools
+        - Any other relevant information
+
+  - type: dropdown
+    id: breaking-changes
+    attributes:
+      label: Breaking Changes
+      description: Would this feature require breaking changes?
+      options:
+        - No breaking changes expected
+        - Minor breaking changes acceptable
+        - Major breaking changes may be necessary
+        - Unsure about breaking changes
+    validations:
+      required: true
