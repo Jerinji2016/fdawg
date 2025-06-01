@@ -1,0 +1,317 @@
+// Component styles
+
+// Buttons
+.btn {
+  display: inline-block;
+  padding: $spacing-sm $spacing-md;
+  background-color: $accent-blue;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #1f6feb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(31, 111, 235, 0.3);
+    text-decoration: none;
+    color: white;
+  }
+  
+  &:focus {
+    outline: 2px solid $accent-blue;
+    outline-offset: 2px;
+  }
+  
+  &.btn-secondary {
+    background-color: $tertiary-bg;
+    color: $text-primary;
+    border: 1px solid $border-color;
+    
+    &:hover {
+      background-color: #30363d;
+      color: $text-primary;
+    }
+  }
+  
+  &.btn-large {
+    padding: $spacing-md $spacing-lg;
+    font-size: 1.1rem;
+  }
+  
+  &.btn-small {
+    padding: $spacing-xs $spacing-sm;
+    font-size: 0.875rem;
+  }
+}
+
+// Cards
+.card {
+  background-color: $secondary-bg;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: #484f58;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .card-title {
+    margin: 0 0 $spacing-md 0;
+    color: $text-primary;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  
+  .card-content {
+    color: $text-secondary;
+    
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Callouts/Alerts
+.callout {
+  padding: $spacing-md;
+  margin: $spacing-md 0;
+  border-radius: 6px;
+  border-left: 4px solid;
+  background-color: $secondary-bg;
+  
+  &.callout-info {
+    border-left-color: $accent-blue;
+    background-color: rgba(88, 166, 255, 0.1);
+    
+    .callout-title {
+      color: $accent-blue;
+    }
+  }
+  
+  &.callout-warning {
+    border-left-color: $accent-yellow;
+    background-color: rgba(210, 153, 34, 0.1);
+    
+    .callout-title {
+      color: $accent-yellow;
+    }
+  }
+  
+  &.callout-danger {
+    border-left-color: $accent-red;
+    background-color: rgba(218, 54, 51, 0.1);
+    
+    .callout-title {
+      color: $accent-red;
+    }
+  }
+  
+  &.callout-success {
+    border-left-color: $accent-green;
+    background-color: rgba(35, 134, 54, 0.1);
+    
+    .callout-title {
+      color: $accent-green;
+    }
+  }
+  
+  .callout-title {
+    font-weight: 600;
+    margin: 0 0 $spacing-sm 0;
+  }
+  
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Code blocks with syntax highlighting
+.highlight {
+  background-color: $secondary-bg;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: $spacing-md 0;
+  
+  pre {
+    margin: 0;
+    padding: $spacing-md;
+    background: transparent;
+    border: none;
+    overflow-x: auto;
+    
+    code {
+      background: none;
+      border: none;
+      padding: 0;
+      color: $text-secondary;
+    }
+  }
+  
+  // Language label
+  &[data-lang]::before {
+    content: attr(data-lang);
+    display: block;
+    background-color: $tertiary-bg;
+    color: $text-muted;
+    padding: $spacing-xs $spacing-md;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid $border-color;
+  }
+}
+
+// Navigation breadcrumbs
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+  font-size: 0.875rem;
+  color: $text-muted;
+  
+  .breadcrumb-item {
+    &:not(:last-child)::after {
+      content: '/';
+      margin: 0 $spacing-sm;
+      color: $border-color;
+    }
+    
+    a {
+      color: $text-link;
+      
+      &:hover {
+        color: $text-link-hover;
+      }
+    }
+    
+    &.active {
+      color: $text-secondary;
+    }
+  }
+}
+
+// Command grid for command reference pages
+.command-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: $spacing-md;
+  margin: $spacing-lg 0;
+}
+
+.command-card {
+  background-color: $secondary-bg;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: $spacing-lg;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: #484f58;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .command-title {
+    color: $accent-blue;
+    font-weight: 600;
+    margin: 0 0 $spacing-sm 0;
+    font-size: 1.1rem;
+  }
+  
+  .command-description {
+    color: $text-muted;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  
+  .command-usage {
+    background-color: $tertiary-bg;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    padding: $spacing-sm;
+    margin-top: $spacing-sm;
+    font-family: $font-family-mono;
+    font-size: 0.8rem;
+    color: #ff7b72;
+  }
+}
+
+// Feature list styling
+.feature-list {
+  list-style: none;
+  padding: 0;
+  
+  li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: $spacing-md;
+    
+    &::before {
+      content: '✓';
+      color: $accent-green;
+      font-weight: bold;
+      margin-right: $spacing-sm;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// Quick navigation section
+.quick-nav {
+  background-color: $secondary-bg;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: $spacing-lg;
+  margin: $spacing-xl 0;
+  
+  .quick-nav-title {
+    color: $text-primary;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 $spacing-md 0;
+  }
+  
+  .quick-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: $spacing-md;
+  }
+  
+  .quick-nav-section {
+    h4 {
+      color: $accent-blue;
+      font-size: 1rem;
+      margin: 0 0 $spacing-sm 0;
+    }
+    
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      
+      li {
+        margin-bottom: $spacing-xs;
+        
+        a {
+          color: $text-secondary;
+          font-size: 0.9rem;
+          
+          &:hover {
+            color: $text-link;
+          }
+        }
+      }
+    }
+  }
+}

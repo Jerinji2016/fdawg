@@ -4,42 +4,45 @@ description: Flutter Development Assistant with Go - Comprehensive CLI tool and 
 url: "https://jerinji2016.github.io"
 baseurl: "/fdawg"
 
-# Theme - Using just-the-docs for Flutter-like appearance
-remote_theme: just-the-docs/just-the-docs
-color_scheme: flutter
+# Custom theme - no remote theme dependency
 plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
 
-# Just the Docs theme configuration
-search_enabled: true
-search:
-  heading_level: 2
-  previews: 3
-  preview_words_before: 5
-  preview_words_after: 10
-  tokenizer_separator: /[\s/]+/
-  rel_url: true
-  button: false
+# GitHub metadata
+repository: "Jerinji2016/fdawg"
+github:
+  repository_url: "https://github.com/Jerinji2016/fdawg"
+  repository_name: "fdawg"
+  owner_name: "Jerinji2016"
 
-# Navigation structure
-nav_sort: case_insensitive
-nav_external_links:
-  - title: "GitHub Repository"
-    url: "https://github.com/Jerinji2016/fdawg"
-    hide_icon: false
+# Show downloads - changed to false, we'll add GitHub stars instead
+show_downloads: false
 
-# Footer content
-footer_content: "Copyright &copy; 2024 FDAWG. Made with ❤️ for the Flutter community."
-
-# Back to top link
-back_to_top: true
-back_to_top_text: "Back to top"
-
-# Last edit timestamp
-last_edit_timestamp: true
-last_edit_time_format: "%b %e %Y at %I:%M %p"
+# Navigation structure for midnight theme
+navigation:
+  - title: "Home"
+    url: "/"
+  - title: "Installation"
+    url: "/installation.html"
+  - title: "Web Interface"
+    url: "/web-interface.html"
+  - title: "Commands"
+    url: "/commands/"
+    subnav:
+      - title: "Environment"
+        url: "/commands/environment.html"
+      - title: "Assets"
+        url: "/commands/assets.html"
+      - title: "Localization"
+        url: "/commands/localization.html"
+      - title: "App Namer"
+        url: "/commands/namer.html"
+      - title: "Server"
+        url: "/commands/server.html"
+  - title: "Development"
+    url: "/development.html"
 
 # Markdown settings
 markdown: kramdown
@@ -64,13 +67,6 @@ defaults:
       type: "pages"
     values:
       layout: "default"
-      nav_order: 1
-  - scope:
-      path: ""
-      type: "commands"
-    values:
-      layout: "default"
-      parent: "Command Reference"
 
 # Exclude files
 exclude:

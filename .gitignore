@@ -17,3 +17,8 @@ fdawg
 /docs/Gemfile.lock
 
 /test_**
+
+# Ignore Github docs build artifacts
+/docs/vendor
+/docs/.bundle
+/docs/.sass-cache

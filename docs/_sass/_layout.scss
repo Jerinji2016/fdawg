@@ -1,0 +1,211 @@
+// Layout styles
+
+// Site Header
+.site-header {
+  background: linear-gradient(135deg, $header-bg 0%, $secondary-bg 100%);
+  border-bottom: 1px solid $border-color;
+  padding: $spacing-md 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md;
+
+    @media (max-width: $breakpoint-md) {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: $spacing-sm;
+    }
+  }
+
+  .site-branding {
+    flex: 0 0 auto; // Don't grow, don't shrink, auto width
+
+    .site-title {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+
+      a {
+        color: $text-primary;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        transition: all 0.2s ease;
+        white-space: nowrap; // Prevent text wrapping
+
+        &:hover {
+          color: $text-link;
+          text-decoration: none;
+          transform: translateX(2px);
+        }
+      }
+
+      .github-icon {
+        width: 20px;
+        height: 20px;
+        opacity: 0.8;
+        transition: opacity 0.2s ease;
+        flex-shrink: 0; // Prevent icon from shrinking
+      }
+
+      a:hover .github-icon {
+        opacity: 1;
+      }
+
+      @media (max-width: $breakpoint-md) {
+        font-size: 1.25rem;
+
+        .github-icon {
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+  }
+  
+  .header-actions {
+    display: flex;
+    align-items: center;
+
+    @media (max-width: $breakpoint-md) {
+      justify-content: center;
+    }
+
+    .github-buttons {
+      display: flex;
+      gap: $spacing-sm;
+
+      iframe {
+        vertical-align: middle;
+      }
+
+      @media (max-width: $breakpoint-sm) {
+        flex-direction: column;
+        align-items: center;
+        gap: $spacing-xs;
+      }
+    }
+  }
+}
+
+// Main Navigation
+.main-navigation {
+  border-top: 1px solid $border-color;
+  padding-top: $spacing-sm;
+  
+  .nav-list {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: $spacing-xs;
+    
+    @media (max-width: $breakpoint-md) {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    @media (max-width: $breakpoint-sm) {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+  
+  .nav-item {
+    .nav-link {
+      display: block;
+      padding: $spacing-sm $spacing-md;
+      color: $text-secondary;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      position: relative;
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: $text-primary;
+        text-decoration: none;
+      }
+      
+      &.active {
+        background-color: $accent-blue;
+        color: white;
+        
+        &:hover {
+          background-color: #1f6feb;
+          color: white;
+        }
+      }
+      
+      @media (max-width: $breakpoint-sm) {
+        padding: $spacing-sm $spacing-lg;
+        min-width: 120px;
+        text-align: center;
+      }
+    }
+  }
+}
+
+// Main Content
+.main-content {
+  min-height: calc(100vh - 200px);
+  padding: $spacing-xxl 0;
+  
+  .container {
+    max-width: 900px;
+  }
+  
+  // Content animations
+  animation: fadeIn 0.3s ease-in;
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+// Site Footer
+.site-footer {
+  background-color: $secondary-bg;
+  border-top: 1px solid $border-color;
+  padding: $spacing-xl 0;
+  margin-top: $spacing-xxl;
+  
+  .footer-content {
+    text-align: center;
+    color: $text-muted;
+    
+    p {
+      margin: $spacing-sm 0;
+      
+      &:first-child {
+        font-weight: 500;
+        color: $text-secondary;
+      }
+    }
+    
+    a {
+      color: $text-link;
+      
+      &:hover {
+        color: $text-link-hover;
+      }
+    }
+  }
+}

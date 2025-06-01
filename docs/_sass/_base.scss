@@ -1,0 +1,271 @@
+// Base styles and variables
+
+// Color palette
+$primary-bg: #0d1117;
+$secondary-bg: #161b22;
+$tertiary-bg: #21262d;
+$header-bg: #1c2128;
+$border-color: #30363d;
+
+$text-primary: #f0f6fc;
+$text-secondary: #e6edf3;
+$text-muted: #8b949e;
+$text-link: #58a6ff;
+$text-link-hover: #79c0ff;
+
+$accent-blue: #1f6feb;
+$accent-green: #238636;
+$accent-red: #da3633;
+$accent-yellow: #d29922;
+
+// Typography
+$font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+$font-family-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+$font-size-base: 16px;
+$line-height-base: 1.6;
+
+// Spacing
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+$spacing-xxl: 3rem;
+
+// Breakpoints
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+
+// Container
+$container-max-width: 1200px;
+
+// Reset and base styles
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: $font-size-base;
+  scroll-behavior: smooth;
+  scroll-padding-top: 120px; // Account for sticky header height
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  line-height: $line-height-base;
+  color: $text-secondary;
+  background-color: $primary-bg;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Container
+.container {
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding: 0 $spacing-md;
+  
+  @media (min-width: $breakpoint-lg) {
+    padding: 0 $spacing-xl;
+  }
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 $spacing-md 0;
+  font-weight: 600;
+  line-height: 1.25;
+  color: $text-primary;
+  letter-spacing: -0.02em;
+  scroll-margin-top: 120px; // Account for sticky header when linking to headings
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: $spacing-lg;
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: 2rem;
+  }
+}
+
+h2 {
+  font-size: 2rem;
+  margin-top: $spacing-xl;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid $border-color;
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: 1.75rem;
+  }
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-top: $spacing-lg;
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: 1.25rem;
+  }
+}
+
+h4 {
+  font-size: 1.25rem;
+  margin-top: $spacing-lg;
+}
+
+h5, h6 {
+  font-size: 1rem;
+  margin-top: $spacing-md;
+}
+
+p {
+  margin: 0 0 $spacing-md 0;
+  line-height: $line-height-base;
+}
+
+// Links
+a {
+  color: $text-link;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: $text-link-hover;
+    text-decoration: underline;
+  }
+  
+  &:focus {
+    outline: 2px solid $accent-blue;
+    outline-offset: 2px;
+  }
+}
+
+// Lists
+ul, ol {
+  margin: 0 0 $spacing-md 0;
+  padding-left: $spacing-xl;
+  
+  li {
+    margin-bottom: $spacing-sm;
+  }
+  
+  ul, ol {
+    margin-top: $spacing-sm;
+    margin-bottom: 0;
+  }
+}
+
+// Code
+code {
+  font-family: $font-family-mono;
+  font-size: 0.875rem;
+  background-color: $tertiary-bg;
+  color: #ff7b72;
+  padding: 0.125rem 0.25rem;
+  border-radius: 3px;
+  border: 1px solid $border-color;
+}
+
+pre {
+  font-family: $font-family-mono;
+  font-size: 0.875rem;
+  background-color: $secondary-bg;
+  color: $text-secondary;
+  padding: $spacing-md;
+  border-radius: 6px;
+  border: 1px solid $border-color;
+  overflow-x: auto;
+  margin: $spacing-md 0;
+  
+  code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+  }
+}
+
+// Blockquotes
+blockquote {
+  margin: $spacing-md 0;
+  padding: 0 $spacing-md;
+  border-left: 4px solid $border-color;
+  color: $text-muted;
+  font-style: italic;
+  
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Tables
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: $spacing-md 0;
+  background-color: $secondary-bg;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  overflow: hidden;
+  
+  th, td {
+    padding: $spacing-sm $spacing-md;
+    text-align: left;
+    border-bottom: 1px solid $border-color;
+  }
+  
+  th {
+    background-color: $tertiary-bg;
+    font-weight: 600;
+    color: $text-primary;
+  }
+  
+  tr:last-child td {
+    border-bottom: none;
+  }
+  
+  tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+}
+
+// Images
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+// Horizontal rule
+hr {
+  border: none;
+  height: 1px;
+  background-color: $border-color;
+  margin: $spacing-xl 0;
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $primary-bg;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $border-color;
+  border-radius: 4px;
+
+  &:hover {
+    background: #484f58;
+  }
+}

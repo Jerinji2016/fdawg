@@ -1,7 +1,13 @@
 source "https://rubygems.org"
 
-gem "github-pages", group: :jekyll_plugins
-gem "just-the-docs"
-gem "jekyll-feed"
-gem "jekyll-sitemap"
-gem "jekyll-seo-tag"
+# Specify Ruby version for compatibility
+ruby "~> 2.6.0"
+
+gem "jekyll", "~> 3.9.0"
+gem "jekyll-feed", "~> 0.15"
+gem "jekyll-sitemap", "~> 1.4"
+gem "jekyll-seo-tag", "~> 2.8"
+gem "kramdown-parser-gfm", "~> 1.1"
+
+# Additional gems for local development
+gem "webrick", "~> 1.7"

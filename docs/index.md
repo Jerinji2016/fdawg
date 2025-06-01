@@ -1,9 +1,7 @@
 ---
 layout: default
-title: Home
-nav_order: 1
+title: FDAWG - Flutter Development Assistant with Go
 description: "FDAWG - Flutter Development Assistant with Go"
-permalink: /
 ---
 
 # FDAWG - Flutter Development Assistant with Go
@@ -24,29 +22,29 @@ FDAWG is a comprehensive Flutter project management tool that provides:
 {: .callout .callout-info }
 > **Quick Start Tip**
 >
-> New to FDAWG? Start with our [Installation Guide](installation.html) to get up and running in minutes!
+> New to FDAWG? Start with our [Installation Guide](installation/) to get up and running in minutes!
 
 ## Quick Navigation
 
 ### 🚀 Getting Started
-- [Installation Guide](installation.html) - Get FDAWG up and running
-- [Quick Start](installation.html#quick-start) - Basic usage examples
+- [Installation Guide](installation/) - Get FDAWG up and running
+- [Quick Start](installation/#quick-start) - Basic usage examples
 
 ### 📖 Command Reference
-- [Environment Commands](commands/environment.html) - Manage environment variables
-- [Asset Commands](commands/assets.html) - Handle project assets
-- [Localization Commands](commands/localization.html) - Translation management
-- [App Namer Commands](commands/namer.html) - Cross-platform app naming
-- [Server Commands](commands/server.html) - Web interface and project validation
+- [Environment Commands](commands/environment/) - Manage environment variables
+- [Asset Commands](commands/assets/) - Handle project assets
+- [Localization Commands](commands/localization/) - Translation management
+- [App Namer Commands](commands/namer/) - Cross-platform app naming
+- [Server Commands](commands/server/) - Web interface and project validation
 
 ### 🌐 Web Interface
-- [Web Interface Guide](web-interface.html) - Complete web dashboard documentation
-- [Features Overview](web-interface.html#features) - All available web features
+- [Web Interface Guide](web-interface/) - Complete web dashboard documentation
+- [Features Overview](web-interface/#features) - All available web features
 
 ### 👨‍💻 Development
-- [Development Setup](development.html) - Contributing to FDAWG
-- [Project Structure](development.html#project-structure) - Understanding the codebase
-- [Building from Source](development.html#building) - Compilation instructions
+- [Development Setup](development/) - Contributing to FDAWG
+- [Project Structure](development/#project-structure) - Understanding the codebase
+- [Building from Source](development/#building) - Compilation instructions
 
 ## Key Features
 
@@ -96,4 +94,4 @@ The web interface includes:
 
 ---
 
-Ready to get started? Check out our [Installation Guide](installation.html) to begin using FDAWG in your Flutter projects.
+Ready to get started? Check out our [Installation Guide](installation/) to begin using FDAWG in your Flutter projects.
