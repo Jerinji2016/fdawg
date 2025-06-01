@@ -20,29 +20,45 @@ github:
 # Show downloads - changed to false, we'll add GitHub stars instead
 show_downloads: false
 
-# Navigation structure for midnight theme
+# Enhanced navigation structure for left sidebar
 navigation:
-  - title: "Home"
-    url: "/"
-  - title: "Installation"
-    url: "/installation.html"
-  - title: "Web Interface"
-    url: "/web-interface.html"
+  - title: "Getting Started"
+    icon: "🚀"
+    items:
+      - title: "Home"
+        url: "/"
+      - title: "Installation"
+        url: "/installation.html"
+  - title: "User Interface"
+    icon: "🖥️"
+    items:
+      - title: "Web Interface"
+        url: "/web-interface.html"
   - title: "Commands"
-    url: "/commands/"
-    subnav:
-      - title: "Environment"
+    icon: "⚡"
+    items:
+      - title: "Overview"
+        url: "/commands/"
+      - title: "Environment Management"
         url: "/commands/environment.html"
-      - title: "Assets"
+        description: "Manage Flutter SDK versions and environments"
+      - title: "Asset Management"
         url: "/commands/assets.html"
+        description: "Handle app icons, splash screens, and assets"
       - title: "Localization"
         url: "/commands/localization.html"
+        description: "Internationalization and localization tools"
       - title: "App Namer"
         url: "/commands/namer.html"
-      - title: "Server"
+        description: "Rename and rebrand Flutter applications"
+      - title: "Development Server"
         url: "/commands/server.html"
+        description: "Local development server and hot reload"
   - title: "Development"
-    url: "/development.html"
+    icon: "🛠️"
+    items:
+      - title: "Contributing"
+        url: "/development.html"
 
 # Markdown settings
 markdown: kramdown

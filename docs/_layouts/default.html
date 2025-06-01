@@ -17,21 +17,86 @@
 
     {% seo %}
     {% feed_meta %}
+
+    <!-- Navigation JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            const navSectionToggles = document.querySelectorAll('.nav-section-toggle');
+
+            // Sidebar toggle functionality
+            function toggleSidebar() {
+                sidebar.classList.toggle('open');
+                sidebarOverlay.classList.toggle('active');
+                document.body.classList.toggle('sidebar-open');
+            }
+
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            sidebarOverlay.addEventListener('click', toggleSidebar);
+
+            // Section collapse functionality
+            navSectionToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const section = this.closest('.nav-section');
+                    const items = section.querySelector('.nav-section-items');
+                    const isExpanded = items.classList.contains('expanded');
+
+                    if (isExpanded) {
+                        items.classList.remove('expanded');
+                        this.setAttribute('aria-expanded', 'false');
+                    } else {
+                        items.classList.add('expanded');
+                        this.setAttribute('aria-expanded', 'true');
+                    }
+                });
+            });
+
+            // Auto-expand sections with active items
+            document.querySelectorAll('.nav-link.active').forEach(activeLink => {
+                const section = activeLink.closest('.nav-section');
+                const items = section.querySelector('.nav-section-items');
+                if (items && items.classList.contains('collapsible')) {
+                    items.classList.add('expanded');
+                    const toggle = section.querySelector('.nav-section-toggle');
+                    if (toggle) {
+                        toggle.setAttribute('aria-expanded', 'true');
+                    }
+                }
+            });
+
+            // Close sidebar on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                    toggleSidebar();
+                }
+            });
+        });
+    </script>
 </head>
 <body>
     <!-- Header -->
     <header class="site-header">
-        <div class="container">
+        <div class="header-container">
             <div class="header-content">
-                <div class="site-branding">
-                    <h1 class="site-title">
-                        <a href="{{ '/' | relative_url }}">
-                            <svg class="github-icon" width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-                            </svg>
-                            {{ site.title }}
-                        </a>
-                    </h1>
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle navigation">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+
+                    <div class="site-branding">
+                        <h1 class="site-title">
+                            <a href="{{ '/' | relative_url }}">
+                                <svg class="github-icon" width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                                </svg>
+                                {{ site.title }}
+                            </a>
+                        </h1>
+                    </div>
                 </div>
 
                 <div class="header-actions">
@@ -43,36 +108,62 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Navigation -->
-            <nav class="main-navigation">
-                <ul class="nav-list">
-                    <li class="nav-item">
-                        <a href="{{ '/' | relative_url }}" class="nav-link {% if page.url == '/' %}active{% endif %}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ '/installation/' | relative_url }}" class="nav-link {% if page.url contains '/installation' %}active{% endif %}">Installation</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ '/web-interface/' | relative_url }}" class="nav-link {% if page.url contains '/web-interface' %}active{% endif %}">Web Interface</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ '/commands/' | relative_url }}" class="nav-link {% if page.url contains '/commands' %}active{% endif %}">Commands</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ '/development/' | relative_url }}" class="nav-link {% if page.url contains '/development' %}active{% endif %}">Development</a>
-                    </li>
-                </ul>
-            </nav>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="container">
-            {{ content }}
-        </div>
-    </main>
+    <!-- Content Layout Wrapper -->
+    <div class="layout-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <nav class="sidebar-nav">
+                    {% for section in site.navigation %}
+                    <div class="nav-section">
+                        <div class="nav-section-header">
+                            <span class="nav-section-icon">{{ section.icon }}</span>
+                            <span class="nav-section-title">{{ section.title }}</span>
+                            {% if section.items.size > 1 %}
+                            <button class="nav-section-toggle" aria-label="Toggle {{ section.title }}">
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                    <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            {% endif %}
+                        </div>
+
+                        {% if section.items %}
+                        <ul class="nav-section-items {% if section.items.size > 1 %}collapsible{% endif %}">
+                            {% for item in section.items %}
+                            <li class="nav-item">
+                                <a href="{{ item.url | relative_url }}"
+                                   class="nav-link {% if page.url == item.url %}active{% elsif item.url != '/' and page.url contains item.url %}active{% endif %}">
+                                    <div class="nav-link-content">
+                                        <span class="nav-link-title">{{ item.title }}</span>
+                                        {% if item.description %}
+                                        <span class="nav-item-description">{{ item.description }}</span>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-wrapper">
+                {{ content }}
+            </div>
+        </main>
+    </div>
 
     <!-- Footer -->
     <footer class="site-footer">

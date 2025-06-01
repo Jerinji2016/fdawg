@@ -50,12 +50,14 @@ $container-max-width: 1200px;
 html {
   font-size: $font-size-base;
   scroll-behavior: smooth;
-  scroll-padding-top: 120px; // Account for sticky header height
+  scroll-padding-top: 60px; // Account for sticky header height
+  height: 100%;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
-  padding: 0;
+  padding: 60px 0 0 0; // Add top padding for fixed header
   font-family: $font-family-base;
   font-size: $font-size-base;
   line-height: $line-height-base;
@@ -63,6 +65,8 @@ body {
   background-color: $primary-bg;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 // Container
@@ -83,7 +87,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.25;
   color: $text-primary;
   letter-spacing: -0.02em;
-  scroll-margin-top: 120px; // Account for sticky header when linking to headings
+  scroll-margin-top: 60px; // Account for sticky header when linking to headings
 }
 
 h1 {
