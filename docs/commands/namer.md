@@ -382,4 +382,4 @@ fdawg namer set --value "Development Portal" --platforms web,windows,macos
 
 ---
 
-**Next:** Learn about [Server Commands](server.html) for web interface and project validation.
+**Next:** Learn about [Server Commands]({{ '/commands/server/' | relative_url }}) for web interface and project validation.

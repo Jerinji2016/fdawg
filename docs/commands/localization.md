@@ -423,4 +423,4 @@ Access via: `fdawg serve` → Localizations tab
 
 ---
 
-**Next:** Learn about [App Namer Commands](namer.html) for cross-platform app naming.
+**Next:** Learn about [App Namer Commands]({{ '/commands/namer/' | relative_url }}) for cross-platform app naming.

@@ -1,8 +1,6 @@
 ---
 layout: default
 title: Installation Guide
-nav_order: 2
-description: "Get FDAWG up and running on your system"
 permalink: /installation/
 ---
 
@@ -165,10 +163,10 @@ If you encounter issues:
 
 Now that FDAWG is installed:
 
-- Explore the [Command Reference](commands/) for detailed command documentation
-- Learn about the [Web Interface](web-interface.html) features
-- Check out the [Development Guide](development.html) if you want to contribute
+- Explore the [Command Reference]({{ '/commands/' | relative_url }}) for detailed command documentation
+- Learn about the [Web Interface]({{ '/web-interface/' | relative_url }}) features
+- Check out the [Development Guide]({{ '/development/' | relative_url }}) if you want to contribute
 
 ---
 
-Ready to start managing your Flutter projects more efficiently? Head over to the [Command Reference](commands/) to learn about all available features!
+Ready to start managing your Flutter projects more efficiently? Head over to the [Command Reference]({{ '/commands/' | relative_url }}) to learn about all available features!

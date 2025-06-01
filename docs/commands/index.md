@@ -21,17 +21,17 @@ fdawg [command] [subcommand] [options] [arguments]
 
 | Command | Description | Documentation |
 |---------|-------------|---------------|
-| [`serve`](server.html) | Start web server for project management | [Server Commands](server.html) |
-| [`init`](server.html#init) | Validate Flutter project structure | [Server Commands](server.html) |
+| [`serve`]({{ '/commands/server/' | relative_url }}) | Start web server for project management | [Server Commands]({{ '/commands/server/' | relative_url }}) |
+| [`init`]({{ '/commands/server/' | relative_url }}#init) | Validate Flutter project structure | [Server Commands]({{ '/commands/server/' | relative_url }}) |
 
 ### Project Management Commands
 
 | Command | Description | Documentation |
 |---------|-------------|---------------|
-| [`env`](environment.html) | Environment variable management | [Environment Commands](environment.html) |
-| [`asset`](assets.html) | Project asset management | [Asset Commands](assets.html) |
-| [`lang`](localization.html) | Localization and translation management | [Localization Commands](localization.html) |
-| [`namer`](namer.html) | Cross-platform app naming | [App Namer Commands](namer.html) |
+| [`env`]({{ '/commands/environment/' | relative_url }}) | Environment variable management | [Environment Commands]({{ '/commands/environment/' | relative_url }}) |
+| [`asset`]({{ '/commands/assets/' | relative_url }}) | Project asset management | [Asset Commands]({{ '/commands/assets/' | relative_url }}) |
+| [`lang`]({{ '/commands/localization/' | relative_url }}) | Localization and translation management | [Localization Commands]({{ '/commands/localization/' | relative_url }}) |
+| [`namer`]({{ '/commands/namer/' | relative_url }}) | Cross-platform app naming | [App Namer Commands]({{ '/commands/namer/' | relative_url }}) |
 
 ## Quick Examples
 
@@ -152,8 +152,8 @@ FDAWG includes comprehensive error handling:
 
 Choose a command category below to explore detailed documentation and examples:
 
-- [🔧 Environment Commands](environment.html) - Manage environment variables
-- [📦 Asset Commands](assets.html) - Handle project assets  
-- [🌍 Localization Commands](localization.html) - Translation management
-- [🏷️ App Namer Commands](namer.html) - Cross-platform app naming
-- [🌐 Server Commands](server.html) - Web interface and validation
+- [🔧 Environment Commands]({{ '/commands/environment/' | relative_url }}) - Manage environment variables
+- [📦 Asset Commands]({{ '/commands/assets/' | relative_url }}) - Handle project assets
+- [🌍 Localization Commands]({{ '/commands/localization/' | relative_url }}) - Translation management
+- [🏷️ App Namer Commands]({{ '/commands/namer/' | relative_url }}) - Cross-platform app naming
+- [🌐 Server Commands]({{ '/commands/server/' | relative_url }}) - Web interface and validation

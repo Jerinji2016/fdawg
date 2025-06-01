@@ -369,4 +369,4 @@ FDAWG works alongside Flutter CLI:
 
 ---
 
-**Next:** Learn about the [Web Interface](../web-interface.html) in detail or explore [Development Setup](../development.html).
+**Next:** Learn about the [Web Interface]({{ '/web-interface/' | relative_url }}) in detail or explore [Development Setup]({{ '/development/' | relative_url }}).

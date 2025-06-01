@@ -359,4 +359,4 @@ IDE configuration management:
 
 ---
 
-The web interface provides a comprehensive, user-friendly way to manage your Flutter projects. For command-line alternatives, see the [Command Reference](commands/) documentation.
+The web interface provides a comprehensive, user-friendly way to manage your Flutter projects. For command-line alternatives, see the [Command Reference]({{ '/commands/' | relative_url }}) documentation.

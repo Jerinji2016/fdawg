@@ -285,4 +285,4 @@ fdawg env delete old_staging
 
 ---
 
-**Next:** Learn about [Asset Commands](assets.html) for managing project assets.
+**Next:** Learn about [Asset Commands]({{ '/commands/assets/' | relative_url }}) for managing project assets.

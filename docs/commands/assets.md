@@ -337,4 +337,4 @@ flutter:
 
 ---
 
-**Next:** Learn about [Localization Commands](localization.html) for managing translations.
+**Next:** Learn about [Localization Commands]({{ '/commands/localization/' | relative_url }}) for managing translations.
