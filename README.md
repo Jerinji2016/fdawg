@@ -3,6 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/Go-1.23.2+-blue.svg)](https://golang.org)
 [![Flutter](https://img.shields.io/badge/Flutter-Compatible-blue.svg)](https://flutter.dev)
+[![Deploy Documentation](https://github.com/Jerinji2016/fdawg/actions/workflows/docs.yml/badge.svg)](https://github.com/Jerinji2016/fdawg/actions/workflows/docs.yml)
 
 FDAWG is a powerful CLI tool and web interface designed to streamline Flutter development workflows. It provides comprehensive project management capabilities including asset management, environment configuration, localization, cross-platform app naming, and much more.
 
