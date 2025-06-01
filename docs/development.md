@@ -1,6 +1,8 @@
 ---
-layout: page
+layout: default
 title: Development Guide
+nav_order: 5
+description: "Contributing to FDAWG development"
 permalink: /development/
 ---
 

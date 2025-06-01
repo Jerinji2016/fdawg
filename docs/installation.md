@@ -1,6 +1,8 @@
 ---
-layout: page
+layout: default
 title: Installation Guide
+nav_order: 2
+description: "Get FDAWG up and running on your system"
 permalink: /installation/
 ---
 

@@ -1,6 +1,8 @@
 ---
-layout: page
+layout: default
 title: Web Interface Guide
+nav_order: 4
+description: "Complete guide to FDAWG's web interface"
 permalink: /web-interface/
 ---
 

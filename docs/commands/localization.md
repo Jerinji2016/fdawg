@@ -1,6 +1,9 @@
 ---
-layout: page
+layout: default
 title: Localization Commands
+parent: Command Reference
+nav_order: 3
+description: "Manage translations and multi-language support"
 permalink: /commands/localization/
 ---
 

@@ -1,6 +1,9 @@
 ---
-layout: page
+layout: default
 title: Environment Commands
+parent: Command Reference
+nav_order: 1
+description: "Manage environment variables and configurations"
 permalink: /commands/environment/
 ---
 

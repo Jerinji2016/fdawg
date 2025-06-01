@@ -1,6 +1,9 @@
 ---
-layout: page
+layout: default
 title: Command Reference
+nav_order: 3
+has_children: true
+description: "Complete reference for all FDAWG commands"
 permalink: /commands/
 ---
 

@@ -1,6 +1,9 @@
 ---
-layout: home
-title: FDAWG Documentation
+layout: default
+title: Home
+nav_order: 1
+description: "FDAWG - Flutter Development Assistant with Go"
+permalink: /
 ---
 
 # FDAWG - Flutter Development Assistant with Go
@@ -11,12 +14,17 @@ Welcome to the comprehensive documentation for FDAWG, a powerful CLI tool and we
 
 FDAWG is a comprehensive Flutter project management tool that provides:
 
-- **Modern Web Interface** - Intuitive dashboard for visual project management
-- **Environment Management** - Handle multiple environment configurations with ease
-- **Asset Management** - Organize and manage project assets efficiently
-- **Localization Support** - Multi-language support with translation management
-- **Cross-Platform Naming** - Manage app names across all platforms
-- **CLI & Web Interface** - Use via command line or modern web dashboard
+- 🌐 **Modern Web Interface** - Intuitive dashboard for visual project management
+- 🔧 **Environment Management** - Handle multiple environment configurations with ease
+- 📦 **Asset Management** - Organize and manage project assets efficiently
+- 🌍 **Localization Support** - Multi-language support with translation management
+- 🏷️ **Cross-Platform Naming** - Manage app names across all platforms
+- 🚀 **CLI & Web Interface** - Use via command line or modern web dashboard
+
+{: .callout .callout-info }
+> **Quick Start Tip**
+>
+> New to FDAWG? Start with our [Installation Guide](installation.html) to get up and running in minutes!
 
 ## Quick Navigation
 

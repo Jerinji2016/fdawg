@@ -1,6 +1,9 @@
 ---
-layout: page
+layout: default
 title: App Namer Commands
+parent: Command Reference
+nav_order: 4
+description: "Manage app names across all platforms"
 permalink: /commands/namer/
 ---
 

@@ -1,6 +1,9 @@
 ---
-layout: page
+layout: default
 title: Asset Commands
+parent: Command Reference
+nav_order: 2
+description: "Manage and organize project assets"
 permalink: /commands/assets/
 ---
 
