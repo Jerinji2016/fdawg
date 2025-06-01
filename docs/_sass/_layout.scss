@@ -210,14 +210,35 @@
         display: flex;
         align-items: center;
         gap: $spacing-sm;
-        padding: $spacing-sm 0;
+        padding: $spacing-sm $spacing-sm;
         margin-bottom: $spacing-sm;
         border-bottom: 1px solid $border-color;
         cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        user-select: none;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.05);
+          border-color: #484f58;
+        }
+
+        // Make entire header clickable for collapsible sections
+        &.collapsible {
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            transform: translateX(2px);
+          }
+
+          &:active {
+            transform: translateX(1px);
+          }
+        }
 
         .nav-section-icon {
           font-size: 1.1rem;
           flex-shrink: 0;
+          transition: all 0.2s ease;
         }
 
         .nav-section-title {
@@ -227,6 +248,7 @@
           font-size: 0.9rem;
           text-transform: uppercase;
           letter-spacing: 0.5px;
+          transition: color 0.2s ease;
         }
 
         .nav-section-toggle {
@@ -234,24 +256,37 @@
           border: none;
           color: $text-secondary;
           cursor: pointer;
-          padding: 2px;
+          padding: 4px;
           border-radius: 3px;
           transition: all 0.2s ease;
           display: flex;
           align-items: center;
           justify-content: center;
-
-          &:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: $text-primary;
-          }
+          pointer-events: none; // Disable individual button clicks since header is clickable
 
           svg {
             transition: transform 0.2s ease;
+            width: 12px;
+            height: 12px;
           }
 
           &[aria-expanded="true"] svg {
             transform: rotate(90deg);
+          }
+        }
+
+        // Enhanced hover state for collapsible headers
+        &.collapsible:hover {
+          .nav-section-icon {
+            transform: scale(1.1);
+          }
+
+          .nav-section-title {
+            color: $text-link;
+          }
+
+          .nav-section-toggle {
+            color: $text-primary;
           }
         }
       }
@@ -284,24 +319,43 @@
             transition: all 0.2s ease;
             position: relative;
             font-size: 0.9rem;
+            border: 1px solid transparent;
 
             &:hover {
               background-color: rgba(255, 255, 255, 0.05);
               color: $text-primary;
               text-decoration: none;
               transform: translateX(2px);
+              border-color: rgba(255, 255, 255, 0.1);
+            }
+
+            &:focus {
+              outline: 2px solid $accent-blue;
+              outline-offset: 2px;
             }
 
             &.active {
               background-color: $accent-blue;
               color: white;
               font-weight: 500;
+              border-color: $accent-blue;
+              box-shadow: 0 2px 4px rgba(31, 111, 235, 0.3);
 
               &:hover {
                 background-color: #1f6feb;
                 color: white;
                 transform: translateX(0);
+                border-color: #1f6feb;
               }
+            }
+
+            .nav-link-content {
+              display: block;
+            }
+
+            .nav-link-title {
+              display: block;
+              line-height: 1.4;
             }
           }
 
@@ -309,9 +363,21 @@
             display: block;
             font-size: 0.75rem;
             color: $text-muted;
-            margin-top: 2px;
-            padding-left: $spacing-md;
+            margin-top: 4px;
             line-height: 1.3;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+          }
+
+          // Improve description visibility on hover
+          .nav-link:hover .nav-item-description {
+            opacity: 1;
+            color: rgba(255, 255, 255, 0.7);
+          }
+
+          .nav-link.active .nav-item-description {
+            color: rgba(255, 255, 255, 0.8);
+            opacity: 1;
           }
         }
       }

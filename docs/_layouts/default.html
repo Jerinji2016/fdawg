@@ -26,6 +26,10 @@
             const sidebarOverlay = document.getElementById('sidebar-overlay');
             const navSectionToggles = document.querySelectorAll('.nav-section-toggle');
 
+            // Debug logging
+            console.log('Navigation initialized');
+            console.log('Found', navSectionToggles.length, 'toggle buttons');
+
             // Sidebar toggle functionality
             function toggleSidebar() {
                 sidebar.classList.toggle('open');
@@ -36,21 +40,44 @@
             sidebarToggle.addEventListener('click', toggleSidebar);
             sidebarOverlay.addEventListener('click', toggleSidebar);
 
-            // Section collapse functionality
-            navSectionToggles.forEach(toggle => {
-                toggle.addEventListener('click', function() {
-                    const section = this.closest('.nav-section');
-                    const items = section.querySelector('.nav-section-items');
-                    const isExpanded = items.classList.contains('expanded');
+            // Section collapse functionality - Make entire header clickable
+            const navSectionHeaders = document.querySelectorAll('.nav-section-header');
+            console.log('Found', navSectionHeaders.length, 'section headers');
 
-                    if (isExpanded) {
-                        items.classList.remove('expanded');
-                        this.setAttribute('aria-expanded', 'false');
-                    } else {
-                        items.classList.add('expanded');
-                        this.setAttribute('aria-expanded', 'true');
-                    }
+            navSectionHeaders.forEach((header, index) => {
+                const section = header.closest('.nav-section');
+                const items = section.querySelector('.nav-section-items');
+                const toggle = header.querySelector('.nav-section-toggle');
+
+                console.log(`Header ${index}:`, {
+                    hasItems: !!items,
+                    isCollapsible: items ? items.classList.contains('collapsible') : false,
+                    hasToggle: !!toggle
                 });
+
+                // Only add click functionality if there are collapsible items
+                if (items && items.classList.contains('collapsible')) {
+                    header.addEventListener('click', function(e) {
+                        // Prevent event bubbling
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        console.log('Header clicked:', header.querySelector('.nav-section-title').textContent);
+
+                        const isExpanded = items.classList.contains('expanded');
+                        console.log('Current state:', isExpanded ? 'expanded' : 'collapsed');
+
+                        if (isExpanded) {
+                            items.classList.remove('expanded');
+                            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+                            console.log('Collapsed section');
+                        } else {
+                            items.classList.add('expanded');
+                            if (toggle) toggle.setAttribute('aria-expanded', 'true');
+                            console.log('Expanded section');
+                        }
+                    });
+                }
             });
 
             // Auto-expand sections with active items
@@ -119,11 +146,11 @@
                 <nav class="sidebar-nav">
                     {% for section in site.navigation %}
                     <div class="nav-section">
-                        <div class="nav-section-header">
+                        <div class="nav-section-header{% if section.items.size > 1 %} collapsible{% endif %}">
                             <span class="nav-section-icon">{{ section.icon }}</span>
                             <span class="nav-section-title">{{ section.title }}</span>
                             {% if section.items.size > 1 %}
-                            <button class="nav-section-toggle" aria-label="Toggle {{ section.title }}">
+                            <button class="nav-section-toggle" aria-label="Toggle {{ section.title }}" aria-expanded="false">
                                 <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
                                     <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
@@ -135,8 +162,18 @@
                         <ul class="nav-section-items {% if section.items.size > 1 %}collapsible{% endif %}">
                             {% for item in section.items %}
                             <li class="nav-item">
+                                {% assign is_active = false %}
+                                {% if page.url == item.url %}
+                                    {% assign is_active = true %}
+                                {% elsif item.url != '/' and page.url contains item.url %}
+                                    {% assign is_active = true %}
+                                {% elsif item.url == '/' and page.url == '/index.html' %}
+                                    {% assign is_active = true %}
+                                {% elsif item.url == '/' and page.url == '/' %}
+                                    {% assign is_active = true %}
+                                {% endif %}
                                 <a href="{{ item.url | relative_url }}"
-                                   class="nav-link {% if page.url == item.url %}active{% elsif item.url != '/' and page.url contains item.url %}active{% endif %}">
+                                   class="nav-link {% if is_active %}active{% endif %}">
                                     <div class="nav-link-content">
                                         <span class="nav-link-title">{{ item.title }}</span>
                                         {% if item.description %}
