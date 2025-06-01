@@ -11,4 +11,9 @@ fdawg
 # Ignore package-lock.json
 /package-lock.json
 
+# Ignore docs build artifacts
+/docs/_site
+/docs/.jekyll-cache
+/docs/Gemfile.lock
+
 /test_**

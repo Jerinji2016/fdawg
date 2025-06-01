@@ -1,0 +1,55 @@
+# Jekyll configuration for GitHub Pages
+title: FDAWG Documentation
+description: Flutter Development Assistant with Go - Comprehensive CLI tool and web interface for Flutter project management
+url: "https://jerinji2016.github.io"
+baseurl: "/fdawg"
+
+# Theme
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Navigation
+header_pages:
+  - installation.md
+  - commands/index.md
+  - web-interface.md
+  - development.md
+
+# Markdown settings
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Collections
+collections:
+  commands:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "page"
+  - scope:
+      path: ""
+      type: "commands"
+    values:
+      layout: "page"
+
+# Exclude files
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
