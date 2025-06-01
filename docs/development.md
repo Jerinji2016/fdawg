@@ -360,11 +360,11 @@ We use conventional commits:
 1. **Create HTML template:**
    ```html
    <!-- internal/server/web/templates/newfeature.html -->
-   {{define "content"}}
+   {% raw %}{{define "content"}}{% endraw %}
    <div class="project-info">
        <!-- Your HTML content -->
    </div>
-   {{end}}
+   {% raw %}{{end}}{% endraw %}
    ```
 
 2. **Add route handler:**
