@@ -7,8 +7,36 @@ SCSS_DIR=internal/server/web/static/scss
 CSS_DIR=internal/server/web/static/css
 
 # Default target
-.PHONY: all
-all: clean sass build
+# Help target
+.PHONY: help
+help:
+	@echo "Available commands:"
+	@echo ""
+	@echo "Build commands:"
+	@echo "  build          - Build the binary"
+	@echo "  clean          - Clean build artifacts"
+	@echo "  all-platforms  - Build binaries for all platforms"
+	@echo ""
+	@echo "Development commands:"
+	@echo "  run            - Build and run the application"
+	@echo "  dev            - Run in development mode with SASS watching"
+	@echo "  test           - Run tests"
+	@echo ""
+	@echo "SASS commands:"
+	@echo "  sass           - Compile SASS to CSS"
+	@echo "  sass-watch     - Watch SASS files for changes"
+	@echo ""
+	@echo "Documentation commands:"
+	@echo "  docs-install   - Install documentation dependencies"
+	@echo "  docs-build     - Build documentation"
+	@echo "  docs-serve     - Serve documentation at http://localhost:4000"
+	@echo "  docs-clean     - Clean documentation build artifacts"
+	@echo "  docs           - Build and serve documentation"
+	@echo ""
+	@echo "Other commands:"
+	@echo "  all            - Clean, compile SASS, and build (default)"
+	@echo "  help           - Show this help message"
+
 
 # Build the binary
 .PHONY: build
@@ -48,15 +76,9 @@ dev: build
 	@echo "SASS files will be watched for changes..."
 	@npm run sass:watch & ./$(BUILD_DIR)/$(BINARY_NAME)
 
-# Install the binary to $GOPATH/bin
-.PHONY: install
-install: build
-	@echo "Installing $(BINARY_NAME)..."
-	@cp $(BUILD_DIR)/$(BINARY_NAME) $(GOPATH)/bin/
-
 # Build for multiple platforms
-.PHONY: cross-build
-cross-build: clean
+.PHONY: all-platforms
+all-platforms: clean
 	@echo "Building for multiple platforms..."
 	@mkdir -p $(BUILD_DIR)
 
@@ -76,3 +98,26 @@ test:
 	@echo "Running tests..."
 	@go test -v ./...
 
+# Documentation commands
+.PHONY: docs-install
+docs-install:
+	@echo "Installing documentation dependencies..."
+	@cd docs && bundle install
+
+.PHONY: docs-build
+docs-build:
+	@echo "Building documentation..."
+	@cd docs && bundle exec jekyll build
+
+.PHONY: docs-serve
+docs-serve:
+	@echo "Serving documentation at http://localhost:4000..."
+	@cd docs && bundle exec jekyll serve --incremental
+
+.PHONY: docs-clean
+docs-clean:
+	@echo "Cleaning documentation build artifacts..."
+	@cd docs && bundle exec jekyll clean
+
+.PHONY: docs
+docs: docs-serve
