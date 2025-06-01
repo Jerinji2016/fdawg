@@ -18,6 +18,7 @@ func main() {
 			commands.AssetCommand(),
 			commands.LangCommand(),
 			commands.NamerCommand(),
+			commands.BundlerCommand(),
 			// More commands will be added here
 		},
 	}
