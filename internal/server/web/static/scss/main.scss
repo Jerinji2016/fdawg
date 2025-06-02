@@ -1,5 +1,8 @@
 // Main SCSS file that imports all partials
 
+// Use Sass color module
+@use 'sass:color';
+
 // Use variables first
 @use 'variables' as *;
 
