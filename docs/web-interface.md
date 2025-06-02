@@ -217,6 +217,35 @@ Cross-platform app naming with live preview:
 - **Platform Conventions**: Follow platform-specific guidelines
 - **Branding**: Consistent brand representation
 
+### 🆔 Bundle ID Management
+
+Comprehensive bundle identifier management across all platforms:
+
+#### Universal Configuration
+- **Single Bundle ID**: Set same identifier for all platforms
+- **Format Validation**: Real-time validation of bundle ID format
+- **Platform Detection**: Automatic detection of available platforms
+- **Confirmation Dialogs**: Safe application of changes
+
+#### Platform-Specific Management
+- **Individual Configuration**: Different bundle IDs per platform
+- **Current ID Display**: Show existing bundle identifiers
+- **Namespace Information**: Display Android namespace details
+- **Edit-in-Place**: Inline editing for each platform
+
+#### Validation & Safety
+- **Format Checking**: Validate reverse domain notation
+- **Error Messages**: Detailed validation error descriptions
+- **Automatic Backup**: Backup files before modifications
+- **Rollback Support**: Restore on failure
+
+#### Platform Support
+- **Android**: applicationId and namespace in build.gradle
+- **iOS**: PRODUCT_BUNDLE_IDENTIFIER in Xcode project
+- **macOS**: Bundle identifier in AppInfo.xcconfig
+- **Linux/Windows**: Binary name in CMakeLists.txt
+- **Web**: App ID in manifest.json
+
 ### ⚡ Fastlane Integration (Coming Soon)
 
 Automated build and deployment management:

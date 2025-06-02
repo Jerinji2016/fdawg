@@ -32,6 +32,7 @@ fdawg [command] [subcommand] [options] [arguments]
 | [`asset`]({{ '/commands/assets/' | relative_url }}) | Project asset management | [Asset Commands]({{ '/commands/assets/' | relative_url }}) |
 | [`lang`]({{ '/commands/localization/' | relative_url }}) | Localization and translation management | [Localization Commands]({{ '/commands/localization/' | relative_url }}) |
 | [`namer`]({{ '/commands/namer/' | relative_url }}) | Cross-platform app naming | [App Namer Commands]({{ '/commands/namer/' | relative_url }}) |
+| [`bundler`]({{ '/commands/bundler/' | relative_url }}) | Bundle ID management for all platforms | [Bundle ID Commands]({{ '/commands/bundler/' | relative_url }}) |
 
 ## Quick Examples
 
@@ -83,6 +84,18 @@ fdawg namer set --value "My Awesome App"
 fdawg namer set --android "Android App" --ios "iOS App"
 ```
 
+### Bundle ID Management
+```bash
+# Get current bundle IDs
+fdawg bundler get
+
+# Set universal bundle ID
+fdawg bundler set --universal com.company.app
+
+# Set platform-specific bundle IDs
+fdawg bundler set --platform android --bundle-id com.company.android
+```
+
 ### Web Interface
 ```bash
 # Start web server on default port (8080)
@@ -132,6 +145,11 @@ Most commands support these global options:
 - `list` / `get` - Get current app names
 - `set` - Set app names (universal or platform-specific)
 
+### Bundle ID Commands (`bundler`)
+- `get` - Get current bundle IDs for all platforms
+- `set` - Set bundle IDs (universal or platform-specific)
+- `validate` - Validate bundle ID format
+
 ## Error Handling
 
 FDAWG includes comprehensive error handling:
@@ -156,4 +174,5 @@ Choose a command category below to explore detailed documentation and examples:
 - [📦 Asset Commands]({{ '/commands/assets/' | relative_url }}) - Handle project assets
 - [🌍 Localization Commands]({{ '/commands/localization/' | relative_url }}) - Translation management
 - [🏷️ App Namer Commands]({{ '/commands/namer/' | relative_url }}) - Cross-platform app naming
+- [🆔 Bundle ID Commands]({{ '/commands/bundler/' | relative_url }}) - Bundle identifier management
 - [🌐 Server Commands]({{ '/commands/server/' | relative_url }}) - Web interface and validation
