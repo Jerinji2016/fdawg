@@ -64,6 +64,12 @@
                             <span>App Namer</span>
                         </a>
                     </li>
+                    <li class="nav-item {{if eq .ActivePage "bundler"}}active{{end}}">
+                        <a href="/bundler" title="Bundle ID Manager" data-tooltip="Bundle ID Manager">
+                            <i class="fas fa-id-card"></i>
+                            <span>Bundle IDs</span>
+                        </a>
+                    </li>
                     <li class="nav-item {{if eq .ActivePage "fastlane"}}active{{end}}">
                         <a href="/fastlane" title="Fastlane" data-tooltip="Fastlane">
                             <i class="fas fa-rocket"></i>
@@ -102,6 +108,9 @@
     {{end}}
     {{if eq .ActivePage "namer"}}
     <script src="/static/js/namer.js"></script>
+    {{end}}
+    {{if eq .ActivePage "bundler"}}
+    <script src="/static/js/bundler.js"></script>
     {{end}}
 </body>
 </html>

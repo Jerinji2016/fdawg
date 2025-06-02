@@ -2731,3 +2731,491 @@
     }
   }
 }
+
+// Bundler-specific styles
+.bundler-section {
+  margin-bottom: 30px;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h4 {
+      margin: 0;
+      color: $text-color;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      i {
+        color: $primary-color;
+      }
+
+      .toggle-btn {
+        background: none;
+        border: none;
+        color: $text-light;
+        margin-left: 10px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: $text-color;
+        }
+
+        i {
+          font-size: 0.9rem;
+          transition: transform 0.3s ease;
+        }
+      }
+    }
+  }
+}
+
+.bundler-form-group {
+  margin-bottom: 20px;
+
+  .universal-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    .bundler-input {
+      flex: 1;
+      padding: 10px 15px;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      background-color: rgba(255, 255, 255, 0.05);
+      color: $text-color;
+      font-family: $font-primary;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      &::placeholder {
+        color: $text-light;
+      }
+    }
+  }
+
+  .form-help {
+    font-size: 0.85rem;
+    color: $text-light;
+    margin-top: 5px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+  }
+}
+
+// Bundler info grid spacing
+.bundler-info-grid {
+  gap: 20px !important;
+}
+
+// Bundler platform forms - reuse namer styles but with bundler-specific naming
+.bundler-section .platform-forms-grid {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+
+  .platform-form-card {
+    .platform-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+
+      .platform-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        color: $text-color;
+
+        i {
+          color: $primary-color;
+          font-size: 1.1rem;
+        }
+      }
+
+      .platform-status {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+        border-radius: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+
+        &.available {
+          background-color: rgba(76, 175, 80, 0.2);
+          color: #4CAF50;
+        }
+
+        &.unavailable {
+          background-color: rgba(255, 152, 0, 0.2);
+          color: #FF9800;
+        }
+      }
+    }
+
+    .current-bundleid-display {
+      margin-bottom: 15px;
+      padding: 15px;
+      background-color: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+
+      .current-bundleid-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+
+        .current-bundleid-label {
+          font-size: 0.75rem;
+          color: $text-light;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-weight: 500;
+        }
+
+        .edit-toggle-btn {
+          background: none;
+          border: none;
+          color: $text-light;
+          cursor: pointer;
+          padding: 6px 8px;
+          border-radius: 4px;
+          transition: all 0.3s ease;
+          font-size: 0.85rem;
+
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: $primary-color;
+          }
+
+          i {
+            font-size: 0.8rem;
+          }
+        }
+      }
+
+      .current-bundleid-value {
+        font-family: $font-mono;
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: $text-color;
+        border: 1px solid $border-color;
+        margin-bottom: 6px;
+        word-break: break-all;
+      }
+
+      .current-namespace {
+        font-size: 0.8rem;
+        color: $text-light;
+        font-style: italic;
+        margin-top: 4px;
+      }
+
+      .error-text {
+        font-size: 0.75rem;
+        color: #ff6b6b;
+        margin-top: 6px;
+
+        i {
+          margin-right: 4px;
+        }
+      }
+    }
+
+    .edit-bundleid-section {
+      padding: 15px;
+      background-color: rgba(255, 255, 255, 0.02);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 10px;
+
+      .platform-input {
+        width: 100%;
+        max-width: none;
+        box-sizing: border-box;
+        padding: 10px 15px;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        background-color: rgba(255, 255, 255, 0.05);
+        color: $text-color;
+        font-family: $font-primary;
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        &::placeholder {
+          color: $text-light;
+        }
+      }
+
+      .edit-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+
+        .validate-platform-btn,
+        .save-platform-btn,
+        .cancel-edit-btn {
+          padding: 8px 16px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-family: $font-primary;
+          font-size: 0.85rem;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          transition: all 0.3s ease;
+          white-space: nowrap;
+
+          &:hover {
+            transform: translateY(-1px);
+          }
+
+          &:active {
+            transform: translateY(0);
+          }
+
+          i {
+            font-size: 0.8rem;
+          }
+        }
+
+        .validate-platform-btn {
+          background-color: rgba(76, 175, 80, 0.2);
+          color: #4CAF50;
+
+          &:hover {
+            background-color: rgba(76, 175, 80, 0.3);
+          }
+        }
+
+        .save-platform-btn {
+          background-color: $primary-color;
+          color: white;
+
+          &:hover {
+            background-color: darken($primary-color, 10%);
+          }
+        }
+
+        .cancel-edit-btn {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: $text-light;
+          border: 1px solid $border-color;
+
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: $text-color;
+          }
+        }
+      }
+    }
+  }
+}
+
+.validation-result {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &.valid {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+  }
+
+  &.invalid {
+    background-color: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+  }
+
+  i {
+    font-size: 0.9rem;
+  }
+}
+
+.confirmation-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+
+  .confirmation-dialog {
+    background-color: $card-background;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+
+    .dialog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      border-bottom: 1px solid $border-color;
+
+      h4 {
+        margin: 0;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        i {
+          color: $primary-color;
+        }
+      }
+    }
+
+    .dialog-content {
+      padding: 20px;
+
+      p {
+        margin: 0 0 15px 0;
+        color: $text-color;
+        line-height: 1.5;
+      }
+
+      .dialog-details {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        padding: 15px;
+        border-left: 3px solid $primary-color;
+        font-family: $font-primary;
+        font-size: 0.9rem;
+        color: $text-color;
+        line-height: 1.5;
+      }
+    }
+
+    .dialog-actions {
+      padding: 20px;
+      border-top: 1px solid $border-color;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+
+      .cancel-btn,
+      .confirm-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: $font-primary;
+        font-weight: 500;
+
+        i {
+          font-size: 0.85rem;
+        }
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+
+      .cancel-btn {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: $text-color;
+        border: 1px solid $border-color;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.15);
+          border-color: rgba(255, 255, 255, 0.3);
+        }
+      }
+
+      .confirm-btn {
+        background-color: $primary-color;
+        color: white;
+
+        &:hover {
+          background-color: darken($primary-color, 10%);
+        }
+      }
+    }
+  }
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+
+  .loading-spinner {
+    background-color: $card-background;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid $border-color;
+
+    i {
+      font-size: 2rem;
+      color: $primary-color;
+      margin-bottom: 15px;
+      display: block;
+    }
+
+    span {
+      color: $text-color;
+      font-family: $font-primary;
+    }
+  }
+}

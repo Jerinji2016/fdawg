@@ -13,6 +13,7 @@ import (
 //go:embed web/templates/assets.html
 //go:embed web/templates/localizations.html
 //go:embed web/templates/namer.html
+//go:embed web/templates/bundler.html
 //go:embed web/templates/fastlane.html
 //go:embed web/templates/run_configs.html
 //go:embed web/static/css/style.css
@@ -21,6 +22,7 @@ import (
 //go:embed web/static/js/assets.js
 //go:embed web/static/js/localizations.js
 //go:embed web/static/js/namer.js
+//go:embed web/static/js/bundler.js
 //go:embed web/static/js/toast.js
 var webFS embed.FS
 

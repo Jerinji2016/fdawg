@@ -102,6 +102,12 @@ func Start(port string, project *flutter.ValidationResult) error {
 		handlePage(w, r, &data, "namer")
 	})
 
+	http.HandleFunc("/bundler", func(w http.ResponseWriter, r *http.Request) {
+		data := *baseData
+		data.ActivePage = "bundler"
+		handlePage(w, r, &data, "bundler")
+	})
+
 	// Serve static files from embedded filesystem
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(GetStaticFS())))
 
