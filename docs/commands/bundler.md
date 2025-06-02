@@ -1,8 +1,10 @@
 ---
 layout: default
 title: Bundle ID Management
-parent: Commands
+parent: Command Reference
 nav_order: 5
+description: Manage bundle ids across all platforms
+permalink: /commands/bundler/
 ---
 
 # Bundle ID Management

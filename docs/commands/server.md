@@ -2,7 +2,7 @@
 layout: default
 title: Server Commands
 parent: Command Reference
-nav_order: 5
+nav_order: 6
 description: "Web interface and project validation"
 permalink: /commands/server/
 ---
