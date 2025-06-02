@@ -2977,7 +2977,6 @@
         gap: 8px;
         justify-content: flex-end;
 
-        .validate-platform-btn,
         .save-platform-btn,
         .cancel-edit-btn {
           padding: 8px 16px;
@@ -3003,15 +3002,6 @@
 
           i {
             font-size: 0.8rem;
-          }
-        }
-
-        .validate-platform-btn {
-          background-color: rgba(76, 175, 80, 0.2);
-          color: #4CAF50;
-
-          &:hover {
-            background-color: rgba(76, 175, 80, 0.3);
           }
         }
 

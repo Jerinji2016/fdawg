@@ -34,11 +34,6 @@ class BundlerManager {
             this.setUniversalBundleID();
         });
 
-        // Universal bundle ID validation
-        document.getElementById('validate-universal-btn').addEventListener('click', () => {
-            this.validateUniversalBundleID();
-        });
-
         // Real-time validation on input
         document.getElementById('universal-bundleid').addEventListener('input', () => {
             this.clearValidationResult();
@@ -158,9 +153,6 @@ class BundlerManager {
                                 value=""
                             >
                             <div class="edit-buttons">
-                                <button class="validate-platform-btn" onclick="bundlerManager.validatePlatformBundleID('${platform.id}')">
-                                    <i class="fas fa-check-circle"></i> Validate
-                                </button>
                                 <button class="save-platform-btn" onclick="bundlerManager.savePlatformBundleID('${platform.id}')">
                                     <i class="fas fa-save"></i> Save
                                 </button>
@@ -182,30 +174,7 @@ class BundlerManager {
         container.innerHTML = html;
     }
 
-    async validateUniversalBundleID() {
-        const bundleID = document.getElementById('universal-bundleid').value.trim();
-        
-        if (!bundleID) {
-            this.showValidationResult('universal-validation-result', false, 'Please enter a bundle ID');
-            return;
-        }
-
-        await this.validateBundleID(bundleID, 'universal-validation-result');
-    }
-
-    async validatePlatformBundleID(platformId) {
-        const input = document.getElementById(`platform-${platformId}`);
-        const bundleID = input.value.trim();
-        
-        if (!bundleID) {
-            this.showValidationResult(`platform-validation-${platformId}`, false, 'Please enter a bundle ID');
-            return;
-        }
-
-        await this.validateBundleID(bundleID, `platform-validation-${platformId}`);
-    }
-
-    async validateBundleID(bundleID, resultElementId) {
+    async validateBundleIDAPI(bundleID) {
         try {
             const response = await fetch('/api/bundler/validate', {
                 method: 'POST',
@@ -220,10 +189,16 @@ class BundlerManager {
             }
 
             const data = await response.json();
-            this.showValidationResult(resultElementId, data.valid, data.error || 'Bundle ID is valid');
+            return {
+                valid: data.valid,
+                error: data.error || 'Bundle ID is valid'
+            };
         } catch (error) {
             console.error('Error validating bundle ID:', error);
-            this.showValidationResult(resultElementId, false, 'Failed to validate bundle ID');
+            return {
+                valid: false,
+                error: 'Failed to validate bundle ID'
+            };
         }
     }
 
@@ -249,6 +224,17 @@ class BundlerManager {
             showToast('Please enter a bundle ID', 'warning');
             return;
         }
+
+        // Validate bundle ID format before proceeding
+        const validation = await this.validateBundleIDAPI(universalBundleID);
+        if (!validation.valid) {
+            this.showValidationResult('universal-validation-result', false, validation.error);
+            showToast('Invalid bundle ID format', 'error');
+            return;
+        }
+
+        // Clear any previous validation messages
+        this.clearValidationResult();
 
         const availablePlatforms = this.platforms.filter(p => p.available);
         if (availablePlatforms.length === 0) {
@@ -296,6 +282,20 @@ class BundlerManager {
         if (!newBundleID) {
             showToast('Please enter a bundle ID', 'warning');
             return;
+        }
+
+        // Validate bundle ID format before proceeding
+        const validation = await this.validateBundleIDAPI(newBundleID);
+        if (!validation.valid) {
+            this.showValidationResult(`platform-validation-${platformId}`, false, validation.error);
+            showToast('Invalid bundle ID format', 'error');
+            return;
+        }
+
+        // Clear any previous validation messages
+        const validationElement = document.getElementById(`platform-validation-${platformId}`);
+        if (validationElement) {
+            validationElement.style.display = 'none';
         }
 
         const platform = this.platforms.find(p => p.id === platformId);
