@@ -70,16 +70,10 @@
                             <span>Bundle IDs</span>
                         </a>
                     </li>
-                    <li class="nav-item {{if eq .ActivePage "fastlane"}}active{{end}}">
-                        <a href="/fastlane" title="Fastlane" data-tooltip="Fastlane">
-                            <i class="fas fa-rocket"></i>
-                            <span>Fastlane</span>
-                        </a>
-                    </li>
-                    <li class="nav-item {{if eq .ActivePage "run-configs"}}active{{end}}">
-                        <a href="/run-configs" title="Run Configurations" data-tooltip="Run Configurations">
-                            <i class="fas fa-play-circle"></i>
-                            <span>Run Configs</span>
+                    <li class="nav-item {{if eq .ActivePage "build"}}active{{end}}">
+                        <a href="/build" title="Build Manager" data-tooltip="Build Manager">
+                            <i class="fas fa-hammer"></i>
+                            <span>Build</span>
                         </a>
                     </li>
                 </ul>
@@ -111,6 +105,9 @@
     {{end}}
     {{if eq .ActivePage "bundler"}}
     <script src="/static/js/bundler.js"></script>
+    {{end}}
+    {{if eq .ActivePage "build"}}
+    <script src="/static/js/build.js"></script>
     {{end}}
 </body>
 </html>

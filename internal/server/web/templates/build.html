@@ -1,0 +1,242 @@
+{{define "content"}}
+<div class="project-info">
+    <div class="info-section">
+        <h3>
+            <span><i class="fas fa-hammer"></i> Build Manager</span>
+            <i class="fas fa-ellipsis-h"></i>
+        </h3>
+
+        <!-- Build Status Section -->
+        <div class="build-section">
+            <div class="section-header">
+                <h4>Build Status</h4>
+                <button id="refresh-status-btn" class="secondary-btn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+
+            <div id="build-status-container" class="info-card">
+                <div class="build-status-content">
+                    <div class="status-item">
+                        <div class="status-label">Configuration Status:</div>
+                        <div id="config-status" class="status-value">
+                            <i class="fas fa-spinner fa-spin"></i> Checking...
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Last Build:</div>
+                        <div id="last-build-status" class="status-value">
+                            <i class="fas fa-spinner fa-spin"></i> Loading...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Setup Section (shown when no config exists) -->
+        <div id="setup-section" class="build-section" style="display: none;">
+            <div class="section-header">
+                <h4><i class="fas fa-cog"></i> Build Setup Required</h4>
+            </div>
+
+            <div class="info-card">
+                <div class="setup-content">
+                    <div class="setup-message">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Build configuration is required before you can start building your Flutter app.</p>
+                    </div>
+                    <div class="setup-options">
+                        <button id="setup-default-btn" class="primary-btn">
+                            <i class="fas fa-magic"></i> Quick Setup (Default Settings)
+                        </button>
+                        <button id="setup-wizard-btn" class="secondary-btn">
+                            <i class="fas fa-cogs"></i> Custom Setup (Wizard)
+                        </button>
+                    </div>
+                    <div class="setup-help">
+                        <p><strong>Quick Setup:</strong> Creates a default configuration with common build settings.</p>
+                        <p><strong>Custom Setup:</strong> Interactive wizard to configure build settings for your specific needs.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Build Configuration Section (shown when config exists) -->
+        <div id="config-section" class="build-section" style="display: none;">
+            <div class="section-header">
+                <h4><i class="fas fa-cog"></i> Build Configuration</h4>
+                <div class="section-actions">
+                    <button id="edit-config-btn" class="secondary-btn">
+                        <i class="fas fa-edit"></i> Edit Config
+                    </button>
+                    <button id="reset-config-btn" class="danger-btn">
+                        <i class="fas fa-trash"></i> Reset
+                    </button>
+                </div>
+            </div>
+
+            <div id="config-display" class="info-card">
+                <!-- Configuration details will be populated here -->
+            </div>
+        </div>
+
+        <!-- Build Execution Section -->
+        <div id="build-section" class="build-section" style="display: none;">
+            <div class="section-header">
+                <h4><i class="fas fa-play"></i> Build Execution</h4>
+            </div>
+
+            <div class="build-form-card info-card">
+                <div class="build-form-content">
+                    <!-- Platform Selection -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-mobile-alt"></i> Select Platforms
+                        </label>
+                        <div id="platform-selection" class="platform-selection-grid">
+                            <!-- Platform checkboxes will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Environment Selection -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-layer-group"></i> Environment (Optional)
+                        </label>
+                        <select id="environment-select" class="form-select">
+                            <option value="">No environment</option>
+                            <!-- Environment options will be populated here -->
+                        </select>
+                    </div>
+
+                    <!-- Build Options -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-sliders-h"></i> Build Options
+                        </label>
+                        <div class="build-options-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="skip-pre-build">
+                                <span class="checkmark"></span>
+                                Skip pre-build steps
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="continue-on-error">
+                                <span class="checkmark"></span>
+                                Continue on error
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="dry-run">
+                                <span class="checkmark"></span>
+                                Dry run (preview only)
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="parallel">
+                                <span class="checkmark"></span>
+                                Parallel builds (experimental)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Build Actions -->
+                    <div class="form-group">
+                        <div class="build-actions">
+                            <button id="start-build-btn" class="primary-btn" disabled>
+                                <i class="fas fa-play"></i> Start Build
+                            </button>
+                            <button id="stop-build-btn" class="danger-btn" style="display: none;">
+                                <i class="fas fa-stop"></i> Stop Build
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Build Progress Section -->
+        <div id="progress-section" class="build-section" style="display: none;">
+            <div class="section-header">
+                <h4><i class="fas fa-tasks"></i> Build Progress</h4>
+            </div>
+
+            <div class="info-card">
+                <div id="build-progress-content">
+                    <!-- Build progress will be shown here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Build Artifacts Section -->
+        <div id="artifacts-section" class="build-section" style="display: none;">
+            <div class="section-header">
+                <h4><i class="fas fa-archive"></i> Build Artifacts</h4>
+                <button id="refresh-artifacts-btn" class="secondary-btn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+
+            <div id="artifacts-container" class="info-card">
+                <!-- Artifacts will be populated here -->
+            </div>
+        </div>
+
+        <!-- Build Information Section -->
+        <div class="build-section">
+            <div class="section-header">
+                <h4><i class="fas fa-info-circle"></i> Build Information <button id="toggle-build-info" class="toggle-btn"><i class="fas fa-chevron-down"></i></button></h4>
+            </div>
+
+            <div id="build-info-container" class="card-grid" style="display: none;">
+                <div class="info-card">
+                    <div class="card-header">
+                        <span class="card-label"><i class="fas fa-cogs"></i> Pre-build Steps</span>
+                    </div>
+                    <div class="platform-info-content">
+                        <div class="info-description">
+                            Pre-build steps run before platform builds to prepare your project:
+                            <ul>
+                                <li>Code generation (build_runner)</li>
+                                <li>Icon generation (flutter_launcher_icons)</li>
+                                <li>Custom setup commands</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="card-header">
+                        <span class="card-label"><i class="fas fa-folder"></i> Artifact Organization</span>
+                    </div>
+                    <div class="platform-info-content">
+                        <div class="info-description">
+                            Build artifacts are organized by:
+                            <ul>
+                                <li>Date folders (e.g., June-6/)</li>
+                                <li>Platform subdirectories</li>
+                                <li>Named with app name, version, and architecture</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="card-header">
+                        <span class="card-label"><i class="fas fa-layer-group"></i> Environment Integration</span>
+                    </div>
+                    <div class="platform-info-content">
+                        <div class="info-description">
+                            When an environment is selected:
+                            <ul>
+                                <li>Uses --dart-define-from-file</li>
+                                <li>Applies environment-specific configurations</li>
+                                <li>Supports multiple build variants</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{end}}
