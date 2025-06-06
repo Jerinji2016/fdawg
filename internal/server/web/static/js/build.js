@@ -56,7 +56,7 @@ class BuildManager {
             this.toggleBuildInfoSection();
         });
 
-        // Drawer events
+        // Build Plan Drawer events
         document.getElementById('close-drawer-btn').addEventListener('click', () => {
             this.closeBuildPlanDrawer();
         });
@@ -69,13 +69,29 @@ class BuildManager {
             this.executeFromDrawer();
         });
 
-        // Close drawer when clicking overlay
-        const drawerOverlay = document.querySelector('.drawer-overlay');
-        if (drawerOverlay) {
-            drawerOverlay.addEventListener('click', () => {
-                this.closeBuildPlanDrawer();
-            });
-        }
+        // Build Configuration Drawer events
+        document.getElementById('close-config-drawer-btn').addEventListener('click', () => {
+            this.closeBuildConfigDrawer();
+        });
+
+        document.getElementById('cancel-config-btn').addEventListener('click', () => {
+            this.closeBuildConfigDrawer();
+        });
+
+        document.getElementById('save-config-btn').addEventListener('click', () => {
+            this.saveConfigFromDrawer();
+        });
+
+        // Close drawers when clicking overlay
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('drawer-overlay')) {
+                if (e.target.closest('#build-plan-drawer')) {
+                    this.closeBuildPlanDrawer();
+                } else if (e.target.closest('#build-config-drawer')) {
+                    this.closeBuildConfigDrawer();
+                }
+            }
+        });
 
 
 
@@ -759,166 +775,43 @@ class BuildManager {
             }
 
             const config = await response.json();
-            this.showConfigEditor(config);
+            this.showBuildConfigDrawer(config, 'Edit Build Configuration');
         } catch (error) {
             console.error('Error loading config for editing:', error);
             showToast('Failed to load configuration for editing', 'error');
         }
     }
 
-    showConfigEditor(config) {
-        const modalHTML = `
-            <div class="modal-overlay">
-                <div class="modal-content config-editor-modal">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-cog"></i> Edit Build Configuration</h3>
-                        <button class="modal-close">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="config-editor-content">
-                            <div class="config-section">
-                                <h4><i class="fas fa-info-circle"></i> Metadata</h4>
-                                <div class="config-form-group">
-                                    <label>App Name Source:</label>
-                                    <select id="edit-app-name-source" class="config-input">
-                                        <option value="pubspec">pubspec.yaml</option>
-                                        <option value="namer">Namer Configuration</option>
-                                        <option value="manual">Manual</option>
-                                    </select>
-                                </div>
-                                <div class="config-form-group">
-                                    <label>Version Source:</label>
-                                    <select id="edit-version-source" class="config-input">
-                                        <option value="pubspec">pubspec.yaml</option>
-                                        <option value="manual">Manual</option>
-                                    </select>
-                                </div>
-                            </div>
+    showBuildConfigDrawer(config, title = 'Build Configuration') {
+        const drawer = document.getElementById('build-config-drawer');
+        const content = document.getElementById('build-config-content');
+        const titleElement = document.getElementById('config-drawer-title');
 
-                            <div class="config-section">
-                                <h4><i class="fas fa-folder"></i> Artifacts</h4>
-                                <div class="config-form-group">
-                                    <label>Output Directory:</label>
-                                    <input type="text" id="edit-output-dir" class="config-input" placeholder="output">
-                                </div>
-                                <div class="config-form-group">
-                                    <label>
-                                        <input type="checkbox" id="edit-date-folders">
-                                        Organize by date folders
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="config-section">
-                                <h4><i class="fas fa-mobile-alt"></i> Platform Settings</h4>
-                                <div id="platform-config-container">
-                                    <!-- Platform configurations will be populated here -->
-                                </div>
-                            </div>
-
-                            <div class="config-section">
-                                <h4><i class="fas fa-cogs"></i> Pre-build Steps</h4>
-                                <div class="config-form-group">
-                                    <label>
-                                        <input type="checkbox" id="edit-install-deps">
-                                        Install dependencies (flutter pub get)
-                                    </label>
-                                </div>
-                                <div class="config-form-group">
-                                    <label>
-                                        <input type="checkbox" id="edit-generate-code">
-                                        Generate code (build_runner)
-                                    </label>
-                                </div>
-                                <div class="config-form-group">
-                                    <label>Custom Commands:</label>
-                                    <textarea id="edit-custom-commands" class="config-input" rows="3"
-                                              placeholder="Enter custom pre-build commands (one per line)"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="primary-btn save-config-btn">
-                            <i class="fas fa-save"></i> Save Configuration
-                        </button>
-                        <button class="secondary-btn cancel-config-btn">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-        const modal = document.querySelector('.modal-overlay:last-child');
-
-        // Populate form with current config
-        this.populateConfigForm(config);
-
-        // Bind events
-        modal.querySelector('.modal-close').addEventListener('click', () => this.hideConfigEditor(modal));
-        modal.querySelector('.cancel-config-btn').addEventListener('click', () => this.hideConfigEditor(modal));
-        modal.querySelector('.save-config-btn').addEventListener('click', () => this.saveConfigChanges(modal));
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                this.hideConfigEditor(modal);
-            }
-        });
-    }
-
-    populateConfigForm(config) {
-        // Metadata
-        document.getElementById('edit-app-name-source').value = config.metadata?.app_name_source || 'pubspec';
-        document.getElementById('edit-version-source').value = config.metadata?.version_source || 'pubspec';
-
-        // Artifacts
-        document.getElementById('edit-output-dir').value = config.artifacts?.base_output_dir || 'output';
-        document.getElementById('edit-date-folders').checked = config.artifacts?.organize_by_date || false;
-
-        // Pre-build steps
-        const preBuild = config.pre_build || {};
-        document.getElementById('edit-install-deps').checked = preBuild.install_dependencies !== false;
-        document.getElementById('edit-generate-code').checked = preBuild.generate_code || false;
-
-        if (preBuild.custom_commands && Array.isArray(preBuild.custom_commands)) {
-            document.getElementById('edit-custom-commands').value = preBuild.custom_commands.join('\n');
+        if (!drawer || !content) {
+            return;
         }
 
-        // Platform configurations
-        this.populatePlatformConfigs(config.platforms || {});
+        // Store current config for editing
+        this.currentEditConfig = config || {};
+        titleElement.textContent = title;
+
+        const html = this.generateConfigDrawerContent(this.currentEditConfig);
+        content.innerHTML = html;
+
+        drawer.classList.add('open');
+        document.body.classList.add('drawer-open');
     }
 
-    populatePlatformConfigs(platforms) {
-        const container = document.getElementById('platform-config-container');
-
-        const platformNames = ['android', 'ios', 'macos', 'linux', 'windows', 'web'];
-
-        const html = platformNames.map(platform => {
-            const platformConfig = platforms[platform] || {};
-            const enabled = platformConfig.enabled || false;
-            const icon = this.getPlatformIcon(platform);
-
-            return `
-                <div class="platform-config-item">
-                    <div class="platform-config-header">
-                        <label class="platform-config-toggle">
-                            <input type="checkbox" id="platform-${platform}" ${enabled ? 'checked' : ''}>
-                            <i class="${icon}"></i>
-                            <span>${platform.charAt(0).toUpperCase() + platform.slice(1)}</span>
-                        </label>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        container.innerHTML = html;
+    closeBuildConfigDrawer() {
+        const drawer = document.getElementById('build-config-drawer');
+        drawer.classList.remove('open');
+        document.body.classList.remove('drawer-open');
+        this.currentEditConfig = null;
     }
 
-    async saveConfigChanges(modal) {
+    async saveConfigFromDrawer() {
         try {
-            const config = this.buildConfigFromForm();
+            const config = this.buildConfigFromDrawerForm();
 
             const response = await fetch('/api/build/config/update', {
                 method: 'POST',
@@ -934,7 +827,7 @@ class BuildManager {
             }
 
             showToast('Configuration saved successfully!', 'success');
-            this.hideConfigEditor(modal);
+            this.closeBuildConfigDrawer();
             await this.loadBuildStatus(); // Refresh the display
         } catch (error) {
             console.error('Error saving config:', error);
@@ -942,47 +835,246 @@ class BuildManager {
         }
     }
 
-    buildConfigFromForm() {
+    generateConfigDrawerContent() {
+        return `
+            <div class="config-drawer-content">
+                <!-- Metadata Section -->
+                <div class="config-section">
+                    <h4><i class="fas fa-info-circle"></i> Metadata Configuration</h4>
+                    <div class="config-form-group">
+                        <label>App Name Source:</label>
+                        <select id="edit-app-name-source" class="config-input">
+                            <option value="namer">Namer Configuration</option>
+                            <option value="pubspec">pubspec.yaml</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="config-form-group" id="custom-app-name-group" style="display: none;">
+                        <label>Custom App Name:</label>
+                        <input type="text" id="edit-custom-app-name" class="config-input" placeholder="Enter custom app name">
+                    </div>
+                    <div class="config-form-group">
+                        <label>Version Source:</label>
+                        <select id="edit-version-source" class="config-input">
+                            <option value="pubspec">pubspec.yaml</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="config-form-group" id="custom-version-group" style="display: none;">
+                        <label>Custom Version:</label>
+                        <input type="text" id="edit-custom-version" class="config-input" placeholder="e.g., 1.0.0+1">
+                    </div>
+                </div>
+
+                <!-- Artifacts Section -->
+                <div class="config-section">
+                    <h4><i class="fas fa-folder"></i> Artifacts Configuration</h4>
+                    <div class="config-form-group">
+                        <label>Base Output Directory:</label>
+                        <input type="text" id="edit-output-dir" class="config-input" placeholder="build/fdawg-outputs">
+                    </div>
+                    <div class="config-form-group">
+                        <label>
+                            <input type="checkbox" id="edit-organize-by-date">
+                            Organize by date folders
+                        </label>
+                    </div>
+                    <div class="config-form-group" id="date-format-group">
+                        <label>Date Format:</label>
+                        <select id="edit-date-format" class="config-input">
+                            <option value="January-2">January-2 (e.g., June-7)</option>
+                            <option value="2006-01-02">2006-01-02 (e.g., 2024-06-07)</option>
+                            <option value="02-01-2006">02-01-2006 (e.g., 07-06-2024)</option>
+                            <option value="custom">Custom Format</option>
+                        </select>
+                    </div>
+                    <div class="config-form-group" id="custom-date-format-group" style="display: none;">
+                        <label>Custom Date Format:</label>
+                        <input type="text" id="edit-custom-date-format" class="config-input" placeholder="Go time format (e.g., 2006-01-02)">
+                    </div>
+                    <div class="config-form-group">
+                        <label>
+                            <input type="checkbox" id="edit-organize-by-platform">
+                            Organize by platform folders
+                        </label>
+                    </div>
+                    <div class="config-form-group">
+                        <label>
+                            <input type="checkbox" id="edit-organize-by-build-type">
+                            Organize by build type folders
+                        </label>
+                    </div>
+                    <div class="config-form-group">
+                        <label>Naming Pattern:</label>
+                        <input type="text" id="edit-naming-pattern" class="config-input" placeholder="{app_name}_{version}_{arch}">
+                        <small class="config-help">Available variables: {app_name}, {version}, {arch}, {platform}, {build_type}</small>
+                    </div>
+                    <div class="config-form-group">
+                        <label>Fallback App Name:</label>
+                        <input type="text" id="edit-fallback-app-name" class="config-input" placeholder="flutter_app">
+                    </div>
+                </div>
+
+                <!-- Pre-build Steps Section -->
+                <div class="config-section">
+                    <h4><i class="fas fa-cogs"></i> Pre-build Steps</h4>
+                    <div class="config-subsection">
+                        <h5><i class="fas fa-globe"></i> Global Steps (All Platforms)</h5>
+                        <div id="global-prebuild-steps">
+                            <!-- Global pre-build steps will be populated here -->
+                        </div>
+                        <button type="button" class="secondary-btn add-step-btn" data-platform="global">
+                            <i class="fas fa-plus"></i> Add Global Step
+                        </button>
+                    </div>
+                    <div class="config-subsection">
+                        <h5><i class="fab fa-android"></i> Android-specific Steps</h5>
+                        <div id="android-prebuild-steps">
+                            <!-- Android pre-build steps will be populated here -->
+                        </div>
+                        <button type="button" class="secondary-btn add-step-btn" data-platform="android">
+                            <i class="fas fa-plus"></i> Add Android Step
+                        </button>
+                    </div>
+                    <div class="config-subsection">
+                        <h5><i class="fab fa-apple"></i> iOS-specific Steps</h5>
+                        <div id="ios-prebuild-steps">
+                            <!-- iOS pre-build steps will be populated here -->
+                        </div>
+                        <button type="button" class="secondary-btn add-step-btn" data-platform="ios">
+                            <i class="fas fa-plus"></i> Add iOS Step
+                        </button>
+                    </div>
+                    <div class="config-subsection">
+                        <h5><i class="fas fa-globe"></i> Web-specific Steps</h5>
+                        <div id="web-prebuild-steps">
+                            <!-- Web pre-build steps will be populated here -->
+                        </div>
+                        <button type="button" class="secondary-btn add-step-btn" data-platform="web">
+                            <i class="fas fa-plus"></i> Add Web Step
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Platform Configuration Section -->
+                <div class="config-section">
+                    <h4><i class="fas fa-mobile-alt"></i> Platform Configuration</h4>
+                    <div id="platform-config-container">
+                        <!-- Platform configurations will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Execution Configuration Section -->
+                <div class="config-section">
+                    <h4><i class="fas fa-play"></i> Execution Configuration</h4>
+                    <div class="config-form-group">
+                        <label>
+                            <input type="checkbox" id="edit-parallel-builds">
+                            Enable parallel builds (experimental)
+                        </label>
+                    </div>
+                    <div class="config-form-group" id="max-parallel-group">
+                        <label>Max Parallel Builds:</label>
+                        <input type="number" id="edit-max-parallel" class="config-input" min="1" max="8" value="2">
+                    </div>
+                    <div class="config-form-group">
+                        <label>
+                            <input type="checkbox" id="edit-continue-on-error">
+                            Continue on error (don't stop if one platform fails)
+                        </label>
+                    </div>
+                    <div class="config-form-group">
+                        <label>
+                            <input type="checkbox" id="edit-save-logs">
+                            Save build logs
+                        </label>
+                    </div>
+                    <div class="config-form-group">
+                        <label>Log Level:</label>
+                        <select id="edit-log-level" class="config-input">
+                            <option value="debug">Debug</option>
+                            <option value="info">Info</option>
+                            <option value="warning">Warning</option>
+                            <option value="error">Error</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    buildConfigFromDrawerForm() {
         // Get current config as base
-        const config = this.buildConfig || {};
+        const config = this.currentEditConfig || {};
 
         // Update metadata
         config.metadata = {
             app_name_source: document.getElementById('edit-app-name-source').value,
+            custom_app_name: document.getElementById('edit-custom-app-name').value,
             version_source: document.getElementById('edit-version-source').value,
+            custom_version: document.getElementById('edit-custom-version').value,
         };
 
         // Update artifacts
         config.artifacts = {
-            base_output_dir: document.getElementById('edit-output-dir').value || 'output',
-            organize_by_date: document.getElementById('edit-date-folders').checked,
+            base_output_dir: document.getElementById('edit-output-dir').value || 'build/fdawg-outputs',
+            organization: {
+                by_date: document.getElementById('edit-organize-by-date').checked,
+                date_format: document.getElementById('edit-date-format').value,
+                by_platform: document.getElementById('edit-organize-by-platform').checked,
+                by_build_type: document.getElementById('edit-organize-by-build-type').checked,
+            },
+            naming: {
+                pattern: document.getElementById('edit-naming-pattern').value || '{app_name}_{version}_{arch}',
+                fallback_app_name: document.getElementById('edit-fallback-app-name').value || 'flutter_app',
+            },
         };
 
-        // Update pre-build steps
-        const customCommands = document.getElementById('edit-custom-commands').value.trim();
-        config.pre_build = {
-            install_dependencies: document.getElementById('edit-install-deps').checked,
-            generate_code: document.getElementById('edit-generate-code').checked,
-            custom_commands: customCommands ? customCommands.split('\n').filter(cmd => cmd.trim()) : [],
+        // Update execution
+        config.execution = {
+            parallel_builds: document.getElementById('edit-parallel-builds').checked,
+            max_parallel: parseInt(document.getElementById('edit-max-parallel').value) || 2,
+            continue_on_error: document.getElementById('edit-continue-on-error').checked,
+            save_logs: document.getElementById('edit-save-logs').checked,
+            log_level: document.getElementById('edit-log-level').value,
         };
 
-        // Update platform configurations
-        config.platforms = config.platforms || {};
-        const platformNames = ['android', 'ios', 'macos', 'linux', 'windows', 'web'];
-
-        platformNames.forEach(platform => {
-            const enabled = document.getElementById(`platform-${platform}`).checked;
-            config.platforms[platform] = config.platforms[platform] || {};
-            config.platforms[platform].enabled = enabled;
-        });
+        // TODO: Add pre-build steps and platform configurations
+        // This will be implemented in the next iteration
 
         return config;
     }
 
-    hideConfigEditor(modal) {
-        if (modal) {
-            modal.remove();
-        }
+    async setupConfig() {
+        // Show configuration drawer with default config for setup
+        const defaultConfig = {
+            metadata: {
+                app_name_source: 'namer',
+                version_source: 'pubspec'
+            },
+            artifacts: {
+                base_output_dir: 'build/fdawg-outputs',
+                organization: {
+                    by_date: true,
+                    date_format: 'January-2',
+                    by_platform: true,
+                    by_build_type: true
+                },
+                naming: {
+                    pattern: '{app_name}_{version}_{arch}',
+                    fallback_app_name: 'flutter_app'
+                }
+            },
+            execution: {
+                parallel_builds: false,
+                max_parallel: 2,
+                continue_on_error: false,
+                save_logs: true,
+                log_level: 'info'
+            }
+        };
+
+        this.showBuildConfigDrawer(defaultConfig, 'Setup Build Configuration');
     }
 
     async resetConfig() {
