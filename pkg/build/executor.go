@@ -56,11 +56,24 @@ func (ce *CommandExecutor) ExecuteStep(step BuildStep) error {
 
 // ExecuteFlutterBuild executes a Flutter build command
 func (ce *CommandExecutor) ExecuteFlutterBuild(args []string, platform Platform) error {
-	ce.Logger.Info("Executing Flutter build for %s", platform)
-	ce.Logger.Debug("Command: flutter %s", strings.Join(args, " "))
+	return ce.ExecuteFlutterBuildWithEnv(args, platform, "")
+}
+
+// ExecuteFlutterBuildWithEnv executes a Flutter build command with optional environment file
+func (ce *CommandExecutor) ExecuteFlutterBuildWithEnv(args []string, platform Platform, envFile string) error {
+	// Add environment file if provided
+	finalArgs := args
+	if envFile != "" {
+		ce.Logger.Info("Executing Flutter build for %s with environment: %s", platform, envFile)
+		finalArgs = append(args, "--dart-define-from-file", envFile)
+	} else {
+		ce.Logger.Info("Executing Flutter build for %s", platform)
+	}
+
+	ce.Logger.Debug("Command: flutter %s", strings.Join(finalArgs, " "))
 
 	// Create command
-	cmd := exec.Command("flutter", args...)
+	cmd := exec.Command("flutter", finalArgs...)
 	cmd.Dir = ce.WorkingDir
 	cmd.Env = ce.buildEnvironment(nil)
 
@@ -278,7 +291,7 @@ func (ce *CommandExecutor) streamOutputWithProgress(reader io.Reader, stepName, 
 // ValidateFlutterInstallation validates that Flutter is installed and available
 func (ce *CommandExecutor) ValidateFlutterInstallation() error {
 	if !ce.commandExists("flutter") {
-		return fmt.Errorf("Flutter is not installed or not in PATH")
+		return fmt.Errorf("flutter is not installed or not in PATH")
 	}
 
 	// Check Flutter version
@@ -320,12 +333,12 @@ func (ce *CommandExecutor) ValidatePlatformRequirements(platform Platform) error
 func (ce *CommandExecutor) validateAndroidRequirements() error {
 	// Check if Android SDK is available
 	if os.Getenv("ANDROID_HOME") == "" && os.Getenv("ANDROID_SDK_ROOT") == "" {
-		return fmt.Errorf("Android SDK not found (ANDROID_HOME or ANDROID_SDK_ROOT not set)")
+		return fmt.Errorf("android SDK not found (ANDROID_HOME or ANDROID_SDK_ROOT not set)")
 	}
 
 	// Check if Java is available
 	if !ce.commandExists("java") {
-		return fmt.Errorf("Java is not installed or not in PATH")
+		return fmt.Errorf("java is not installed or not in PATH")
 	}
 
 	return nil
@@ -335,7 +348,7 @@ func (ce *CommandExecutor) validateAndroidRequirements() error {
 func (ce *CommandExecutor) validateIOSRequirements() error {
 	// Check if running on macOS
 	if !ce.commandExists("xcodebuild") {
-		return fmt.Errorf("Xcode is not installed (iOS builds require macOS with Xcode)")
+		return fmt.Errorf("xcode is not installed (iOS builds require macOS with xcode)")
 	}
 
 	return nil
@@ -351,7 +364,7 @@ func (ce *CommandExecutor) validateWebRequirements() error {
 func (ce *CommandExecutor) validateMacOSRequirements() error {
 	// Check if running on macOS
 	if !ce.commandExists("xcodebuild") {
-		return fmt.Errorf("Xcode is not installed (macOS builds require macOS with Xcode)")
+		return fmt.Errorf("xcode is not installed (macOS builds require macOS with xcode)")
 	}
 
 	return nil

@@ -35,6 +35,7 @@ type BuildOptions struct {
 	ContinueOnError bool
 	DryRun          bool
 	Parallel        bool
+	Environment     string
 }
 
 // BuildResult contains the results of a build process
@@ -141,7 +142,7 @@ func (bm *BuildManager) ExecuteBuild(platforms []Platform, options BuildOptions)
 	for _, platform := range platforms {
 		bm.Logger.Info("Building for platform: %s", platform)
 
-		platformResult, err := bm.buildPlatform(platform)
+		platformResult, err := bm.buildPlatformWithOptions(platform, options)
 		result.PlatformResults[platform] = platformResult
 
 		if err != nil {
@@ -208,8 +209,8 @@ func (bm *BuildManager) ShowBuildPlan(platforms []Platform, options BuildOptions
 	return nil
 }
 
-// buildPlatform builds for a specific platform
-func (bm *BuildManager) buildPlatform(platform Platform) (*PlatformBuildResult, error) {
+// buildPlatformWithOptions builds for a specific platform with build options
+func (bm *BuildManager) buildPlatformWithOptions(platform Platform, options BuildOptions) (*PlatformBuildResult, error) {
 	startTime := time.Now()
 	result := &PlatformBuildResult{
 		Platform: platform,
@@ -234,8 +235,8 @@ func (bm *BuildManager) buildPlatform(platform Platform) (*PlatformBuildResult, 
 		return result, result.Error
 	}
 
-	// Build platform
-	artifacts, err := bm.executePlatformBuild(platform, platformConfig)
+	// Build platform with options
+	artifacts, err := bm.executePlatformBuildWithOptions(platform, platformConfig, options)
 	if err != nil {
 		result.Error = err
 		return result, err
@@ -312,7 +313,7 @@ func (bm *BuildManager) setupBuildLogging(startTime time.Time) string {
 }
 
 // generateBuildSummary generates a summary of the build process
-func (bm *BuildManager) generateBuildSummary(result *BuildResult) {
+func (bm *BuildManager) generateBuildSummary(_ *BuildResult) {
 	// TODO: Generate detailed build summary
 	bm.Logger.Info("Build summary generated")
 }
@@ -359,21 +360,21 @@ func (bm *BuildManager) executePlatformPreBuildSteps(platform Platform) error {
 	return nil
 }
 
-// executePlatformBuild executes the build for a specific platform
-func (bm *BuildManager) executePlatformBuild(platform Platform, config interface{}) ([]*BuildArtifact, error) {
+// executePlatformBuildWithOptions executes the build for a specific platform with options
+func (bm *BuildManager) executePlatformBuildWithOptions(platform Platform, config interface{}, options BuildOptions) ([]*BuildArtifact, error) {
 	switch platform {
 	case PlatformAndroid:
-		return bm.buildAndroid(config.(*AndroidBuildConfig))
+		return bm.buildAndroidWithOptions(config.(*AndroidBuildConfig), options)
 	case PlatformIOS:
-		return bm.buildIOS(config.(*IOSBuildConfig))
+		return bm.buildIOSWithOptions(config.(*IOSBuildConfig), options)
 	case PlatformWeb:
-		return bm.buildWeb(config.(*WebBuildConfig))
+		return bm.buildWebWithOptions(config.(*WebBuildConfig), options)
 	case PlatformMacOS:
-		return bm.buildMacOS(config.(*MacOSBuildConfig))
+		return bm.buildMacOSWithOptions(config.(*MacOSBuildConfig), options)
 	case PlatformLinux:
-		return bm.buildLinux(config.(*LinuxBuildConfig))
+		return bm.buildLinuxWithOptions(config.(*LinuxBuildConfig), options)
 	case PlatformWindows:
-		return bm.buildWindows(config.(*WindowsBuildConfig))
+		return bm.buildWindowsWithOptions(config.(*WindowsBuildConfig), options)
 	default:
 		return nil, fmt.Errorf("unsupported platform: %s", platform)
 	}
@@ -410,8 +411,13 @@ func (bm *BuildManager) showPlatformBuildPlan(platform Platform) error {
 		for _, buildType := range iosConfig.BuildTypes {
 			fmt.Printf("    • %s (%s)\n", buildType.Name, buildType.Type)
 		}
-	// Add other platforms as needed
+		// Add other platforms as needed
 	}
 
 	return nil
+}
+
+// getEnvironmentFilePath returns the path to the environment file
+func (bm *BuildManager) getEnvironmentFilePath(envName string) string {
+	return filepath.Join(bm.ProjectPath, ".environment", envName+".json")
 }

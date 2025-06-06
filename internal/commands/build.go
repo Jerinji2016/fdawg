@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Jerinji2016/fdawg/pkg/build"
+	"github.com/Jerinji2016/fdawg/pkg/environment"
 	"github.com/Jerinji2016/fdawg/pkg/flutter"
 	"github.com/Jerinji2016/fdawg/pkg/utils"
 	"github.com/urfave/cli/v2"
@@ -50,6 +51,11 @@ func BuildCommand() *cli.Command {
 					&cli.BoolFlag{
 						Name:  "parallel",
 						Usage: "Run platform builds in parallel (experimental)",
+					},
+					&cli.StringFlag{
+						Name:    "env",
+						Aliases: []string{"e"},
+						Usage:   "Environment to use for build (uses --dart-define-from-file)",
 					},
 				},
 				Action: runBuild,
@@ -149,6 +155,16 @@ func runBuild(c *cli.Context) error {
 		return err
 	}
 
+	// Validate environment if specified
+	envName := c.String("env")
+	if envName != "" {
+		if err := validateEnvironment(project.ProjectPath, envName); err != nil {
+			utils.Error("Environment validation failed: %v", err)
+			return err
+		}
+		utils.Info("Using environment: %s", envName)
+	}
+
 	// Create build manager
 	buildManager, err := build.NewBuildManager(project.ProjectPath, buildConfig)
 	if err != nil {
@@ -162,6 +178,7 @@ func runBuild(c *cli.Context) error {
 		ContinueOnError: c.Bool("continue-on-error"),
 		DryRun:          c.Bool("dry-run"),
 		Parallel:        c.Bool("parallel"),
+		Environment:     c.String("env"),
 	}
 
 	if options.DryRun {
@@ -588,4 +605,30 @@ func contains(platforms []build.Platform, platform build.Platform) bool {
 		}
 	}
 	return false
+}
+
+// validateEnvironment validates that the specified environment exists
+func validateEnvironment(projectPath, envName string) error {
+	// Check if environment file exists
+	_, err := environment.GetEnvFile(projectPath, envName)
+	if err != nil {
+		// List available environments for helpful error message
+		envFiles, listErr := environment.ListEnvFiles(projectPath)
+		if listErr != nil {
+			return fmt.Errorf("environment '%s' not found", envName)
+		}
+
+		if len(envFiles) == 0 {
+			return fmt.Errorf("environment '%s' not found. No environments exist. Create one with: fdawg env create %s", envName, envName)
+		}
+
+		var availableEnvs []string
+		for _, envFile := range envFiles {
+			availableEnvs = append(availableEnvs, envFile.Name)
+		}
+
+		return fmt.Errorf("environment '%s' not found. Available environments: %s", envName, strings.Join(availableEnvs, ", "))
+	}
+
+	return nil
 }

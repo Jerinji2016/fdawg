@@ -11,12 +11,12 @@ import (
 
 // Platform-specific build implementations
 
-// buildAndroid builds for Android platform
-func (bm *BuildManager) buildAndroid(config *AndroidBuildConfig) ([]*BuildArtifact, error) {
+// buildAndroidWithOptions builds for Android platform with options
+func (bm *BuildManager) buildAndroidWithOptions(config *AndroidBuildConfig, options BuildOptions) ([]*BuildArtifact, error) {
 	var allArtifacts []*BuildArtifact
 
 	executor := NewCommandExecutor(bm.ProjectPath, bm.Logger)
-	
+
 	// Set Android environment variables
 	if len(config.Environment) > 0 {
 		executor.SetEnvironment(config.Environment)
@@ -40,9 +40,17 @@ func (bm *BuildManager) buildAndroid(config *AndroidBuildConfig) ([]*BuildArtifa
 		// Add custom arguments
 		args = append(args, buildType.CustomArgs...)
 
-		// Execute build
-		if err := executor.ExecuteFlutterBuild(args, PlatformAndroid); err != nil {
-			return allArtifacts, fmt.Errorf("Android %s build failed: %w", buildType.Type, err)
+		// Execute build with environment if specified
+		var buildErr error
+		if options.Environment != "" {
+			envFile := bm.getEnvironmentFilePath(options.Environment)
+			buildErr = executor.ExecuteFlutterBuildWithEnv(args, PlatformAndroid, envFile)
+		} else {
+			buildErr = executor.ExecuteFlutterBuild(args, PlatformAndroid)
+		}
+
+		if buildErr != nil {
+			return allArtifacts, fmt.Errorf("android %s build failed: %w", buildType.Type, buildErr)
 		}
 
 		// Collect artifacts based on build type
@@ -121,7 +129,7 @@ func (bm *BuildManager) collectAndroidArtifact(buildType string) ([]*BuildArtifa
 	}
 
 	if _, err := os.Stat(artifactPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("Android artifact not found: %s", artifactPath)
+		return nil, fmt.Errorf("android artifact not found: %s", artifactPath)
 	}
 
 	artifact := &BuildArtifact{
@@ -134,8 +142,8 @@ func (bm *BuildManager) collectAndroidArtifact(buildType string) ([]*BuildArtifa
 	return []*BuildArtifact{artifact}, nil
 }
 
-// buildIOS builds for iOS platform
-func (bm *BuildManager) buildIOS(config *IOSBuildConfig) ([]*BuildArtifact, error) {
+// buildIOSWithOptions builds for iOS platform with options
+func (bm *BuildManager) buildIOSWithOptions(config *IOSBuildConfig, options BuildOptions) ([]*BuildArtifact, error) {
 	var allArtifacts []*BuildArtifact
 
 	executor := NewCommandExecutor(bm.ProjectPath, bm.Logger)
@@ -158,9 +166,17 @@ func (bm *BuildManager) buildIOS(config *IOSBuildConfig) ([]*BuildArtifact, erro
 		// Add custom arguments
 		args = append(args, buildType.CustomArgs...)
 
-		// Execute build
-		if err := executor.ExecuteFlutterBuild(args, PlatformIOS); err != nil {
-			return allArtifacts, fmt.Errorf("iOS %s build failed: %w", buildType.Type, err)
+		// Execute build with environment if specified
+		var buildErr error
+		if options.Environment != "" {
+			envFile := bm.getEnvironmentFilePath(options.Environment)
+			buildErr = executor.ExecuteFlutterBuildWithEnv(args, PlatformIOS, envFile)
+		} else {
+			buildErr = executor.ExecuteFlutterBuild(args, PlatformIOS)
+		}
+
+		if buildErr != nil {
+			return allArtifacts, fmt.Errorf("iOS %s build failed: %w", buildType.Type, buildErr)
 		}
 
 		// Collect artifacts
@@ -231,7 +247,7 @@ func (bm *BuildManager) collectIPA() ([]*BuildArtifact, error) {
 // findXCArchive finds the .xcarchive file
 func (bm *BuildManager) findXCArchive() string {
 	buildDir := filepath.Join(bm.ProjectPath, "build", "ios", "archive")
-	
+
 	entries, err := os.ReadDir(buildDir)
 	if err != nil {
 		return ""
@@ -249,7 +265,7 @@ func (bm *BuildManager) findXCArchive() string {
 // findIPA finds the .ipa file
 func (bm *BuildManager) findIPA() string {
 	buildDir := filepath.Join(bm.ProjectPath, "build", "ios", "ipa")
-	
+
 	entries, err := os.ReadDir(buildDir)
 	if err != nil {
 		return ""
@@ -264,8 +280,8 @@ func (bm *BuildManager) findIPA() string {
 	return ""
 }
 
-// buildWeb builds for Web platform
-func (bm *BuildManager) buildWeb(config *WebBuildConfig) ([]*BuildArtifact, error) {
+// buildWebWithOptions builds for Web platform with options
+func (bm *BuildManager) buildWebWithOptions(config *WebBuildConfig, options BuildOptions) ([]*BuildArtifact, error) {
 	var allArtifacts []*BuildArtifact
 
 	executor := NewCommandExecutor(bm.ProjectPath, bm.Logger)
@@ -283,9 +299,17 @@ func (bm *BuildManager) buildWeb(config *WebBuildConfig) ([]*BuildArtifact, erro
 		// Add custom arguments
 		args = append(args, buildType.CustomArgs...)
 
-		// Execute build
-		if err := executor.ExecuteFlutterBuild(args, PlatformWeb); err != nil {
-			return allArtifacts, fmt.Errorf("Web build failed: %w", err)
+		// Execute build with environment if specified
+		var buildErr error
+		if options.Environment != "" {
+			envFile := bm.getEnvironmentFilePath(options.Environment)
+			buildErr = executor.ExecuteFlutterBuildWithEnv(args, PlatformWeb, envFile)
+		} else {
+			buildErr = executor.ExecuteFlutterBuild(args, PlatformWeb)
+		}
+
+		if buildErr != nil {
+			return allArtifacts, fmt.Errorf("web build failed: %w", buildErr)
 		}
 
 		// Collect artifacts
@@ -310,7 +334,7 @@ func (bm *BuildManager) buildWeb(config *WebBuildConfig) ([]*BuildArtifact, erro
 // collectWebArtifacts collects Web build artifacts
 func (bm *BuildManager) collectWebArtifacts() ([]*BuildArtifact, error) {
 	webBuildDir := filepath.Join(bm.ProjectPath, "build", "web")
-	
+
 	if _, err := os.Stat(webBuildDir); os.IsNotExist(err) {
 		return nil, fmt.Errorf("web build directory not found: %s", webBuildDir)
 	}
@@ -337,27 +361,27 @@ func (bm *BuildManager) createWebArchive(sourceDir, zipPath string) error {
 	// TODO: Implement proper zip creation in Go
 	cmd := exec.Command("zip", "-r", zipPath, ".")
 	cmd.Dir = sourceDir
-	
+
 	return cmd.Run()
 }
 
-// buildMacOS builds for macOS platform
-func (bm *BuildManager) buildMacOS(config *MacOSBuildConfig) ([]*BuildArtifact, error) {
-	return bm.buildDesktop(PlatformMacOS, config.BuildTypes[0].BuildMode, config.BuildTypes[0].CustomArgs)
+// buildMacOSWithOptions builds for macOS platform with options
+func (bm *BuildManager) buildMacOSWithOptions(config *MacOSBuildConfig, options BuildOptions) ([]*BuildArtifact, error) {
+	return bm.buildDesktopWithOptions(PlatformMacOS, config.BuildTypes[0].BuildMode, config.BuildTypes[0].CustomArgs, options)
 }
 
-// buildLinux builds for Linux platform
-func (bm *BuildManager) buildLinux(config *LinuxBuildConfig) ([]*BuildArtifact, error) {
-	return bm.buildDesktop(PlatformLinux, config.BuildTypes[0].BuildMode, config.BuildTypes[0].CustomArgs)
+// buildLinuxWithOptions builds for Linux platform with options
+func (bm *BuildManager) buildLinuxWithOptions(config *LinuxBuildConfig, options BuildOptions) ([]*BuildArtifact, error) {
+	return bm.buildDesktopWithOptions(PlatformLinux, config.BuildTypes[0].BuildMode, config.BuildTypes[0].CustomArgs, options)
 }
 
-// buildWindows builds for Windows platform
-func (bm *BuildManager) buildWindows(config *WindowsBuildConfig) ([]*BuildArtifact, error) {
-	return bm.buildDesktop(PlatformWindows, config.BuildTypes[0].BuildMode, config.BuildTypes[0].CustomArgs)
+// buildWindowsWithOptions builds for Windows platform with options
+func (bm *BuildManager) buildWindowsWithOptions(config *WindowsBuildConfig, options BuildOptions) ([]*BuildArtifact, error) {
+	return bm.buildDesktopWithOptions(PlatformWindows, config.BuildTypes[0].BuildMode, config.BuildTypes[0].CustomArgs, options)
 }
 
-// buildDesktop builds for desktop platforms (macOS, Linux, Windows)
-func (bm *BuildManager) buildDesktop(platform Platform, buildMode string, customArgs []string) ([]*BuildArtifact, error) {
+// buildDesktopWithOptions builds for desktop platforms with options
+func (bm *BuildManager) buildDesktopWithOptions(platform Platform, buildMode string, customArgs []string, options BuildOptions) ([]*BuildArtifact, error) {
 	executor := NewCommandExecutor(bm.ProjectPath, bm.Logger)
 
 	bm.Logger.Info("Building %s", platform)
@@ -372,9 +396,17 @@ func (bm *BuildManager) buildDesktop(platform Platform, buildMode string, custom
 	// Add custom arguments
 	args = append(args, customArgs...)
 
-	// Execute build
-	if err := executor.ExecuteFlutterBuild(args, platform); err != nil {
-		return nil, fmt.Errorf("%s build failed: %w", platform, err)
+	// Execute build with environment if specified
+	var buildErr error
+	if options.Environment != "" {
+		envFile := bm.getEnvironmentFilePath(options.Environment)
+		buildErr = executor.ExecuteFlutterBuildWithEnv(args, platform, envFile)
+	} else {
+		buildErr = executor.ExecuteFlutterBuild(args, platform)
+	}
+
+	if buildErr != nil {
+		return nil, fmt.Errorf("%s build failed: %w", platform, buildErr)
 	}
 
 	// Collect artifacts
@@ -426,7 +458,7 @@ func (bm *BuildManager) collectDesktopArtifacts(platform Platform) ([]*BuildArti
 			// macOS .app bundle
 			appPath := filepath.Join(buildDir, entry.Name())
 			arch := bm.detectMacOSArchitecture(appPath)
-			
+
 			artifact := &BuildArtifact{
 				Platform:     platform,
 				Architecture: arch,
