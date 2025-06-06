@@ -3269,6 +3269,64 @@
   }
 }
 
+// Compact Build Status
+.build-status-compact {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 25px;
+
+  .status-compact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    h4 {
+      margin: 0;
+      color: $text-color;
+      font-weight: 500;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      i {
+        color: $primary-color;
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .status-compact-content {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+
+    .status-compact-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .status-compact-label {
+        font-size: 0.85rem;
+        color: $text-light;
+        font-weight: 500;
+      }
+
+      .status-compact-value {
+        font-size: 0.85rem;
+        color: $text-color;
+        font-family: $font-mono;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+    }
+  }
+}
+
 .build-status-content {
   display: flex;
   flex-direction: column;
@@ -3422,8 +3480,8 @@
 
 .platform-selection-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
 
   .platform-checkbox-label {
     display: block;
@@ -3440,11 +3498,19 @@
     }
 
     &.unavailable {
-      opacity: 0.5;
+      opacity: 0.4;
       cursor: not-allowed;
 
       .platform-checkbox-content {
         background-color: rgba(255, 255, 255, 0.02);
+
+        i {
+          color: rgba(255, 255, 255, 0.3);
+        }
+
+        span {
+          color: rgba(255, 255, 255, 0.4);
+        }
       }
     }
 
@@ -3457,54 +3523,34 @@
       color: white;
       border-color: $primary-color;
 
-      .platform-status {
-        color: rgba(255, 255, 255, 0.9);
-        background-color: rgba(255, 255, 255, 0.2);
+      i {
+        color: white;
       }
 
-      i {
+      span {
         color: white;
       }
     }
 
     .platform-checkbox-content {
-      padding: 20px 15px;
+      padding: 12px 8px;
       text-align: center;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 4px;
       transition: all 0.3s ease;
       background-color: rgba(255, 255, 255, 0.03);
 
       i {
-        font-size: 2rem;
+        font-size: 1.3rem;
         color: $primary-color;
-        margin-bottom: 5px;
       }
 
-      span:first-of-type {
+      span {
         font-weight: 600;
-        font-size: 1rem;
+        font-size: 0.8rem;
         color: $text-color;
-      }
-
-      .platform-status {
-        font-size: 0.75rem;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-
-        &.available {
-          background-color: rgba(76, 175, 80, 0.2);
-          color: #4caf50;
-        }
-
-        &.unavailable {
-          background-color: rgba(158, 158, 158, 0.2);
-          color: #9e9e9e;
-        }
+        line-height: 1.2;
       }
     }
   }
@@ -3561,11 +3607,12 @@
     .checkmark {
       width: 20px;
       height: 20px;
-      border: 2px solid $border-color;
+      border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 4px;
       position: relative;
       transition: all 0.3s ease;
       flex-shrink: 0;
+      background-color: rgba(255, 255, 255, 0.05);
 
       &::after {
         content: '';
@@ -3635,5 +3682,664 @@
 
   i {
     font-size: 0.9rem;
+  }
+}
+
+// Configuration Editor Modal
+.config-editor-modal {
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  .modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}
+
+.config-editor-content {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+
+  .config-section {
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.02);
+
+    h4 {
+      margin: 0 0 15px 0;
+      color: $text-color;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 10px;
+
+      i {
+        color: $primary-color;
+      }
+    }
+  }
+}
+
+.config-form-group {
+  margin-bottom: 15px;
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: $text-color;
+    font-size: 0.9rem;
+
+    input[type="checkbox"] {
+      margin-right: 8px;
+    }
+  }
+
+  .config-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: $text-color;
+    font-family: $font-primary;
+    font-size: 0.9rem;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+
+  textarea.config-input {
+    resize: vertical;
+    min-height: 80px;
+    font-family: $font-mono;
+  }
+
+  select.config-input {
+    cursor: pointer;
+
+    option {
+      background-color: $card-background;
+      color: $text-color;
+    }
+  }
+}
+
+.platform-config-item {
+  margin-bottom: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.03);
+
+  .platform-config-header {
+    .platform-config-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 500;
+      color: $text-color;
+
+      input[type="checkbox"] {
+        margin: 0;
+        transform: scale(1.1);
+      }
+
+      i {
+        font-size: 1.1rem;
+        color: $primary-color;
+        width: 20px;
+        text-align: center;
+      }
+
+      span {
+        font-size: 0.9rem;
+      }
+
+      &:hover {
+        color: $primary-color;
+      }
+    }
+  }
+}
+
+// Build Artifacts Styling
+.artifacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.artifact-tile {
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.03);
+  transition: all 0.3s ease;
+  overflow: hidden;
+
+  &:hover {
+    border-color: $primary-color;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+.artifact-tile-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.artifact-tile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+
+  .artifact-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0; // Allow text truncation
+
+    i {
+      color: $primary-color;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .artifact-name {
+      font-weight: 600;
+      font-size: 1rem;
+      color: $text-color;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+  }
+
+  .artifact-download-btn {
+    background: linear-gradient(135deg, $primary-color, $secondary-color);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 40px;
+    height: 36px;
+
+    &:hover {
+      background: linear-gradient(135deg, $secondary-color, $primary-color);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    i {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.artifact-tile-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .artifact-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .artifact-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1;
+
+    &.artifact-type-chip {
+      background-color: rgba(33, 150, 243, 0.2);
+      color: #2196f3;
+      border: 1px solid rgba(33, 150, 243, 0.3);
+    }
+
+    &.artifact-size-chip {
+      background-color: rgba(76, 175, 80, 0.2);
+      color: #4caf50;
+      border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    &.artifact-platform-chip {
+      background-color: rgba(156, 39, 176, 0.2);
+      color: #9c27b0;
+      border: 1px solid rgba(156, 39, 176, 0.3);
+    }
+  }
+
+  .artifact-date {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+    margin-top: auto;
+  }
+}
+
+// Empty state styling
+.info-text {
+  text-align: center;
+  color: $text-light;
+  font-style: italic;
+  padding: 40px 20px;
+  font-size: 0.9rem;
+}
+
+// Build Plan Styling
+.build-plan {
+  text-align: center;
+  padding: 30px;
+
+  .plan-header {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: $primary-color;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    i {
+      font-size: 1.3rem;
+    }
+  }
+
+  .plan-details {
+    text-align: left;
+    max-width: 600px;
+    margin: 0 auto;
+
+    .plan-section {
+      margin-bottom: 25px;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+      border: 1px solid $border-color;
+
+      h5 {
+        margin: 0 0 15px 0;
+        color: $text-color;
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        i {
+          color: $primary-color;
+          font-size: 0.9rem;
+        }
+      }
+
+      .plan-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .plan-label {
+          font-weight: 500;
+          color: $text-light;
+          font-size: 0.9rem;
+        }
+
+        .plan-value {
+          color: $text-color;
+          font-family: $font-mono;
+          font-size: 0.9rem;
+        }
+      }
+
+      .plan-note {
+        background-color: rgba(33, 150, 243, 0.1);
+        border: 1px solid rgba(33, 150, 243, 0.3);
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 15px;
+        color: #2196f3;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        line-height: 1.4;
+
+        i {
+          margin-top: 2px;
+          flex-shrink: 0;
+        }
+      }
+    }
+  }
+}
+
+// Build Plan Drawer
+.build-plan-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  &.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .drawer-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+  }
+
+  .drawer-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 500px;
+    height: 100%;
+    background-color: $card-background;
+    border-left: 1px solid $border-color;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+  }
+
+  &.open .drawer-content {
+    transform: translateX(0);
+  }
+
+  .drawer-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid $border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.03);
+
+    h3 {
+      margin: 0;
+      color: $text-color;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      i {
+        color: $primary-color;
+      }
+    }
+
+    .drawer-close-btn {
+      background: none;
+      border: none;
+      color: $text-light;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: $text-color;
+      }
+
+      i {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .drawer-body {
+    flex: 1;
+    padding: 25px;
+    overflow-y: auto;
+  }
+
+  .drawer-footer {
+    padding: 20px 25px;
+    border-top: 1px solid $border-color;
+    display: flex;
+    gap: 12px;
+    background-color: rgba(255, 255, 255, 0.03);
+
+    button {
+      flex: 1;
+    }
+  }
+}
+
+// Build Plan Content in Drawer
+.plan-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+
+  .plan-summary {
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    padding: 20px;
+
+    h4 {
+      margin: 0 0 15px 0;
+      color: $text-color;
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      i {
+        color: $primary-color;
+        font-size: 0.9rem;
+      }
+    }
+
+    .plan-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .plan-label {
+        font-weight: 500;
+        color: $text-light;
+        font-size: 0.9rem;
+      }
+
+      .plan-value {
+        color: $text-color;
+        font-family: $font-mono;
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .plan-details {
+    h4 {
+      margin: 0 0 15px 0;
+      color: $text-color;
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      i {
+        color: $primary-color;
+        font-size: 0.9rem;
+      }
+    }
+
+    .plan-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .plan-step {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background-color: rgba(255, 255, 255, 0.03);
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        font-size: 0.9rem;
+
+        &.disabled {
+          opacity: 0.6;
+
+          i {
+            color: #f44336;
+          }
+        }
+
+        i {
+          color: $primary-color;
+          width: 16px;
+          text-align: center;
+        }
+
+        span {
+          color: $text-color;
+        }
+      }
+    }
+
+    .plan-platforms {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .plan-platform {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background-color: rgba(255, 255, 255, 0.03);
+        border: 1px solid $border-color;
+        border-radius: 8px;
+
+        i {
+          font-size: 1.5rem;
+          color: $primary-color;
+          width: 24px;
+          text-align: center;
+        }
+
+        .platform-details {
+          flex: 1;
+
+          .platform-name {
+            font-weight: 600;
+            color: $text-color;
+            font-size: 1rem;
+            margin-bottom: 4px;
+          }
+
+          .platform-type {
+            font-size: 0.8rem;
+            color: $text-light;
+            font-family: $font-mono;
+          }
+        }
+      }
+    }
+  }
+
+  .plan-note {
+    background-color: rgba(33, 150, 243, 0.1);
+    border: 1px solid rgba(33, 150, 243, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: #2196f3;
+    font-size: 0.9rem;
+    line-height: 1.4;
+
+    i {
+      margin-top: 2px;
+      flex-shrink: 0;
+      font-size: 1rem;
+    }
+
+    strong {
+      color: #1976d2;
+    }
+  }
+}
+
+// Body class when drawer is open
+body.drawer-open {
+  overflow: hidden;
+}
+
+// Responsive drawer
+@media (max-width: 768px) {
+  .build-plan-drawer .drawer-content {
+    width: 100%;
+    max-width: 100vw;
   }
 }

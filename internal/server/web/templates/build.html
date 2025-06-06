@@ -3,32 +3,28 @@
     <div class="info-section">
         <h3>
             <span><i class="fas fa-hammer"></i> Build Manager</span>
-            <i class="fas fa-ellipsis-h"></i>
         </h3>
 
         <!-- Build Status Section -->
-        <div class="build-section">
-            <div class="section-header">
-                <h4>Build Status</h4>
+        <div class="build-status-compact">
+            <div class="status-compact-header">
+                <h4><i class="fas fa-info-circle"></i> Build Status</h4>
                 <button id="refresh-status-btn" class="secondary-btn">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
             </div>
-
-            <div id="build-status-container" class="info-card">
-                <div class="build-status-content">
-                    <div class="status-item">
-                        <div class="status-label">Configuration Status:</div>
-                        <div id="config-status" class="status-value">
-                            <i class="fas fa-spinner fa-spin"></i> Checking...
-                        </div>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-label">Last Build:</div>
-                        <div id="last-build-status" class="status-value">
-                            <i class="fas fa-spinner fa-spin"></i> Loading...
-                        </div>
-                    </div>
+            <div class="status-compact-content">
+                <div class="status-compact-item">
+                    <span class="status-compact-label">Configuration:</span>
+                    <span id="config-status" class="status-compact-value">
+                        <i class="fas fa-spinner fa-spin"></i> Checking...
+                    </span>
+                </div>
+                <div class="status-compact-item">
+                    <span class="status-compact-label">Last Build:</span>
+                    <span id="last-build-status" class="status-compact-value">
+                        <i class="fas fa-spinner fa-spin"></i> Loading...
+                    </span>
                 </div>
             </div>
         </div>
@@ -235,6 +231,32 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Build Plan Drawer -->
+<div id="build-plan-drawer" class="build-plan-drawer">
+    <div class="drawer-overlay"></div>
+    <div class="drawer-content">
+        <div class="drawer-header">
+            <h3><i class="fas fa-list-alt"></i> Build Plan</h3>
+            <button id="close-drawer-btn" class="drawer-close-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="drawer-body">
+            <div id="build-plan-content">
+                <!-- Build plan content will be populated here -->
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <button id="execute-build-btn" class="primary-btn">
+                <i class="fas fa-play"></i> Execute Build
+            </button>
+            <button id="cancel-build-btn" class="secondary-btn">
+                <i class="fas fa-times"></i> Cancel
+            </button>
         </div>
     </div>
 </div>

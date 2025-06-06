@@ -35,6 +35,8 @@ func (api *BuildAPI) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/build/platforms", api.handleGetPlatforms)
 	mux.HandleFunc("/api/build/artifacts", api.handleGetArtifacts)
 	mux.HandleFunc("/api/build/artifacts/download", api.handleDownloadArtifact)
+	mux.HandleFunc("/api/build/config", api.handleGetConfig)
+	mux.HandleFunc("/api/build/config/update", api.handleUpdateConfig)
 }
 
 // Request/Response types for build API
@@ -310,10 +312,14 @@ func (api *BuildAPI) handleGetArtifacts(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// For now, return empty artifacts
-	// In the future, this would scan the build output directory
+	artifacts, err := api.scanBuildArtifacts()
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to scan artifacts: %v", err), http.StatusInternalServerError)
+		return
+	}
+
 	response := BuildArtifactsResponse{
-		Artifacts: []BuildArtifactInfo{},
+		Artifacts: artifacts,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -327,15 +333,115 @@ func (api *BuildAPI) handleDownloadArtifact(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	path := r.URL.Query().Get("path")
-	if path == "" {
+	relativePath := r.URL.Query().Get("path")
+	if relativePath == "" {
 		http.Error(w, "Path parameter required", http.StatusBadRequest)
 		return
 	}
 
-	// For now, just return an error
-	// In the future, this would serve the actual file
-	http.Error(w, "Download not yet implemented", http.StatusNotImplemented)
+	// Get build config to determine output directory
+	configPath := ".fdawg/build.yaml"
+	if !api.buildConfigExists(configPath) {
+		http.Error(w, "Build configuration not found", http.StatusNotFound)
+		return
+	}
+
+	buildConfig, err := build.LoadBuildConfig(api.project.ProjectPath, configPath)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to load build config: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	outputDir := buildConfig.Artifacts.BaseOutputDir
+	if outputDir == "" {
+		outputDir = "output"
+	}
+
+	// Construct full file path
+	fullPath := filepath.Join(api.project.ProjectPath, outputDir, relativePath)
+
+	// Security check: ensure the file is within the output directory
+	outputPath := filepath.Join(api.project.ProjectPath, outputDir)
+	if !strings.HasPrefix(fullPath, outputPath) {
+		http.Error(w, "Invalid file path", http.StatusBadRequest)
+		return
+	}
+
+	// Check if file exists
+	fileInfo, err := os.Stat(fullPath)
+	if os.IsNotExist(err) {
+		http.Error(w, "File not found", http.StatusNotFound)
+		return
+	}
+	if err != nil {
+		http.Error(w, fmt.Sprintf("File access error: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Open the file
+	file, err := os.Open(fullPath)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to open file: %v", err), http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	// Set headers for download
+	filename := filepath.Base(fullPath)
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))
+	w.Header().Set("Content-Type", "application/octet-stream")
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
+
+	// Stream the file to the response
+	http.ServeContent(w, r, filename, fileInfo.ModTime(), file)
+}
+
+// handleGetConfig handles GET requests to get build configuration for editing
+func (api *BuildAPI) handleGetConfig(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	configPath := ".fdawg/build.yaml"
+	if !api.buildConfigExists(configPath) {
+		http.Error(w, "Build configuration not found", http.StatusNotFound)
+		return
+	}
+
+	buildConfig, err := build.LoadBuildConfig(api.project.ProjectPath, configPath)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to load build config: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(buildConfig)
+}
+
+// handleUpdateConfig handles POST requests to update build configuration
+func (api *BuildAPI) handleUpdateConfig(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var config build.BuildConfig
+	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	configPath := ".fdawg/build.yaml"
+
+	// Save the updated configuration
+	if err := build.SaveBuildConfig(api.project.ProjectPath, configPath, &config); err != nil {
+		http.Error(w, fmt.Sprintf("Failed to save configuration: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"status": "success"})
 }
 
 // Helper methods
@@ -347,8 +453,29 @@ func (api *BuildAPI) buildConfigExists(configPath string) bool {
 }
 
 func (api *BuildAPI) getLastBuildInfo() string {
-	// For now, return a placeholder
-	// In the future, this would check build logs or artifacts
+	// Check for recent artifacts to determine last build
+	artifacts, err := api.scanBuildArtifacts()
+	if err != nil || len(artifacts) == 0 {
+		return "No recent builds"
+	}
+
+	// Find the most recent artifact
+	var mostRecent *BuildArtifactInfo
+	for i := range artifacts {
+		if mostRecent == nil {
+			mostRecent = &artifacts[i]
+			continue
+		}
+		// Simple comparison by date string (could be improved with actual time parsing)
+		if artifacts[i].Date > mostRecent.Date {
+			mostRecent = &artifacts[i]
+		}
+	}
+
+	if mostRecent != nil {
+		return fmt.Sprintf("Last build: %s (%s)", mostRecent.Date, mostRecent.Platform)
+	}
+
 	return "No recent builds"
 }
 
@@ -381,6 +508,180 @@ func (api *BuildAPI) validateEnvironment(envName string) error {
 	// For now, just return nil
 	// In the future, this would validate the environment exists
 	return nil
+}
+
+func (api *BuildAPI) scanBuildArtifacts() ([]BuildArtifactInfo, error) {
+	var artifacts []BuildArtifactInfo
+
+	// Check if build config exists to get output directory
+	configPath := ".fdawg/build.yaml"
+	if !api.buildConfigExists(configPath) {
+		return artifacts, nil // Return empty if no config
+	}
+
+	buildConfig, err := build.LoadBuildConfig(api.project.ProjectPath, configPath)
+	if err != nil {
+		return artifacts, err
+	}
+
+	outputDir := buildConfig.Artifacts.BaseOutputDir
+	if outputDir == "" {
+		outputDir = "output" // Default output directory
+	}
+
+	outputPath := filepath.Join(api.project.ProjectPath, outputDir)
+
+	// Check if output directory exists
+	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
+		return artifacts, nil // Return empty if no output directory
+	}
+
+	// Walk through the output directory
+	err = filepath.Walk(outputPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil // Skip errors and continue
+		}
+
+		// Skip directories
+		if info.IsDir() {
+			return nil
+		}
+
+		// Only include build artifacts (common extensions)
+		ext := strings.ToLower(filepath.Ext(info.Name()))
+		if !isArtifactFile(ext) {
+			return nil
+		}
+
+		// Determine platform from path
+		platform := determinePlatformFromPath(path, outputPath)
+
+		// Get relative path from output directory
+		relPath, _ := filepath.Rel(outputPath, path)
+
+		// Format file size
+		size := formatFileSize(info.Size())
+
+		// Format date
+		date := info.ModTime().Format("Jan 2, 2006 15:04")
+
+		artifact := BuildArtifactInfo{
+			Name:     info.Name(),
+			Path:     relPath,
+			Platform: platform,
+			Type:     getArtifactType(ext),
+			Size:     size,
+			Date:     date,
+		}
+
+		artifacts = append(artifacts, artifact)
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Sort artifacts by date (newest first)
+	// Simple sort by name for now
+	return artifacts, nil
+}
+
+func isArtifactFile(ext string) bool {
+	artifactExtensions := []string{
+		".apk", ".aab", ".ipa", ".app", ".dmg", ".exe", ".msix",
+		".deb", ".rpm", ".tar.gz", ".zip", ".tar.xz",
+	}
+
+	for _, validExt := range artifactExtensions {
+		if ext == validExt {
+			return true
+		}
+	}
+	return false
+}
+
+func determinePlatformFromPath(filePath, outputPath string) string {
+	relPath, _ := filepath.Rel(outputPath, filePath)
+	pathParts := strings.Split(relPath, string(filepath.Separator))
+
+	// Look for platform indicators in path
+	for _, part := range pathParts {
+		part = strings.ToLower(part)
+		switch {
+		case strings.Contains(part, "android"):
+			return "android"
+		case strings.Contains(part, "ios"):
+			return "ios"
+		case strings.Contains(part, "macos"):
+			return "macos"
+		case strings.Contains(part, "linux"):
+			return "linux"
+		case strings.Contains(part, "windows"):
+			return "windows"
+		case strings.Contains(part, "web"):
+			return "web"
+		}
+	}
+
+	// Fallback: determine by file extension
+	ext := strings.ToLower(filepath.Ext(filePath))
+	switch ext {
+	case ".apk", ".aab":
+		return "android"
+	case ".ipa":
+		return "ios"
+	case ".app", ".dmg":
+		return "macos"
+	case ".exe", ".msix":
+		return "windows"
+	case ".deb", ".rpm", ".tar.gz", ".tar.xz":
+		return "linux"
+	default:
+		return "unknown"
+	}
+}
+
+func getArtifactType(ext string) string {
+	switch ext {
+	case ".apk":
+		return "Android APK"
+	case ".aab":
+		return "Android Bundle"
+	case ".ipa":
+		return "iOS App"
+	case ".app":
+		return "macOS App"
+	case ".dmg":
+		return "macOS Installer"
+	case ".exe":
+		return "Windows Executable"
+	case ".msix":
+		return "Windows Package"
+	case ".deb":
+		return "Debian Package"
+	case ".rpm":
+		return "RPM Package"
+	case ".tar.gz", ".tar.xz":
+		return "Linux Archive"
+	case ".zip":
+		return "Archive"
+	default:
+		return "Build Artifact"
+	}
+}
+
+func formatFileSize(bytes int64) string {
+	const unit = 1024
+	if bytes < unit {
+		return fmt.Sprintf("%d B", bytes)
+	}
+	div, exp := int64(unit), 0
+	for n := bytes / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
 }
 
 func contains(slice []string, item string) bool {
