@@ -6,6 +6,10 @@ description: "FDAWG - Flutter Development Assistant with Go"
 
 # FDAWG - Flutter Development Assistant with Go
 
+<div align="center">
+  <img src="{{ '/assets/images/fdawg_logo.png' | relative_url }}" alt="FDAWG Logo" width="200" height="200">
+</div>
+
 Welcome to the comprehensive documentation for FDAWG, a powerful CLI tool and web interface designed to streamline Flutter development workflows.
 
 ## What is FDAWG?

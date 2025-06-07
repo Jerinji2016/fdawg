@@ -1,5 +1,9 @@
 # FDAWG - Flutter Development Assistant with Go
 
+<div align="center">
+  <img src="fdawg_logo.png" alt="FDAWG Logo" width="200" height="200">
+</div>
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/Go-1.23.2+-blue.svg)](https://golang.org)
 [![Flutter](https://img.shields.io/badge/Flutter-Compatible-blue.svg)](https://flutter.dev)
