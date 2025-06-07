@@ -259,35 +259,185 @@ class BuildManager {
             return;
         }
 
-
-
         const html = `
-            <div class="config-summary">
-                <div class="config-item">
-                    <div class="config-label">App Name Source:</div>
-                    <div class="config-value">${this.buildConfig.metadata?.app_name_source || this.buildConfig.Metadata?.AppNameSource || 'pubspec'}</div>
+            <div class="build-config-preview">
+                <div class="preview-header">
+                    <h4><i class="fas fa-cog"></i> Build Configuration</h4>
+                    <button class="collapse-preview-btn" onclick="buildManager.toggleConfigPreview()">
+                        <i class="fas fa-chevron-up" id="preview-toggle-icon"></i>
+                    </button>
                 </div>
-                <div class="config-item">
-                    <div class="config-label">Version Source:</div>
-                    <div class="config-value">${this.buildConfig.metadata?.version_source || this.buildConfig.Metadata?.VersionSource || 'pubspec'}</div>
-                </div>
-                <div class="config-item">
-                    <div class="config-label">Output Directory:</div>
-                    <div class="config-value">${this.buildConfig.artifacts?.base_output_dir || this.buildConfig.Artifacts?.BaseOutputDir || 'output'}</div>
-                </div>
-                <div class="config-item">
-                    <div class="config-label">Enabled Platforms:</div>
-                    <div class="config-value">${this.getEnabledPlatforms()}</div>
-                </div>
-                <div class="config-item">
-                    <div class="config-label">Pre-build Steps:</div>
-                    <div class="config-value">${this.getPreBuildSteps()}</div>
+                <div class="preview-content" id="build-config-preview-content">
+                    ${this.generateConfigPreview()}
                 </div>
             </div>
         `;
 
         container.innerHTML = html;
     }
+
+    generateConfigPreview() {
+        if (!this.buildConfig) return '<p>No configuration available</p>';
+
+        const metadata = this.buildConfig.Metadata || this.buildConfig.metadata || {};
+        const artifacts = this.buildConfig.Artifacts || this.buildConfig.artifacts || {};
+        const execution = this.buildConfig.Execution || this.buildConfig.execution || {};
+        const platforms = this.buildConfig.Platforms || this.buildConfig.platforms || {};
+        const preBuild = this.buildConfig.PreBuild || this.buildConfig.pre_build || {};
+
+        return `
+            <div class="config-preview-grid">
+                <!-- Metadata Section -->
+                <div class="config-preview-section">
+                    <h5><i class="fas fa-info-circle"></i> Metadata</h5>
+                    <div class="config-preview-items">
+                        <div class="config-preview-item">
+                            <span class="preview-label">App Name Source:</span>
+                            <span class="preview-value">${metadata.AppNameSource || metadata.app_name_source || 'namer'}</span>
+                        </div>
+                        ${metadata.AppNameSource === 'custom' || metadata.app_name_source === 'custom' ? `
+                        <div class="config-preview-item">
+                            <span class="preview-label">Custom App Name:</span>
+                            <span class="preview-value">${metadata.CustomAppName || metadata.custom_app_name || 'Not set'}</span>
+                        </div>
+                        ` : ''}
+                        <div class="config-preview-item">
+                            <span class="preview-label">Version Source:</span>
+                            <span class="preview-value">${metadata.VersionSource || metadata.version_source || 'pubspec'}</span>
+                        </div>
+                        ${metadata.VersionSource === 'custom' || metadata.version_source === 'custom' ? `
+                        <div class="config-preview-item">
+                            <span class="preview-label">Custom Version:</span>
+                            <span class="preview-value">${metadata.CustomVersion || metadata.custom_version || 'Not set'}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- Artifacts Section -->
+                <div class="config-preview-section">
+                    <h5><i class="fas fa-archive"></i> Artifacts</h5>
+                    <div class="config-preview-items">
+                        <div class="config-preview-item">
+                            <span class="preview-label">Output Directory:</span>
+                            <span class="preview-value">${artifacts.BaseOutputDir || artifacts.base_output_dir || 'build/fdawg-outputs'}</span>
+                        </div>
+                        <div class="config-preview-item">
+                            <span class="preview-label">Organization:</span>
+                            <span class="preview-value">${this.getOrganizationSummary(artifacts.Organization || artifacts.organization)}</span>
+                        </div>
+                        <div class="config-preview-item">
+                            <span class="preview-label">Naming Pattern:</span>
+                            <span class="preview-value">${artifacts.Naming?.Pattern || artifacts.naming?.pattern || '{app_name}_{version}_{arch}'}</span>
+                        </div>
+                        <div class="config-preview-item">
+                            <span class="preview-label">Fallback App Name:</span>
+                            <span class="preview-value">${artifacts.Naming?.FallbackAppName || artifacts.naming?.fallback_app_name || 'flutter_app'}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Execution Section -->
+                <div class="config-preview-section">
+                    <h5><i class="fas fa-cogs"></i> Execution</h5>
+                    <div class="config-preview-items">
+                        <div class="config-preview-item">
+                            <span class="preview-label">Parallel Builds:</span>
+                            <span class="preview-value">${execution.ParallelBuilds || execution.parallel_builds ? 'Enabled' : 'Disabled'}</span>
+                        </div>
+                        <div class="config-preview-item">
+                            <span class="preview-label">Max Parallel:</span>
+                            <span class="preview-value">${execution.MaxParallel || execution.max_parallel || 2}</span>
+                        </div>
+                        <div class="config-preview-item">
+                            <span class="preview-label">Continue on Error:</span>
+                            <span class="preview-value">${execution.ContinueOnError || execution.continue_on_error ? 'Yes' : 'No'}</span>
+                        </div>
+                        <div class="config-preview-item">
+                            <span class="preview-label">Log Level:</span>
+                            <span class="preview-value">${execution.LogLevel || execution.log_level || 'info'}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Platforms Section -->
+                <div class="config-preview-section">
+                    <h5><i class="fas fa-mobile-alt"></i> Platforms</h5>
+                    <div class="config-preview-items">
+                        ${this.getPlatformsSummary(platforms)}
+                    </div>
+                </div>
+
+                <!-- Pre-build Steps Section -->
+                <div class="config-preview-section">
+                    <h5><i class="fas fa-list-ol"></i> Pre-build Steps</h5>
+                    <div class="config-preview-items">
+                        ${this.getPreBuildStepsSummary(preBuild)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    getOrganizationSummary(organization) {
+        if (!organization) return 'Default';
+
+        const org = organization;
+        const features = [];
+
+        if (org.ByDate || org.by_date) features.push('By Date');
+        if (org.ByPlatform || org.by_platform) features.push('By Platform');
+        if (org.ByBuildType || org.by_build_type) features.push('By Build Type');
+
+        return features.length > 0 ? features.join(', ') : 'None';
+    }
+
+    getPlatformsSummary(platforms) {
+        if (!platforms || Object.keys(platforms).length === 0) {
+            return '<div class="config-preview-item"><span class="preview-value">No platforms configured</span></div>';
+        }
+
+        return Object.keys(platforms).map(platformName => {
+            const platform = platforms[platformName];
+            const enabled = platform.Enabled !== undefined ? platform.Enabled : platform.enabled;
+            const buildTypesCount = platform.BuildTypes?.length || platform.build_types?.length || 0;
+
+            return `
+                <div class="config-preview-item">
+                    <span class="preview-label">${platformName}:</span>
+                    <span class="preview-value ${enabled ? 'enabled' : 'disabled'}">
+                        ${enabled ? 'Enabled' : 'Disabled'} (${buildTypesCount} build types)
+                    </span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    getPreBuildStepsSummary(preBuild) {
+        if (!preBuild) return '<div class="config-preview-item"><span class="preview-value">No pre-build steps configured</span></div>';
+
+        const sections = ['Global', 'Android', 'IOS', 'Web'];
+        const summaries = [];
+
+        sections.forEach(section => {
+            const steps = preBuild[section] || preBuild[section.toLowerCase()] || [];
+            if (steps.length > 0) {
+                summaries.push(`${section}: ${steps.length} step${steps.length !== 1 ? 's' : ''}`);
+            }
+        });
+
+        if (summaries.length === 0) {
+            return '<div class="config-preview-item"><span class="preview-value">No pre-build steps configured</span></div>';
+        }
+
+        return summaries.map(summary => `
+            <div class="config-preview-item">
+                <span class="preview-value">${summary}</span>
+            </div>
+        `).join('');
+    }
+
+
 
     getEnabledPlatforms() {
         if (!this.buildConfig) return 'None';
@@ -801,8 +951,14 @@ class BuildManager {
         // Populate form with current config
         this.populateConfigDrawerForm(this.currentEditConfig);
 
+        // Populate platform configuration
+        this.populatePlatformConfig(this.currentEditConfig);
+
         // Bind dynamic events
         this.bindConfigDrawerEvents();
+
+        // Bind add step buttons after HTML is inserted
+        this.bindAddStepButtons();
 
         drawer.classList.add('open');
         document.body.classList.add('drawer-open');
@@ -870,6 +1026,95 @@ class BuildManager {
         }
 
         return true;
+    }
+
+    populatePlatformConfig(config) {
+        const container = document.getElementById('platform-config-container');
+        if (!container) return;
+
+        const platforms = config?.Platforms || config?.platforms || {};
+        const platformNames = ['Android', 'IOS', 'Web', 'MacOS', 'Linux', 'Windows'];
+
+        let html = '<div class="platform-config-grid">';
+
+        platformNames.forEach(platformName => {
+            const platformConfig = platforms[platformName] || platforms[platformName.toLowerCase()] || {};
+            const enabled = platformConfig.Enabled !== undefined ? platformConfig.Enabled : true;
+            const buildTypesCount = platformConfig.BuildTypes ? platformConfig.BuildTypes.length : 0;
+
+            html += `
+                <div class="platform-config-card">
+                    <div class="platform-config-header">
+                        <div class="platform-info">
+                            <i class="${this.getPlatformIcon(platformName.toLowerCase())}"></i>
+                            <span class="platform-name">${platformName}</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" class="platform-enabled-toggle"
+                                   data-platform="${platformName}" ${enabled ? 'checked' : ''}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="platform-config-details">
+                        <span class="build-types-count">${buildTypesCount} build type${buildTypesCount !== 1 ? 's' : ''}</span>
+                        <button type="button" class="secondary-btn small-btn configure-platform-btn"
+                                data-platform="${platformName}">
+                            <i class="fas fa-cog"></i> Configure
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+        container.innerHTML = html;
+
+        // Bind platform configuration events
+        this.bindPlatformConfigEvents();
+    }
+
+    bindPlatformConfigEvents() {
+        // Platform enabled/disabled toggles
+        document.querySelectorAll('.platform-enabled-toggle').forEach(toggle => {
+            toggle.addEventListener('change', (e) => {
+                const platform = e.target.dataset.platform;
+                const enabled = e.target.checked;
+                console.log(`Platform ${platform} ${enabled ? 'enabled' : 'disabled'}`);
+                // Update the current config
+                if (!this.currentEditConfig.Platforms) {
+                    this.currentEditConfig.Platforms = {};
+                }
+                if (!this.currentEditConfig.Platforms[platform]) {
+                    this.currentEditConfig.Platforms[platform] = {};
+                }
+                this.currentEditConfig.Platforms[platform].Enabled = enabled;
+            });
+        });
+
+        // Configure platform buttons
+        document.querySelectorAll('.configure-platform-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const platform = e.target.dataset.platform || e.target.closest('.configure-platform-btn').dataset.platform;
+                this.showPlatformConfigModal(platform);
+            });
+        });
+    }
+
+    showPlatformConfigModal(platform) {
+        showToast(`Platform configuration for ${platform} coming soon!`, 'info');
+        // TODO: Implement detailed platform configuration modal
+    }
+
+    getPlatformIcon(platform) {
+        const icons = {
+            'android': 'fab fa-android',
+            'ios': 'fab fa-apple',
+            'web': 'fas fa-globe',
+            'macos': 'fab fa-apple',
+            'linux': 'fab fa-linux',
+            'windows': 'fab fa-windows'
+        };
+        return icons[platform.toLowerCase()] || 'fas fa-desktop';
     }
 
     async saveConfigFromDrawer() {
@@ -997,7 +1242,7 @@ class BuildManager {
                     <p class="config-description">Define commands that run before building. Global steps apply to all platforms, while platform-specific steps only run for those targets.</p>
                     <div class="config-subsection">
                         <h5><i class="fas fa-globe"></i> Global Steps (All Platforms)</h5>
-                        <div id="global-prebuild-steps">
+                        <div id="global-steps-container">
                             <!-- Global pre-build steps will be populated here -->
                         </div>
                         <button type="button" class="secondary-btn add-step-btn" data-platform="global">
@@ -1006,7 +1251,7 @@ class BuildManager {
                     </div>
                     <div class="config-subsection">
                         <h5><i class="fab fa-android"></i> Android-specific Steps</h5>
-                        <div id="android-prebuild-steps">
+                        <div id="android-steps-container">
                             <!-- Android pre-build steps will be populated here -->
                         </div>
                         <button type="button" class="secondary-btn add-step-btn" data-platform="android">
@@ -1015,7 +1260,7 @@ class BuildManager {
                     </div>
                     <div class="config-subsection">
                         <h5><i class="fab fa-apple"></i> iOS-specific Steps</h5>
-                        <div id="ios-prebuild-steps">
+                        <div id="ios-steps-container">
                             <!-- iOS pre-build steps will be populated here -->
                         </div>
                         <button type="button" class="secondary-btn add-step-btn" data-platform="ios">
@@ -1024,7 +1269,7 @@ class BuildManager {
                     </div>
                     <div class="config-subsection">
                         <h5><i class="fas fa-globe"></i> Web-specific Steps</h5>
-                        <div id="web-prebuild-steps">
+                        <div id="web-steps-container">
                             <!-- Web pre-build steps will be populated here -->
                         </div>
                         <button type="button" class="secondary-btn add-step-btn" data-platform="web">
@@ -1136,6 +1381,36 @@ class BuildManager {
 
         // Update visibility of custom fields
         this.updateCustomFieldVisibility();
+
+        // Populate prebuild steps
+        this.populatePreBuildSteps(config);
+    }
+
+    populatePreBuildSteps(config) {
+        if (!config) return;
+
+        const preBuild = config.PreBuild || config.pre_build || {};
+        const platforms = ['global', 'android', 'ios', 'web'];
+
+        platforms.forEach(platform => {
+            const steps = preBuild[platform] || preBuild[platform.charAt(0).toUpperCase() + platform.slice(1)] || [];
+            const container = document.getElementById(`${platform}-steps-container`);
+
+            if (!container) return;
+
+            // Clear existing steps
+            container.innerHTML = '';
+
+            // Add existing steps
+            steps.forEach((step) => {
+                this.addPreBuildStep(platform, step);
+            });
+
+            // If no steps exist, ensure there's at least one empty step
+            if (steps.length === 0) {
+                this.addPreBuildStep(platform);
+            }
+        });
     }
 
     bindConfigDrawerEvents() {
@@ -1159,10 +1434,37 @@ class BuildManager {
             this.updateCustomFieldVisibility();
         });
 
-        // Add step buttons
-        document.querySelectorAll('.add-step-btn').forEach(btn => {
+        // Add step buttons - use event delegation on the drawer
+        const drawer = document.getElementById('build-config-drawer');
+        if (drawer) {
+            // Remove any existing listeners to prevent duplicates
+            drawer.removeEventListener('click', this.handleAddStepClick);
+
+            // Add new listener
+            this.handleAddStepClick = (e) => {
+                if (e.target.classList.contains('add-step-btn') || e.target.closest('.add-step-btn')) {
+                    const btn = e.target.classList.contains('add-step-btn') ? e.target : e.target.closest('.add-step-btn');
+                    const platform = btn.dataset.platform;
+                    if (platform) {
+                        this.addPreBuildStep(platform);
+                    }
+                }
+            };
+
+            drawer.addEventListener('click', this.handleAddStepClick);
+        }
+    }
+
+    bindAddStepButtons() {
+        const addStepButtons = document.querySelectorAll('.add-step-btn');
+
+        addStepButtons.forEach(btn => {
+            const platform = btn.dataset.platform;
+
+            // Add new listener
             btn.addEventListener('click', (e) => {
-                const platform = e.target.dataset.platform || e.target.closest('.add-step-btn').dataset.platform;
+                e.preventDefault();
+                e.stopPropagation();
                 this.addPreBuildStep(platform);
             });
         });
@@ -1198,15 +1500,25 @@ class BuildManager {
         }
     }
 
-    addPreBuildStep(platform) {
-        const container = document.getElementById(`${platform}-prebuild-steps`);
-        if (!container) return;
+    addPreBuildStep(platform, existingStep = null) {
+        const container = document.getElementById(`${platform}-steps-container`);
+        if (!container) {
+            return;
+        }
 
         const stepIndex = container.children.length;
+
+        // Use existing step data or defaults
+        const stepName = existingStep?.Name || existingStep?.name || `Custom Step ${stepIndex + 1}`;
+        const stepCommand = existingStep?.Command || existingStep?.command || '';
+        const stepRequired = existingStep?.Required !== undefined ? existingStep.Required :
+                           (existingStep?.required !== undefined ? existingStep.required : true);
+        const stepTimeout = existingStep?.Timeout || existingStep?.timeout || 300;
+
         const stepHTML = `
             <div class="prebuild-step-item" data-platform="${platform}" data-index="${stepIndex}">
                 <div class="step-header">
-                    <input type="text" class="config-input step-name" placeholder="Step name" value="Custom Step ${stepIndex + 1}">
+                    <input type="text" class="config-input step-name" placeholder="Step name" value="${stepName}">
                     <button type="button" class="remove-step-btn" title="Remove step">
                         <i class="fas fa-times"></i>
                     </button>
@@ -1214,17 +1526,23 @@ class BuildManager {
                 <div class="step-body">
                     <div class="config-form-group">
                         <label>Command:</label>
-                        <input type="text" class="config-input step-command" placeholder="e.g., dart run build_runner build">
+                        <input type="text" class="config-input step-command" placeholder="e.g., dart run build_runner build" value="${stepCommand}">
                     </div>
                     <div class="step-options">
-                        <label>
-                            <input type="checkbox" class="step-required" checked>
-                            Required (fail build if this step fails)
-                        </label>
-                        <label>
-                            Timeout (seconds):
-                            <input type="number" class="config-input step-timeout" value="300" min="30" max="3600">
-                        </label>
+                        <div class="step-option-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="step-required" ${stepRequired ? 'checked' : ''}>
+                                <span class="checkbox-text">Required</span>
+                            </label>
+                            <div class="info-tooltip">
+                                <i class="fas fa-info-circle info-icon"></i>
+                                <span class="tooltip-text">Fail build if this step fails</span>
+                            </div>
+                        </div>
+                        <div class="step-option-group">
+                            <label class="input-label">Timeout (seconds):</label>
+                            <input type="number" class="config-input step-timeout" value="${stepTimeout}" min="30" max="3600" placeholder="300">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1342,7 +1660,7 @@ class BuildManager {
     }
 
     collectPreBuildSteps(platform) {
-        const container = document.getElementById(`${platform}-prebuild-steps`);
+        const container = document.getElementById(`${platform}-steps-container`);
         if (!container) return [];
 
         const steps = [];

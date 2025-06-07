@@ -23,13 +23,61 @@ func NewEnvironmentAPI(project *flutter.ValidationResult) *EnvironmentAPI {
 	}
 }
 
+// EnvironmentListResponse represents the response for environment list API
+type EnvironmentListResponse struct {
+	Environments []EnvironmentInfo `json:"environments"`
+}
+
+// EnvironmentInfo represents basic environment information
+type EnvironmentInfo struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
 // RegisterRoutes registers environment API routes
 func (api *EnvironmentAPI) RegisterRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("/api/environment/list", api.handleListEnvironments)
 	mux.HandleFunc("/api/environment/create", api.handleCreateEnvironment)
 	mux.HandleFunc("/api/environment/add-variable", api.handleAddVariable)
 	mux.HandleFunc("/api/environment/delete-variable", api.handleDeleteVariable)
 	mux.HandleFunc("/api/environment/delete-env", api.handleDeleteEnvironment)
 	mux.HandleFunc("/api/environment/download", api.handleDownloadEnvironment)
+}
+
+// handleListEnvironments handles GET requests to list all environments
+func (api *EnvironmentAPI) handleListEnvironments(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Get all environment files
+	envFiles, err := environment.ListEnvFiles(api.project.ProjectPath)
+	if err != nil {
+		// Return empty list if no environments or error
+		response := EnvironmentListResponse{
+			Environments: []EnvironmentInfo{},
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	// Convert to EnvironmentInfo format
+	var environments []EnvironmentInfo
+	for _, envFile := range envFiles {
+		environments = append(environments, EnvironmentInfo{
+			Name:        envFile.Name,
+			Description: fmt.Sprintf("Environment file with %d variables", len(envFile.Variables)),
+		})
+	}
+
+	response := EnvironmentListResponse{
+		Environments: environments,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
 
 // handleCreateEnvironment handles POST requests to create environment files

@@ -4570,3 +4570,380 @@ body.drawer-open {
     max-width: 100vw;
   }
 }
+
+// Platform Configuration Grid
+.platform-config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.platform-config-card {
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $primary-color;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .platform-config-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+
+    .platform-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      i {
+        font-size: 1.25rem;
+        color: $primary-color;
+      }
+
+      .platform-name {
+        font-weight: 600;
+        color: $text-color;
+      }
+    }
+  }
+
+  .platform-config-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .build-types-count {
+      font-size: 0.875rem;
+      color: $text-light;
+    }
+
+    .small-btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+  }
+}
+
+// Toggle Switch Component
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: $border-color;
+    transition: 0.3s;
+    border-radius: 24px;
+
+    &:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+  }
+
+  input:checked + .toggle-slider {
+    background-color: $primary-color;
+  }
+
+  input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+  }
+}
+
+// Prebuild Step Container
+.prebuild-step-item {
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+
+  .step-header {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    align-items: center;
+
+    .step-name {
+      flex: 1;
+      min-width: 0; // Allow shrinking
+    }
+
+    .remove-step-btn {
+      flex-shrink: 0;
+      background: rgba(244, 67, 54, 0.2);
+      color: #f44336;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(244, 67, 54, 0.3);
+      }
+    }
+  }
+
+  .step-body {
+    .config-form-group {
+      margin-bottom: 1rem;
+
+      .config-input {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+    }
+  }
+}
+
+// Prebuild Step Styling Improvements
+.step-options {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  .step-option-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    &.checkbox-group {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      margin: 0;
+
+      input[type="checkbox"] {
+        margin: 0;
+        width: auto;
+      }
+
+      .checkbox-text {
+        font-size: 0.875rem;
+        color: $text-color;
+        white-space: nowrap;
+      }
+    }
+
+    .input-label {
+      font-size: 0.875rem;
+      color: $text-light;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .config-input {
+      width: 80px;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      color: $text-color;
+      font-family: $font-primary;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      &::placeholder {
+        color: $text-light;
+      }
+    }
+
+    &:first-child {
+      flex: 0 0 auto;
+    }
+
+    &:last-child {
+      flex: 0 0 auto;
+      margin-left: auto;
+    }
+  }
+
+  .info-tooltip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.25rem;
+
+    .info-icon {
+      color: $text-light;
+      font-size: 0.875rem;
+      cursor: help;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: $primary-color;
+      }
+    }
+
+    .tooltip-text {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.9);
+      color: white;
+      text-align: center;
+      padding: 0.5rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      z-index: 1000;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+      }
+    }
+
+    &:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+}
+
+// Build Configuration Preview
+.build-config-preview {
+  .preview-content {
+    padding: 0;
+  }
+}
+
+.config-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.config-preview-section {
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+
+  h5 {
+    margin: 0;
+    color: $text-color;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid $border-color;
+
+    i {
+      color: $primary-color;
+      font-size: 0.8rem;
+    }
+  }
+}
+
+.config-preview-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+}
+
+.config-preview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.2s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .preview-label {
+    font-size: 0.875rem;
+    color: $text-light;
+    font-weight: 500;
+    flex: 0 0 auto;
+    margin-right: 1rem;
+  }
+
+  .preview-value {
+    font-size: 0.875rem;
+    color: $text-color;
+    text-align: right;
+    flex: 1;
+    word-break: break-word;
+
+    &.enabled {
+      color: #4caf50;
+      font-weight: 500;
+    }
+
+    &.disabled {
+      color: #f44336;
+      font-weight: 500;
+    }
+  }
+}
+
+
