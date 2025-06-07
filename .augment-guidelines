@@ -5,3 +5,4 @@
 - Use `make build` to build the go binary
 - The `main.go` is located at `cmd/flutter-manager/main.go`
 - Use `dawgs_test` for testing the fdawg commands
+- Use port `3030` to serve the project as in `fdawg serve --port 3030`
