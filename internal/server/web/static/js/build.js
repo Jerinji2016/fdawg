@@ -34,6 +34,10 @@ class BuildManager {
         });
 
         // Config buttons
+        document.getElementById('collapse-config-btn').addEventListener('click', () => {
+            this.toggleConfigPreview();
+        });
+
         document.getElementById('edit-config-btn').addEventListener('click', () => {
             this.editConfig();
         });
@@ -260,13 +264,7 @@ class BuildManager {
         }
 
         const html = `
-            <div class="build-config-preview">
-                <div class="preview-header">
-                    <h4><i class="fas fa-cog"></i> Build Configuration</h4>
-                    <button class="collapse-preview-btn" onclick="buildManager.toggleConfigPreview()">
-                        <i class="fas fa-chevron-up" id="preview-toggle-icon"></i>
-                    </button>
-                </div>
+            <div class="build-config-preview" id="build-config-preview-container">
                 <div class="preview-content" id="build-config-preview-content">
                     ${this.generateConfigPreview()}
                 </div>
@@ -475,6 +473,21 @@ class BuildManager {
         }
 
         return steps.length > 0 ? steps.join(', ') : 'None configured';
+    }
+
+    toggleConfigPreview() {
+        const container = document.getElementById('build-config-preview-container');
+        const icon = document.getElementById('config-collapse-icon');
+
+        if (container.style.display === 'none') {
+            container.style.display = 'block';
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        } else {
+            container.style.display = 'none';
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        }
     }
 
     updateBuildButton() {
