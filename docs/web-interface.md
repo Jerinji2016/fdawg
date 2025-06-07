@@ -46,8 +46,8 @@ The web interface uses a sidebar navigation with the following sections:
 - **📦 Assets** - Asset management and organization
 - **🌍 Localizations** - Translation management
 - **🏷️ App Namer** - Cross-platform app naming
-- **⚡ Fastlane** - Build automation (coming soon)
-- **🚀 Run Configs** - IDE configuration management (coming soon)
+- **🆔 Bundle ID** - Bundle identifier management
+- **🔨 Build** - Build management and artifact organization
 
 ### Common UI Elements
 
@@ -245,6 +245,46 @@ Comprehensive bundle identifier management across all platforms:
 - **macOS**: Bundle identifier in AppInfo.xcconfig
 - **Linux/Windows**: Binary name in CMakeLists.txt
 - **Web**: App ID in manifest.json
+
+### 🔨 Build Management
+
+Comprehensive build system with multi-platform support and artifact organization:
+
+#### Build Configuration
+- **Interactive Setup**: Guided configuration wizard
+- **Default Configuration**: Quick setup with sensible defaults
+- **Configuration Editor**: Visual form-based configuration editing
+- **Platform Detection**: Automatic detection of available platforms
+
+#### Build Execution
+- **Platform Selection**: Choose specific platforms or build all
+- **Environment Integration**: Use environment files with builds
+- **Build Options**: Dry-run, parallel builds, error handling
+- **Real-time Progress**: Live build progress and status updates
+
+#### Pre-Build Management
+- **Automatic Detection**: Detect common build tools (build_runner, icons)
+- **Custom Steps**: Configure custom pre-build commands
+- **Global vs Platform**: Global and platform-specific pre-build steps
+- **Step Configuration**: Timeout, conditions, and environment settings
+
+#### Artifact Management
+- **Organized Output**: Date-based folder organization
+- **Naming Patterns**: Configurable artifact naming with app name and version
+- **Download Interface**: Direct download links for build artifacts
+- **Build History**: Track previous builds and their artifacts
+
+#### Build Monitoring
+- **Streaming Output**: Real-time build output and logs
+- **Progress Tracking**: Platform-specific build progress
+- **Error Handling**: Clear error messages and recovery options
+- **Build Status**: Current and historical build status
+
+#### Features
+- **Dry-Run Mode**: Preview build plan without execution
+- **Parallel Builds**: Experimental parallel platform builds
+- **Build Logs**: Persistent build logs and output
+- **Configuration Preview**: Visual preview of build configuration
 
 ### ⚡ Fastlane Integration (Coming Soon)
 

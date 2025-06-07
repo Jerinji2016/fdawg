@@ -19,6 +19,7 @@ FDAWG is a powerful CLI tool and web interface designed to streamline Flutter de
 - 🌍 **Localization Support** - Multi-language support with easy translation management
 - 🏷️ **Cross-Platform Naming** - Manage app names across all platforms
 - 🆔 **Bundle ID Management** - Configure bundle identifiers for all platforms
+- 🔨 **Build Management** - Comprehensive build system with pre-build setup and artifact organization
 - 🚀 **CLI & Web Interface** - Use via command line or modern web dashboard
 
 ## 🚀 Quick Start
@@ -60,6 +61,7 @@ fdawg lang list
 | `lang` | Localization and translation management |
 | `namer` | Cross-platform app naming |
 | `bundler` | Bundle ID management for all platforms |
+| `build` | Build Flutter applications with comprehensive configuration |
 
 For detailed command documentation and examples, visit our [comprehensive documentation](https://jerinji2016.github.io/fdawg/).
 
@@ -78,6 +80,7 @@ The web interface provides:
 - 🌍 Translation management with Google Translate integration
 - 🏷️ Cross-platform app naming with live preview
 - 🆔 Bundle ID management with validation and platform-specific configuration
+- 🔨 Build management with pre-build setup, artifact organization, and streaming output
 
 ## 📚 Documentation
 

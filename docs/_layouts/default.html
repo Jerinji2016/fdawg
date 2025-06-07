@@ -71,6 +71,21 @@
                 }
             });
 
+            // Auto-expand Commands section by default
+            document.querySelectorAll('.nav-section').forEach(section => {
+                const title = section.querySelector('.nav-section-title');
+                if (title && title.textContent.trim() === 'Commands') {
+                    const items = section.querySelector('.nav-section-items');
+                    if (items && items.classList.contains('collapsible')) {
+                        items.classList.add('expanded');
+                        const toggle = section.querySelector('.nav-section-toggle');
+                        if (toggle) {
+                            toggle.setAttribute('aria-expanded', 'true');
+                        }
+                    }
+                }
+            });
+
             // Auto-expand sections with active items
             document.querySelectorAll('.nav-link.active').forEach(activeLink => {
                 const section = activeLink.closest('.nav-section');
