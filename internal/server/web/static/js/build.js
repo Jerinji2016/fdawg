@@ -6,6 +6,12 @@ class BuildManager {
         this.buildConfig = null;
         this.isBuilding = false;
         this.buildProgress = null;
+        this.buildEventSource = null;
+        this.buildResults = {
+            succeeded: [],
+            failed: [],
+            inProgress: []
+        };
         this.init();
     }
 
@@ -476,15 +482,15 @@ class BuildManager {
     }
 
     toggleConfigPreview() {
-        const container = document.getElementById('build-config-preview-container');
+        const configDisplay = document.getElementById('config-display');
         const icon = document.getElementById('config-collapse-icon');
 
-        if (container.style.display === 'none') {
-            container.style.display = 'block';
+        if (configDisplay.style.display === 'none') {
+            configDisplay.style.display = 'block';
             icon.classList.remove('fa-chevron-down');
             icon.classList.add('fa-chevron-up');
         } else {
-            container.style.display = 'none';
+            configDisplay.style.display = 'none';
             icon.classList.remove('fa-chevron-up');
             icon.classList.add('fa-chevron-down');
         }
@@ -592,7 +598,17 @@ class BuildManager {
         startBtn.style.display = 'none';
         stopBtn.style.display = 'inline-block';
 
-        this.showProgressSection();
+        // Only show progress section for actual builds, not dry runs
+        if (!options.dry_run) {
+            this.showProgressSection();
+
+            // Initialize platforms as in progress
+            platforms.forEach(platform => {
+                this.addPlatformToInProgress(platform);
+            });
+
+            this.startBuildStreaming();
+        }
 
         try {
             const response = await fetch('/api/build/run', {
@@ -618,8 +634,20 @@ class BuildManager {
                 this.showBuildPlanDrawer();
                 showToast('Build plan generated!', 'info');
             } else {
-                this.displayBuildResult(result);
-                showToast('Build completed!', 'success');
+                // Process build results and update platform status
+                this.processBuildResult(result);
+
+                // Update the progress section with final results instead of replacing it
+                this.updateProgressSectionWithResults(result);
+
+                // Handle both Go struct naming and JSON naming
+                const success = result.Success !== undefined ? result.Success : result.success;
+
+                if (success) {
+                    showToast('Build completed!', 'success');
+                } else {
+                    showToast('Build completed with errors', 'warning');
+                }
             }
         } catch (error) {
             console.error('Build error:', error);
@@ -630,6 +658,7 @@ class BuildManager {
             this.updateBuildButton();
             startBtn.style.display = 'inline-block';
             stopBtn.style.display = 'none';
+            this.stopBuildStreaming();
             this.loadArtifacts(); // Refresh artifacts after build
         }
     }
@@ -659,6 +688,13 @@ class BuildManager {
         const progressSection = document.getElementById('progress-section');
         const progressContent = document.getElementById('build-progress-content');
 
+        // Reset build results
+        this.buildResults = {
+            succeeded: [],
+            failed: [],
+            inProgress: []
+        };
+
         progressSection.style.display = 'block';
         progressContent.innerHTML = `
             <div class="build-progress">
@@ -667,12 +703,353 @@ class BuildManager {
                 </div>
                 <div class="progress-details">
                     <p>Building selected platforms. This may take several minutes.</p>
+                    <div class="build-status-summary" id="build-status-summary">
+                        <div class="status-item">
+                            <span class="status-label">In Progress:</span>
+                            <span class="status-value" id="in-progress-platforms">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Succeeded:</span>
+                            <span class="status-value succeeded" id="succeeded-platforms">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Failed:</span>
+                            <span class="status-value failed" id="failed-platforms">-</span>
+                        </div>
+                    </div>
                     <div class="progress-log" id="build-log">
-                        <div class="log-entry">Starting build process...</div>
+                        <div class="log-entry log-info">
+                            <span class="log-timestamp">${new Date().toLocaleTimeString()}</span>
+                            <span class="log-icon"><i class="fas fa-info-circle"></i></span>
+                            <span class="log-message">Initializing build process...</span>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
+    }
+
+    startBuildStreaming() {
+        // Close any existing connection
+        this.stopBuildStreaming();
+
+        // Create EventSource for streaming build logs
+        this.buildEventSource = new EventSource('/api/build/stream');
+
+        this.buildEventSource.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                this.handleBuildStreamData(data);
+            } catch (error) {
+                console.error('Error parsing stream data:', error);
+                this.addBuildLogEntry(event.data, 'info');
+            }
+        };
+
+        this.buildEventSource.onerror = (error) => {
+            console.error('Build stream error:', error);
+            this.addBuildLogEntry('Connection to build stream lost. Retrying...', 'error');
+        };
+
+        this.buildEventSource.onopen = () => {
+            console.log('Build stream connected');
+            this.addBuildLogEntry('Connected to build stream...', 'info');
+        };
+    }
+
+    stopBuildStreaming() {
+        if (this.buildEventSource) {
+            this.buildEventSource.close();
+            this.buildEventSource = null;
+        }
+    }
+
+    handleBuildStreamData(data) {
+        switch (data.type) {
+            case 'log':
+                this.addBuildLogEntry(data.message, data.level || 'info');
+                break;
+            case 'progress':
+                this.updateBuildProgress(data.step, data.total, data.current);
+                break;
+            case 'status':
+                this.updateBuildStatus(data.status, data.message);
+                break;
+            case 'complete':
+                this.handleBuildComplete(data);
+                break;
+            case 'error':
+                this.handleBuildError(data.error);
+                break;
+            default:
+                console.log('Unknown stream data type:', data.type);
+        }
+    }
+
+    addBuildLogEntry(message, level = 'info') {
+        const logContainer = document.getElementById('build-log');
+        if (!logContainer) return;
+
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry log-${level}`;
+
+        const icon = this.getLogIcon(level);
+        logEntry.innerHTML = `
+            <span class="log-timestamp">${timestamp}</span>
+            <span class="log-icon">${icon}</span>
+            <span class="log-message">${this.escapeHtml(message)}</span>
+        `;
+
+        logContainer.appendChild(logEntry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    getLogIcon(level) {
+        const icons = {
+            info: '<i class="fas fa-info-circle"></i>',
+            success: '<i class="fas fa-check-circle"></i>',
+            warning: '<i class="fas fa-exclamation-triangle"></i>',
+            error: '<i class="fas fa-times-circle"></i>',
+            debug: '<i class="fas fa-bug"></i>'
+        };
+        return icons[level] || icons.info;
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    updateBuildProgress(step, total, current) {
+        const progressHeader = document.querySelector('.progress-header');
+        if (progressHeader) {
+            progressHeader.innerHTML = `
+                <i class="fas fa-spinner fa-spin"></i>
+                Building... (${current}/${total}) - ${step}
+            `;
+        }
+    }
+
+    updateBuildStatus(status, message) {
+        const progressHeader = document.querySelector('.progress-header');
+        if (progressHeader) {
+            const icon = status === 'success' ? 'fa-check' :
+                        status === 'error' ? 'fa-times' : 'fa-spinner fa-spin';
+            progressHeader.innerHTML = `
+                <i class="fas ${icon}"></i> ${message}
+            `;
+        }
+    }
+
+    handleBuildComplete() {
+        this.addBuildLogEntry('Build completed successfully!', 'success');
+        this.updateBuildStatus('success', 'Build completed!');
+        this.stopBuildStreaming();
+        showToast('Build completed successfully!', 'success');
+    }
+
+    handleBuildError(error) {
+        this.addBuildLogEntry(`Build failed: ${error}`, 'error');
+        this.updateBuildStatus('error', 'Build failed');
+        this.stopBuildStreaming();
+        showToast(`Build failed: ${error}`, 'error');
+    }
+
+    updateBuildStatusSummary() {
+        const inProgressEl = document.getElementById('in-progress-platforms');
+        const succeededEl = document.getElementById('succeeded-platforms');
+        const failedEl = document.getElementById('failed-platforms');
+
+        if (inProgressEl) {
+            inProgressEl.textContent = this.buildResults.inProgress.length > 0 ?
+                this.buildResults.inProgress.join(', ') : '-';
+        }
+
+        if (succeededEl) {
+            succeededEl.textContent = this.buildResults.succeeded.length > 0 ?
+                this.buildResults.succeeded.join(', ') : '-';
+        }
+
+        if (failedEl) {
+            failedEl.textContent = this.buildResults.failed.length > 0 ?
+                this.buildResults.failed.join(', ') : '-';
+        }
+    }
+
+    addPlatformToInProgress(platform) {
+        if (!this.buildResults.inProgress.includes(platform)) {
+            this.buildResults.inProgress.push(platform);
+            this.updateBuildStatusSummary();
+        }
+    }
+
+    movePlatformToSucceeded(platform) {
+        // Remove from in progress
+        const inProgressIndex = this.buildResults.inProgress.indexOf(platform);
+        if (inProgressIndex > -1) {
+            this.buildResults.inProgress.splice(inProgressIndex, 1);
+        }
+
+        // Add to succeeded if not already there
+        if (!this.buildResults.succeeded.includes(platform)) {
+            this.buildResults.succeeded.push(platform);
+        }
+
+        this.updateBuildStatusSummary();
+        this.addBuildLogEntry(`✅ ${platform} build completed successfully`, 'success');
+    }
+
+    movePlatformToFailed(platform, error) {
+        // Remove from in progress
+        const inProgressIndex = this.buildResults.inProgress.indexOf(platform);
+        if (inProgressIndex > -1) {
+            this.buildResults.inProgress.splice(inProgressIndex, 1);
+        }
+
+        // Add to failed if not already there
+        if (!this.buildResults.failed.includes(platform)) {
+            this.buildResults.failed.push(platform);
+        }
+
+        this.updateBuildStatusSummary();
+        this.addBuildLogEntry(`❌ ${platform} build failed: ${error}`, 'error');
+    }
+
+    processBuildResult(result) {
+        console.log('Processing build result:', result);
+
+        // Clear in-progress platforms since build is complete
+        this.buildResults.inProgress = [];
+
+        // Process platform results if available (handle both Go naming conventions)
+        const platformResults = result.PlatformResults || result.platform_results;
+        console.log('Platform results:', platformResults);
+
+        if (platformResults) {
+            Object.entries(platformResults).forEach(([platform, platformResult]) => {
+                // Handle both Go struct naming (Success) and JSON naming (success)
+                const success = platformResult.Success !== undefined ? platformResult.Success : platformResult.success;
+                const error = platformResult.Error || platformResult.error;
+
+                console.log(`Platform ${platform}: success=${success}, error=${error}`);
+
+                if (success) {
+                    this.movePlatformToSucceeded(platform);
+                } else {
+                    this.movePlatformToFailed(platform, error ? error.toString() : 'Build failed');
+                }
+            });
+        } else {
+            // Fallback: if no platform results, assume all platforms succeeded if overall success
+            const platforms = this.currentBuildParams?.platforms || [];
+            platforms.forEach(platform => {
+                // Handle both Go struct naming (Success) and JSON naming (success)
+                const success = result.Success !== undefined ? result.Success : result.success;
+                console.log(`Fallback for platform ${platform}: success=${success}`);
+
+                if (success) {
+                    this.movePlatformToSucceeded(platform);
+                } else {
+                    this.movePlatformToFailed(platform, 'Build failed');
+                }
+            });
+        }
+
+        // Update final status
+        this.updateBuildStatusSummary();
+
+        // Update progress header
+        const totalPlatforms = this.buildResults.succeeded.length + this.buildResults.failed.length;
+        const successCount = this.buildResults.succeeded.length;
+
+        if (this.buildResults.failed.length === 0) {
+            this.updateBuildStatus('success', `All ${totalPlatforms} platform(s) built successfully!`);
+        } else if (this.buildResults.succeeded.length === 0) {
+            this.updateBuildStatus('error', `All ${totalPlatforms} platform(s) failed to build`);
+        } else {
+            this.updateBuildStatus('warning', `${successCount}/${totalPlatforms} platform(s) built successfully`);
+        }
+    }
+
+    updateProgressSectionWithResults(result) {
+        const progressContent = document.getElementById('build-progress-content');
+        if (!progressContent) return;
+
+        // Handle both Go struct naming and JSON naming
+        const success = result.Success !== undefined ? result.Success : result.success;
+        const duration = result.Duration || result.duration || 'Unknown';
+        const platformResults = result.PlatformResults || result.platform_results || {};
+
+        // Keep the existing build progress structure but add results
+        const existingProgress = progressContent.querySelector('.build-progress');
+        if (existingProgress) {
+            // Add build results section to existing progress
+            const resultsSection = document.createElement('div');
+            resultsSection.className = 'build-results-section';
+            resultsSection.innerHTML = `
+                <div class="results-header">
+                    <h4><i class="fas ${success ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> Build Results</h4>
+                </div>
+                <div class="results-details">
+                    <div class="result-item">
+                        <span class="result-label">Duration:</span>
+                        <span class="result-value">${this.formatDuration(duration)}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Total Artifacts:</span>
+                        <span class="result-value">${(result.Artifacts || result.artifacts || []).length}</span>
+                    </div>
+                </div>
+                ${Object.keys(platformResults).length > 0 ? this.generatePlatformResultsHTML(platformResults) : ''}
+            `;
+
+            existingProgress.appendChild(resultsSection);
+        }
+    }
+
+    generatePlatformResultsHTML(platformResults) {
+        let html = '<div class="platform-results-summary"><h5>Platform Details</h5>';
+
+        Object.entries(platformResults).forEach(([platform, platformResult]) => {
+            const platformSuccess = platformResult.Success !== undefined ? platformResult.Success : platformResult.success;
+            const artifacts = platformResult.Artifacts || platformResult.artifacts || [];
+            const error = platformResult.Error || platformResult.error;
+
+            html += `
+                <div class="platform-result-item ${platformSuccess ? 'success' : 'error'}">
+                    <div class="platform-result-header">
+                        <i class="${this.getPlatformIcon(platform)}"></i>
+                        <span class="platform-name">${platform.charAt(0).toUpperCase() + platform.slice(1)}</span>
+                        <span class="platform-status ${platformSuccess ? 'success' : 'error'}">
+                            ${platformSuccess ? '✅ Success' : '❌ Failed'}
+                        </span>
+                    </div>
+                    ${artifacts.length > 0 ? `
+                        <div class="platform-artifacts-count">
+                            ${artifacts.length} artifact${artifacts.length !== 1 ? 's' : ''} created
+                        </div>
+                    ` : ''}
+                    ${error ? `
+                        <div class="platform-error-msg">${error.toString ? error.toString() : error}</div>
+                    ` : ''}
+                </div>
+            `;
+        });
+
+        html += '</div>';
+        return html;
+    }
+
+    formatDuration(duration) {
+        if (typeof duration === 'string') return duration;
+        if (typeof duration === 'number') {
+            // Convert nanoseconds to seconds
+            const seconds = duration / 1000000000;
+            return `${seconds.toFixed(2)}s`;
+        }
+        return 'Unknown';
     }
 
     showBuildPlanDrawer() {
@@ -794,43 +1171,53 @@ class BuildManager {
     displayBuildResult(result) {
         const progressContent = document.getElementById('build-progress-content');
 
+        // Handle both Go struct naming and JSON naming
+        const success = result.Success !== undefined ? result.Success : result.success;
+        const duration = result.Duration || result.duration || 'Unknown';
+        const platformResults = result.PlatformResults || result.platform_results || {};
+
         let html = `
             <div class="build-result">
-                <div class="result-header ${result.success ? 'success' : 'error'}">
-                    <i class="fas ${result.success ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-                    Build ${result.success ? 'Completed' : 'Failed'}
+                <div class="result-header ${success ? 'success' : 'error'}">
+                    <i class="fas ${success ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                    Build ${success ? 'Completed' : 'Failed'}
                 </div>
                 <div class="result-details">
                     <div class="result-item">
                         <span class="result-label">Duration:</span>
-                        <span class="result-value">${result.duration || 'Unknown'}</span>
+                        <span class="result-value">${duration}</span>
                     </div>
                     <div class="result-item">
                         <span class="result-label">Platforms:</span>
-                        <span class="result-value">${Object.keys(result.platform_results || {}).join(', ')}</span>
+                        <span class="result-value">${Object.keys(platformResults).join(', ')}</span>
                     </div>
                 </div>
         `;
 
-        if (result.platform_results) {
+        if (Object.keys(platformResults).length > 0) {
             html += '<div class="platform-results">';
-            Object.entries(result.platform_results).forEach(([platform, platformResult]) => {
+            Object.entries(platformResults).forEach(([platform, platformResult]) => {
+                // Handle both Go struct naming and JSON naming
+                const platformSuccess = platformResult.Success !== undefined ? platformResult.Success : platformResult.success;
+                const platformError = platformResult.Error || platformResult.error;
+                const artifacts = platformResult.Artifacts || platformResult.artifacts || [];
+
                 html += `
-                    <div class="platform-result ${platformResult.success ? 'success' : 'error'}">
+                    <div class="platform-result ${platformSuccess ? 'success' : 'error'}">
                         <div class="platform-result-header">
                             <i class="${this.getPlatformIcon(platform)}"></i>
                             ${platform.charAt(0).toUpperCase() + platform.slice(1)}
                             <span class="platform-result-status">
-                                ${platformResult.success ? 'Success' : 'Failed'}
+                                ${platformSuccess ? 'Success' : 'Failed'}
                             </span>
                         </div>
-                        ${platformResult.artifacts ? `
+                        ${artifacts.length > 0 ? `
                             <div class="platform-artifacts">
-                                Artifacts: ${platformResult.artifacts.length}
+                                Artifacts: ${artifacts.length}
                             </div>
                         ` : ''}
-                        ${platformResult.error ? `
-                            <div class="platform-error">${platformResult.error}</div>
+                        ${platformError ? `
+                            <div class="platform-error">${platformError.toString ? platformError.toString() : platformError}</div>
                         ` : ''}
                     </div>
                 `;

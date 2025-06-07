@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/Jerinji2016/fdawg/internal/server/helpers"
 	"github.com/Jerinji2016/fdawg/pkg/build"
@@ -37,6 +38,7 @@ func (api *BuildAPI) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/build/artifacts/download", api.handleDownloadArtifact)
 	mux.HandleFunc("/api/build/config", api.handleGetConfig)
 	mux.HandleFunc("/api/build/config/update", api.handleUpdateConfig)
+	mux.HandleFunc("/api/build/stream", api.handleBuildStream)
 }
 
 // Request/Response types for build API
@@ -63,12 +65,13 @@ type BuildRunRequest struct {
 }
 
 type BuildArtifactInfo struct {
-	Name     string `json:"name"`
-	Path     string `json:"path"`
-	Platform string `json:"platform"`
-	Type     string `json:"type"`
-	Size     string `json:"size"`
-	Date     string `json:"date"`
+	Name      string    `json:"name"`
+	Path      string    `json:"path"`
+	Platform  string    `json:"platform"`
+	Type      string    `json:"type"`
+	Size      string    `json:"size"`
+	Date      string    `json:"date"`
+	Timestamp time.Time `json:"timestamp"`
 }
 
 type BuildArtifactsResponse struct {
@@ -444,6 +447,58 @@ func (api *BuildAPI) handleUpdateConfig(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(map[string]string{"status": "success"})
 }
 
+// handleBuildStream handles Server-Sent Events for real-time build streaming
+func (api *BuildAPI) handleBuildStream(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Set headers for Server-Sent Events
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "Cache-Control")
+
+	// Create a flusher to send data immediately
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "Streaming unsupported", http.StatusInternalServerError)
+		return
+	}
+
+	// Send initial connection message
+	fmt.Fprintf(w, "data: %s\n\n", `{"type":"log","message":"Build stream connected","level":"info"}`)
+	flusher.Flush()
+
+	// Keep connection alive and send periodic heartbeats
+	// For now, this is a simple implementation
+	// In a real implementation, you would:
+	// 1. Subscribe to build events from the build manager
+	// 2. Stream real-time build logs and progress
+	// 3. Handle client disconnection properly
+
+	// Simple heartbeat for demonstration
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+
+	// Listen for client disconnect
+	ctx := r.Context()
+
+	for {
+		select {
+		case <-ctx.Done():
+			// Client disconnected
+			return
+		case <-ticker.C:
+			// Send heartbeat
+			fmt.Fprintf(w, "data: %s\n\n", `{"type":"log","message":"Connection alive","level":"debug"}`)
+			flusher.Flush()
+		}
+	}
+}
+
 // Helper methods
 
 func (api *BuildAPI) buildConfigExists(configPath string) bool {
@@ -566,12 +621,13 @@ func (api *BuildAPI) scanBuildArtifacts() ([]BuildArtifactInfo, error) {
 		date := info.ModTime().Format("Jan 2, 2006 15:04")
 
 		artifact := BuildArtifactInfo{
-			Name:     info.Name(),
-			Path:     relPath,
-			Platform: platform,
-			Type:     getArtifactType(ext),
-			Size:     size,
-			Date:     date,
+			Name:      info.Name(),
+			Path:      relPath,
+			Platform:  platform,
+			Type:      getArtifactType(ext),
+			Size:      size,
+			Date:      date,
+			Timestamp: info.ModTime(),
 		}
 
 		artifacts = append(artifacts, artifact)
@@ -583,8 +639,21 @@ func (api *BuildAPI) scanBuildArtifacts() ([]BuildArtifactInfo, error) {
 	}
 
 	// Sort artifacts by date (newest first)
-	// Simple sort by name for now
+	sortArtifactsByDate(artifacts)
+
 	return artifacts, nil
+}
+
+// sortArtifactsByDate sorts artifacts by creation time (newest first)
+func sortArtifactsByDate(artifacts []BuildArtifactInfo) {
+	// Use sort.Slice to sort by timestamp in descending order (newest first)
+	for i := 0; i < len(artifacts); i++ {
+		for j := i + 1; j < len(artifacts); j++ {
+			if artifacts[i].Timestamp.Before(artifacts[j].Timestamp) {
+				artifacts[i], artifacts[j] = artifacts[j], artifacts[i]
+			}
+		}
+	}
 }
 
 func isArtifactFile(ext string) bool {

@@ -4946,4 +4946,295 @@ body.drawer-open {
   }
 }
 
+// Build Progress Container
+.build-progress {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Build Status Summary
+.build-status-summary {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border: 1px solid $border-color;
+
+  .status-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+
+    .status-label {
+      font-size: 0.75rem;
+      color: $text-light;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+    }
+
+    .status-value {
+      font-size: 0.875rem;
+      color: $text-color;
+      font-weight: 600;
+      min-height: 1.2rem;
+
+      &.succeeded {
+        color: #4caf50;
+      }
+
+      &.failed {
+        color: #f44336;
+      }
+    }
+  }
+}
+
+// Build Progress Log Styling
+.progress-log {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  padding: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+  font-family: $font-mono;
+  font-size: 0.875rem;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  .log-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+    &:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .log-timestamp {
+      color: $text-light;
+      font-size: 0.75rem;
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+
+    .log-icon {
+      min-width: 16px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+
+      i {
+        font-size: 0.75rem;
+      }
+    }
+
+    .log-message {
+      flex: 1;
+      word-wrap: break-word;
+      line-height: 1.4;
+    }
+
+    &.log-info {
+      .log-icon i {
+        color: #2196f3;
+      }
+    }
+
+    &.log-success {
+      .log-icon i {
+        color: #4caf50;
+      }
+    }
+
+    &.log-warning {
+      .log-icon i {
+        color: #ff9800;
+      }
+    }
+
+    &.log-error {
+      .log-icon i {
+        color: #f44336;
+      }
+
+      .log-message {
+        color: #ffcdd2;
+      }
+    }
+
+    &.log-debug {
+      .log-icon i {
+        color: #9c27b0;
+      }
+
+      .log-message {
+        color: $text-light;
+        font-style: italic;
+      }
+    }
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $primary-color;
+    border-radius: 3px;
+
+    &:hover {
+      background: $secondary-color;
+    }
+  }
+}
+
+// Build Results Section
+.build-results-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  border: 1px solid $border-color;
+
+  .results-header {
+    margin-bottom: 1rem;
+
+    h4 {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: $text-color;
+      font-size: 1rem;
+
+      i {
+        font-size: 1.1rem;
+
+        &.fa-check-circle {
+          color: #4caf50;
+        }
+
+        &.fa-exclamation-circle {
+          color: #f44336;
+        }
+      }
+    }
+  }
+
+  .results-details {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1rem;
+
+    .result-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .result-label {
+        font-size: 0.75rem;
+        color: $text-light;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+      }
+
+      .result-value {
+        font-size: 0.875rem;
+        color: $text-color;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Platform Results Summary
+.platform-results-summary {
+  h5 {
+    margin: 0 0 0.75rem 0;
+    color: $text-color;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .platform-result-item {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid $border-color;
+
+    &.success {
+      background: rgba(76, 175, 80, 0.1);
+      border-color: rgba(76, 175, 80, 0.3);
+    }
+
+    &.error {
+      background: rgba(244, 67, 54, 0.1);
+      border-color: rgba(244, 67, 54, 0.3);
+    }
+
+    .platform-result-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+
+      i {
+        font-size: 1rem;
+        color: $text-light;
+      }
+
+      .platform-name {
+        font-weight: 600;
+        color: $text-color;
+      }
+
+      .platform-status {
+        margin-left: auto;
+        font-size: 0.75rem;
+        font-weight: 600;
+
+        &.success {
+          color: #4caf50;
+        }
+
+        &.error {
+          color: #f44336;
+        }
+      }
+    }
+
+    .platform-artifacts-count {
+      font-size: 0.75rem;
+      color: $text-light;
+      margin-bottom: 0.25rem;
+    }
+
+    .platform-error-msg {
+      font-size: 0.75rem;
+      color: #ffcdd2;
+      font-family: $font-mono;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.5rem;
+      border-radius: 3px;
+      margin-top: 0.5rem;
+    }
+  }
+}
+
 
