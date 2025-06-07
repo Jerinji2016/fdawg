@@ -798,6 +798,12 @@ class BuildManager {
         const html = this.generateConfigDrawerContent(this.currentEditConfig);
         content.innerHTML = html;
 
+        // Populate form with current config
+        this.populateConfigDrawerForm(this.currentEditConfig);
+
+        // Bind dynamic events
+        this.bindConfigDrawerEvents();
+
         drawer.classList.add('open');
         document.body.classList.add('drawer-open');
     }
@@ -809,9 +815,73 @@ class BuildManager {
         this.currentEditConfig = null;
     }
 
+    validateConfigForm() {
+        const errors = [];
+
+        // Validate app name source
+        const appNameSource = document.getElementById('edit-app-name-source')?.value;
+        if (!appNameSource) {
+            errors.push('App name source is required');
+        }
+
+        // Validate custom app name if custom source is selected
+        if (appNameSource === 'custom') {
+            const customAppName = document.getElementById('edit-custom-app-name')?.value;
+            if (!customAppName || customAppName.trim() === '') {
+                errors.push('Custom app name is required when using custom source');
+            }
+        }
+
+        // Validate version source
+        const versionSource = document.getElementById('edit-version-source')?.value;
+        if (!versionSource) {
+            errors.push('Version source is required');
+        }
+
+        // Validate custom version if custom source is selected
+        if (versionSource === 'custom') {
+            const customVersion = document.getElementById('edit-custom-version')?.value;
+            if (!customVersion || customVersion.trim() === '') {
+                errors.push('Custom version is required when using custom source');
+            }
+        }
+
+        // Validate output directory
+        const outputDir = document.getElementById('edit-output-dir')?.value;
+        if (!outputDir || outputDir.trim() === '') {
+            errors.push('Base output directory is required');
+        }
+
+        // Validate naming pattern
+        const namingPattern = document.getElementById('edit-naming-pattern')?.value;
+        if (!namingPattern || namingPattern.trim() === '') {
+            errors.push('Naming pattern is required');
+        }
+
+        // Validate fallback app name
+        const fallbackAppName = document.getElementById('edit-fallback-app-name')?.value;
+        if (!fallbackAppName || fallbackAppName.trim() === '') {
+            errors.push('Fallback app name is required');
+        }
+
+        if (errors.length > 0) {
+            showToast(`Validation errors: ${errors.join(', ')}`, 'error');
+            return false;
+        }
+
+        return true;
+    }
+
     async saveConfigFromDrawer() {
         try {
+            // Validate form before building config
+            if (!this.validateConfigForm()) {
+                return;
+            }
+
             const config = this.buildConfigFromDrawerForm();
+
+            console.log('Saving config:', config);
 
             const response = await fetch('/api/build/config/update', {
                 method: 'POST',
@@ -823,8 +893,12 @@ class BuildManager {
 
             if (!response.ok) {
                 const errorText = await response.text();
+                console.error('Server error response:', errorText);
                 throw new Error(errorText || 'Failed to save configuration');
             }
+
+            const result = await response.json();
+            console.log('Save result:', result);
 
             showToast('Configuration saved successfully!', 'success');
             this.closeBuildConfigDrawer();
@@ -841,6 +915,7 @@ class BuildManager {
                 <!-- Metadata Section -->
                 <div class="config-section">
                     <h4><i class="fas fa-info-circle"></i> Metadata Configuration</h4>
+                    <p class="config-description">Configure how app name and version are determined for builds. Choose between automatic detection from project files or manual specification.</p>
                     <div class="config-form-group">
                         <label>App Name Source:</label>
                         <select id="edit-app-name-source" class="config-input">
@@ -869,6 +944,7 @@ class BuildManager {
                 <!-- Artifacts Section -->
                 <div class="config-section">
                     <h4><i class="fas fa-folder"></i> Artifacts Configuration</h4>
+                    <p class="config-description">Control where build artifacts are stored and how they are organized. Configure output directories, folder structure, and file naming patterns.</p>
                     <div class="config-form-group">
                         <label>Base Output Directory:</label>
                         <input type="text" id="edit-output-dir" class="config-input" placeholder="build/fdawg-outputs">
@@ -918,6 +994,7 @@ class BuildManager {
                 <!-- Pre-build Steps Section -->
                 <div class="config-section">
                     <h4><i class="fas fa-cogs"></i> Pre-build Steps</h4>
+                    <p class="config-description">Define commands that run before building. Global steps apply to all platforms, while platform-specific steps only run for those targets.</p>
                     <div class="config-subsection">
                         <h5><i class="fas fa-globe"></i> Global Steps (All Platforms)</h5>
                         <div id="global-prebuild-steps">
@@ -959,6 +1036,7 @@ class BuildManager {
                 <!-- Platform Configuration Section -->
                 <div class="config-section">
                     <h4><i class="fas fa-mobile-alt"></i> Platform Configuration</h4>
+                    <p class="config-description">Enable or disable specific platforms for building. Only enabled platforms will be available for selection during builds.</p>
                     <div id="platform-config-container">
                         <!-- Platform configurations will be populated here -->
                     </div>
@@ -967,6 +1045,7 @@ class BuildManager {
                 <!-- Execution Configuration Section -->
                 <div class="config-section">
                     <h4><i class="fas fa-play"></i> Execution Configuration</h4>
+                    <p class="config-description">Control how builds are executed, including parallel processing, error handling, and logging options for better build management.</p>
                     <div class="config-form-group">
                         <label>
                             <input type="checkbox" id="edit-parallel-builds">
@@ -1003,74 +1082,333 @@ class BuildManager {
         `;
     }
 
+    populateConfigDrawerForm(config) {
+        if (!config) return;
+
+        console.log('Populating form with config:', config);
+
+        // Metadata
+        const metadata = config.metadata || config.Metadata || {};
+        const appNameSourceEl = document.getElementById('edit-app-name-source');
+        const customAppNameEl = document.getElementById('edit-custom-app-name');
+        const versionSourceEl = document.getElementById('edit-version-source');
+        const customVersionEl = document.getElementById('edit-custom-version');
+
+        if (appNameSourceEl) appNameSourceEl.value = metadata.app_name_source || metadata.AppNameSource || 'namer';
+        if (customAppNameEl) customAppNameEl.value = metadata.custom_app_name || metadata.CustomAppName || '';
+        if (versionSourceEl) versionSourceEl.value = metadata.version_source || metadata.VersionSource || 'pubspec';
+        if (customVersionEl) customVersionEl.value = metadata.custom_version || metadata.CustomVersion || '';
+
+        // Artifacts
+        const artifacts = config.artifacts || config.Artifacts || {};
+        const organization = artifacts.organization || artifacts.Organization || {};
+        const naming = artifacts.naming || artifacts.Naming || {};
+
+        const outputDirEl = document.getElementById('edit-output-dir');
+        const organizeDateEl = document.getElementById('edit-organize-by-date');
+        const dateFormatEl = document.getElementById('edit-date-format');
+        const organizePlatformEl = document.getElementById('edit-organize-by-platform');
+        const organizeBuildTypeEl = document.getElementById('edit-organize-by-build-type');
+        const namingPatternEl = document.getElementById('edit-naming-pattern');
+        const fallbackAppNameEl = document.getElementById('edit-fallback-app-name');
+
+        if (outputDirEl) outputDirEl.value = artifacts.base_output_dir || artifacts.BaseOutputDir || 'build/fdawg-outputs';
+        if (organizeDateEl) organizeDateEl.checked = organization.by_date || organization.ByDate || false;
+        if (dateFormatEl) dateFormatEl.value = organization.date_format || organization.DateFormat || 'January-2';
+        if (organizePlatformEl) organizePlatformEl.checked = organization.by_platform || organization.ByPlatform || false;
+        if (organizeBuildTypeEl) organizeBuildTypeEl.checked = organization.by_build_type || organization.ByBuildType || false;
+        if (namingPatternEl) namingPatternEl.value = naming.pattern || naming.Pattern || '{app_name}_{version}_{arch}';
+        if (fallbackAppNameEl) fallbackAppNameEl.value = naming.fallback_app_name || naming.FallbackAppName || 'flutter_app';
+
+        // Execution
+        const execution = config.execution || config.Execution || {};
+        const parallelBuildsEl = document.getElementById('edit-parallel-builds');
+        const maxParallelEl = document.getElementById('edit-max-parallel');
+        const continueOnErrorEl = document.getElementById('edit-continue-on-error');
+        const saveLogsEl = document.getElementById('edit-save-logs');
+        const logLevelEl = document.getElementById('edit-log-level');
+
+        if (parallelBuildsEl) parallelBuildsEl.checked = execution.parallel_builds || execution.ParallelBuilds || false;
+        if (maxParallelEl) maxParallelEl.value = execution.max_parallel || execution.MaxParallel || 2;
+        if (continueOnErrorEl) continueOnErrorEl.checked = execution.continue_on_error || execution.ContinueOnError || false;
+        if (saveLogsEl) saveLogsEl.checked = execution.save_logs !== undefined ? (execution.save_logs || execution.SaveLogs) : true;
+        if (logLevelEl) logLevelEl.value = execution.log_level || execution.LogLevel || 'info';
+
+        // Update visibility of custom fields
+        this.updateCustomFieldVisibility();
+    }
+
+    bindConfigDrawerEvents() {
+        // App name source change
+        document.getElementById('edit-app-name-source').addEventListener('change', () => {
+            this.updateCustomFieldVisibility();
+        });
+
+        // Version source change
+        document.getElementById('edit-version-source').addEventListener('change', () => {
+            this.updateCustomFieldVisibility();
+        });
+
+        // Date format change
+        document.getElementById('edit-date-format').addEventListener('change', () => {
+            this.updateCustomFieldVisibility();
+        });
+
+        // Parallel builds change
+        document.getElementById('edit-parallel-builds').addEventListener('change', () => {
+            this.updateCustomFieldVisibility();
+        });
+
+        // Add step buttons
+        document.querySelectorAll('.add-step-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const platform = e.target.dataset.platform || e.target.closest('.add-step-btn').dataset.platform;
+                this.addPreBuildStep(platform);
+            });
+        });
+    }
+
+    updateCustomFieldVisibility() {
+        // App name custom field
+        const appNameSource = document.getElementById('edit-app-name-source').value;
+        const customAppNameGroup = document.getElementById('custom-app-name-group');
+        if (customAppNameGroup) {
+            customAppNameGroup.style.display = appNameSource === 'custom' ? 'block' : 'none';
+        }
+
+        // Version custom field
+        const versionSource = document.getElementById('edit-version-source').value;
+        const customVersionGroup = document.getElementById('custom-version-group');
+        if (customVersionGroup) {
+            customVersionGroup.style.display = versionSource === 'custom' ? 'block' : 'none';
+        }
+
+        // Date format custom field
+        const dateFormat = document.getElementById('edit-date-format').value;
+        const customDateFormatGroup = document.getElementById('custom-date-format-group');
+        if (customDateFormatGroup) {
+            customDateFormatGroup.style.display = dateFormat === 'custom' ? 'block' : 'none';
+        }
+
+        // Max parallel field
+        const parallelBuilds = document.getElementById('edit-parallel-builds').checked;
+        const maxParallelGroup = document.getElementById('max-parallel-group');
+        if (maxParallelGroup) {
+            maxParallelGroup.style.display = parallelBuilds ? 'block' : 'none';
+        }
+    }
+
+    addPreBuildStep(platform) {
+        const container = document.getElementById(`${platform}-prebuild-steps`);
+        if (!container) return;
+
+        const stepIndex = container.children.length;
+        const stepHTML = `
+            <div class="prebuild-step-item" data-platform="${platform}" data-index="${stepIndex}">
+                <div class="step-header">
+                    <input type="text" class="config-input step-name" placeholder="Step name" value="Custom Step ${stepIndex + 1}">
+                    <button type="button" class="remove-step-btn" title="Remove step">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="step-body">
+                    <div class="config-form-group">
+                        <label>Command:</label>
+                        <input type="text" class="config-input step-command" placeholder="e.g., dart run build_runner build">
+                    </div>
+                    <div class="step-options">
+                        <label>
+                            <input type="checkbox" class="step-required" checked>
+                            Required (fail build if this step fails)
+                        </label>
+                        <label>
+                            Timeout (seconds):
+                            <input type="number" class="config-input step-timeout" value="300" min="30" max="3600">
+                        </label>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', stepHTML);
+
+        // Bind remove button
+        const removeBtn = container.querySelector('.prebuild-step-item:last-child .remove-step-btn');
+        removeBtn.addEventListener('click', () => {
+            removeBtn.closest('.prebuild-step-item').remove();
+        });
+    }
+
     buildConfigFromDrawerForm() {
-        // Get current config as base
-        const config = this.currentEditConfig || {};
+        // Create a fresh config object with only snake_case fields
+        const config = {};
 
         // Update metadata
-        config.metadata = {
-            app_name_source: document.getElementById('edit-app-name-source').value,
-            custom_app_name: document.getElementById('edit-custom-app-name').value,
-            version_source: document.getElementById('edit-version-source').value,
-            custom_version: document.getElementById('edit-custom-version').value,
+        const appNameSourceEl = document.getElementById('edit-app-name-source');
+        const versionSourceEl = document.getElementById('edit-version-source');
+
+        if (!appNameSourceEl || !versionSourceEl) {
+            console.error('Required form elements not found');
+            throw new Error('Required form elements not found');
+        }
+
+        const appNameSource = appNameSourceEl.value || 'namer';
+        const versionSource = versionSourceEl.value || 'pubspec';
+
+        config.Metadata = {
+            AppNameSource: appNameSource,
+            CustomAppName: '',
+            VersionSource: versionSource,
+            CustomVersion: '',
         };
 
+        // Add custom values only if custom source is selected
+        if (appNameSource === 'custom') {
+            const customAppNameEl = document.getElementById('edit-custom-app-name');
+            config.Metadata.CustomAppName = customAppNameEl ? customAppNameEl.value : '';
+        }
+        if (versionSource === 'custom') {
+            const customVersionEl = document.getElementById('edit-custom-version');
+            config.Metadata.CustomVersion = customVersionEl ? customVersionEl.value : '';
+        }
+
         // Update artifacts
-        config.artifacts = {
-            base_output_dir: document.getElementById('edit-output-dir').value || 'build/fdawg-outputs',
-            organization: {
-                by_date: document.getElementById('edit-organize-by-date').checked,
-                date_format: document.getElementById('edit-date-format').value,
-                by_platform: document.getElementById('edit-organize-by-platform').checked,
-                by_build_type: document.getElementById('edit-organize-by-build-type').checked,
+        const dateFormatEl = document.getElementById('edit-date-format');
+        const dateFormat = dateFormatEl ? dateFormatEl.value || 'January-2' : 'January-2';
+
+        const customDateFormatEl = document.getElementById('edit-custom-date-format');
+        const finalDateFormat = dateFormat === 'custom' && customDateFormatEl ?
+            customDateFormatEl.value || 'January-2' : dateFormat;
+
+        const organizationConfig = {
+            ByDate: document.getElementById('edit-organize-by-date')?.checked || false,
+            DateFormat: finalDateFormat,
+            ByPlatform: document.getElementById('edit-organize-by-platform')?.checked || false,
+            ByBuildType: document.getElementById('edit-organize-by-build-type')?.checked || false,
+        };
+
+        config.Artifacts = {
+            BaseOutputDir: document.getElementById('edit-output-dir')?.value || 'build/fdawg-outputs',
+            Organization: organizationConfig,
+            Naming: {
+                Pattern: document.getElementById('edit-naming-pattern')?.value || '{app_name}_{version}_{arch}',
+                FallbackAppName: document.getElementById('edit-fallback-app-name')?.value || 'flutter_app',
             },
-            naming: {
-                pattern: document.getElementById('edit-naming-pattern').value || '{app_name}_{version}_{arch}',
-                fallback_app_name: document.getElementById('edit-fallback-app-name').value || 'flutter_app',
+            Cleanup: {
+                Enabled: true,
+                KeepLastBuilds: 10,
+                MaxAgeDays: 30,
             },
         };
 
         // Update execution
-        config.execution = {
-            parallel_builds: document.getElementById('edit-parallel-builds').checked,
-            max_parallel: parseInt(document.getElementById('edit-max-parallel').value) || 2,
-            continue_on_error: document.getElementById('edit-continue-on-error').checked,
-            save_logs: document.getElementById('edit-save-logs').checked,
-            log_level: document.getElementById('edit-log-level').value,
+        const maxParallelEl = document.getElementById('edit-max-parallel');
+        const logLevelEl = document.getElementById('edit-log-level');
+
+        config.Execution = {
+            ParallelBuilds: document.getElementById('edit-parallel-builds')?.checked || false,
+            MaxParallel: maxParallelEl ? parseInt(maxParallelEl.value) || 2 : 2,
+            ContinueOnError: document.getElementById('edit-continue-on-error')?.checked || false,
+            SaveLogs: document.getElementById('edit-save-logs')?.checked || true,
+            LogLevel: logLevelEl ? logLevelEl.value || 'info' : 'info',
         };
 
-        // TODO: Add pre-build steps and platform configurations
-        // This will be implemented in the next iteration
+        // Update pre-build steps
+        config.PreBuild = {
+            Global: this.collectPreBuildSteps('global'),
+            Android: this.collectPreBuildSteps('android'),
+            IOS: this.collectPreBuildSteps('ios'),
+            Web: this.collectPreBuildSteps('web'),
+        };
 
+        // Update platforms (preserve existing platform configurations from currentEditConfig)
+        const existingConfig = this.currentEditConfig || {};
+        config.Platforms = existingConfig.Platforms || existingConfig.platforms || {};
+
+        // Ensure platforms config has proper structure if empty
+        if (!config.Platforms || Object.keys(config.Platforms).length === 0) {
+            config.Platforms = {
+                Android: { Enabled: true, BuildTypes: [], Environment: {} },
+                IOS: { Enabled: true, BuildTypes: [] },
+                Web: { Enabled: true, BuildTypes: [] },
+                MacOS: { Enabled: true, BuildTypes: [] },
+                Linux: { Enabled: true, BuildTypes: [] },
+                Windows: { Enabled: true, BuildTypes: [] }
+            };
+        }
+
+        console.log('Built config from form:', config);
         return config;
+    }
+
+    collectPreBuildSteps(platform) {
+        const container = document.getElementById(`${platform}-prebuild-steps`);
+        if (!container) return [];
+
+        const steps = [];
+        const stepItems = container.querySelectorAll('.prebuild-step-item');
+
+        stepItems.forEach(item => {
+            const name = item.querySelector('.step-name').value.trim();
+            const command = item.querySelector('.step-command').value.trim();
+            const required = item.querySelector('.step-required').checked;
+            const timeout = parseInt(item.querySelector('.step-timeout').value) || 300;
+
+            if (name && command) {
+                steps.push({
+                    Name: name,
+                    Command: command,
+                    Required: required,
+                    Timeout: timeout,
+                    WorkingDir: '',
+                    Environment: {},
+                    Condition: ''
+                });
+            }
+        });
+
+        return steps;
     }
 
     async setupConfig() {
         // Show configuration drawer with default config for setup
         const defaultConfig = {
-            metadata: {
-                app_name_source: 'namer',
-                version_source: 'pubspec'
+            Metadata: {
+                AppNameSource: 'namer',
+                VersionSource: 'pubspec',
+                CustomAppName: '',
+                CustomVersion: ''
             },
-            artifacts: {
-                base_output_dir: 'build/fdawg-outputs',
-                organization: {
-                    by_date: true,
-                    date_format: 'January-2',
-                    by_platform: true,
-                    by_build_type: true
+            Artifacts: {
+                BaseOutputDir: 'build/fdawg-outputs',
+                Organization: {
+                    ByDate: true,
+                    DateFormat: 'January-2',
+                    ByPlatform: true,
+                    ByBuildType: true
                 },
-                naming: {
-                    pattern: '{app_name}_{version}_{arch}',
-                    fallback_app_name: 'flutter_app'
+                Naming: {
+                    Pattern: '{app_name}_{version}_{arch}',
+                    FallbackAppName: 'flutter_app'
+                },
+                Cleanup: {
+                    Enabled: true,
+                    KeepLastBuilds: 10,
+                    MaxAgeDays: 30
                 }
             },
-            execution: {
-                parallel_builds: false,
-                max_parallel: 2,
-                continue_on_error: false,
-                save_logs: true,
-                log_level: 'info'
+            Execution: {
+                ParallelBuilds: false,
+                MaxParallel: 2,
+                ContinueOnError: false,
+                SaveLogs: true,
+                LogLevel: 'info'
+            },
+            PreBuild: {
+                Global: [],
+                Android: [],
+                IOS: [],
+                Web: []
             }
         };
 

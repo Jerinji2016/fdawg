@@ -428,7 +428,7 @@ func (api *BuildAPI) handleUpdateConfig(w http.ResponseWriter, r *http.Request) 
 
 	var config build.BuildConfig
 	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Invalid request body: %v", err), http.StatusBadRequest)
 		return
 	}
 

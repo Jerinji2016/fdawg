@@ -4365,6 +4365,17 @@ body.drawer-open {
       }
     }
 
+    .config-description {
+      margin: 0 0 20px 0;
+      padding: 12px;
+      background-color: rgba(33, 150, 243, 0.1);
+      border: 1px solid rgba(33, 150, 243, 0.2);
+      border-radius: 6px;
+      color: #64b5f6;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
     .config-subsection {
       margin-bottom: 20px;
       padding: 15px;
@@ -4462,6 +4473,87 @@ body.drawer-open {
     padding: 8px 12px;
     font-size: 0.8rem;
     border-radius: 4px;
+  }
+
+  .prebuild-step-item {
+    margin-bottom: 15px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid $border-color;
+    border-radius: 6px;
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+
+      .step-name {
+        flex: 1;
+        font-weight: 500;
+        padding: 8px 10px;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        background-color: rgba(255, 255, 255, 0.05);
+        color: $text-color;
+        font-family: $font-primary;
+        font-size: 0.9rem;
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+      }
+
+      .remove-step-btn {
+        background: #f44336;
+        color: white;
+        border: none;
+        padding: 6px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #d32f2f;
+        }
+
+        i {
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    .step-body {
+      .step-options {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        margin-top: 10px;
+        font-size: 0.85rem;
+
+        label {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 0;
+
+          input[type="checkbox"] {
+            margin: 0;
+          }
+
+          input[type="number"] {
+            width: 80px;
+            margin-left: 6px;
+          }
+        }
+      }
+    }
   }
 }
 
