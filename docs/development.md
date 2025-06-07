@@ -122,6 +122,8 @@ app := &cli.App{
         commands.AssetCommand,
         commands.LocalizationCommand,
         commands.NamerCommand,
+        commands.BundlerCommand,
+        commands.BuildCommand,
     },
 }
 ```
@@ -145,6 +147,55 @@ The web server uses Go's standard `net/http` package with:
 - **Template rendering** for HTML pages
 - **JSON API endpoints** for dynamic functionality
 - **WebSocket support** for real-time updates (planned)
+
+### Build System Architecture
+
+The build system (`pkg/build/`) provides comprehensive Flutter build management:
+
+**Core Components:**
+- **BuildManager** - Orchestrates the entire build process
+- **BuildConfig** - YAML-based configuration with validation
+- **CommandExecutor** - Executes commands with timeout and environment handling
+- **Platform implementations** - Android, iOS, Web, macOS, Linux, Windows
+- **Artifact management** - Organized output with naming patterns
+- **Setup wizard** - Interactive configuration setup
+
+**Key Features:**
+- Multi-platform builds with platform-specific configurations
+- Pre-build step execution (build_runner, flutter_launcher_icons, etc.)
+- Environment integration using `--dart-define-from-file`
+- Real-time build output streaming via WebSocket
+- Organized artifact output with date-based folders
+- Parallel build execution (experimental)
+- Dry-run mode for build plan preview
+
+**Configuration Structure:**
+```yaml
+metadata:
+  app_name_source: namer    # namer, pubspec, custom
+  version_source: pubspec   # pubspec, custom
+
+pre_build:
+  global:                   # Run before all platform builds
+    - name: "Generate code"
+      command: "dart run build_runner build"
+
+platforms:
+  android:
+    enabled: true
+    build_types:
+      - name: "release_apk"
+        type: "apk"
+        build_mode: "release"
+
+artifacts:
+  base_output_dir: "build/fdawg-outputs"
+  organization:
+    by_date: true
+    date_format: "January-2"
+  naming:
+    pattern: "{app_name}_{version}_{arch}"
+```
 
 ## Development Practices
 
@@ -239,6 +290,11 @@ cd dwag_tests
 ../build/fdawg init
 ../build/fdawg serve
 ../build/fdawg env list
+
+# Test build system
+../build/fdawg build setup --default
+../build/fdawg build run --platforms android --dry-run
+../build/fdawg build status
 ```
 
 ### Unit Tests
@@ -262,6 +318,12 @@ fdawg env create test
 fdawg env add TEST_VAR test_value --env test
 fdawg env show test
 fdawg env delete test
+
+# Test complete build workflow
+fdawg build setup --default
+fdawg build run --platforms android --dry-run
+fdawg build run --platforms web
+fdawg build status
 ```
 
 ## Contributing

@@ -8,6 +8,13 @@
     <title>{% if page.title %}{{ page.title }} - {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
     <meta name="description" content="{{ page.description | default: site.description }}">
 
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ '/assets/images/apple-touch-icon.png' | relative_url }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ '/assets/images/favicon-32x32.png' | relative_url }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ '/assets/images/favicon-16x16.png' | relative_url }}">
+    <link rel="manifest" href="{{ '/assets/images/site.webmanifest' | relative_url }}">
+    <link rel="shortcut icon" href="{{ '/assets/images/favicon.ico' | relative_url }}">
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 
@@ -61,6 +68,21 @@
                             if (toggle) toggle.setAttribute('aria-expanded', 'true');
                         }
                     });
+                }
+            });
+
+            // Auto-expand Commands section by default
+            document.querySelectorAll('.nav-section').forEach(section => {
+                const title = section.querySelector('.nav-section-title');
+                if (title && title.textContent.trim() === 'Commands') {
+                    const items = section.querySelector('.nav-section-items');
+                    if (items && items.classList.contains('collapsible')) {
+                        items.classList.add('expanded');
+                        const toggle = section.querySelector('.nav-section-toggle');
+                        if (toggle) {
+                            toggle.setAttribute('aria-expanded', 'true');
+                        }
+                    }
                 }
             });
 

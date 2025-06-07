@@ -13,4 +13,5 @@ func SetupAPIRoutes(project *flutter.ValidationResult) {
 	SetupTranslationAPIRoutes(project)
 	SetupNamerAPIRoutes(project)
 	SetupBundlerAPIRoutes(project)
+	SetupBuildAPIRoutes(project)
 }

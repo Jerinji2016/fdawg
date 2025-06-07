@@ -7,23 +7,12 @@ import (
 	"net/http"
 )
 
-//go:embed web/templates/layout.html
-//go:embed web/templates/overview.html
-//go:embed web/templates/environment.html
-//go:embed web/templates/assets.html
-//go:embed web/templates/localizations.html
-//go:embed web/templates/namer.html
-//go:embed web/templates/bundler.html
-//go:embed web/templates/fastlane.html
-//go:embed web/templates/run_configs.html
-//go:embed web/static/css/style.css
-//go:embed web/static/js/main.js
-//go:embed web/static/js/environment.js
-//go:embed web/static/js/assets.js
-//go:embed web/static/js/localizations.js
-//go:embed web/static/js/namer.js
-//go:embed web/static/js/bundler.js
-//go:embed web/static/js/toast.js
+// Embed entire web directory recursively to avoid manual file listing
+// This approach automatically includes all files in the web directory,
+// eliminating the need to manually add each new template or static file.
+// Any new .html templates or .js/.css files will be automatically included.
+//
+//go:embed web
 var webFS embed.FS
 
 // GetTemplateFS returns a filesystem for accessing embedded templates

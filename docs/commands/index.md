@@ -33,6 +33,7 @@ fdawg [command] [subcommand] [options] [arguments]
 | [`lang`]({{ '/commands/localization/' | relative_url }}) | Localization and translation management | [Localization Commands]({{ '/commands/localization/' | relative_url }}) |
 | [`namer`]({{ '/commands/namer/' | relative_url }}) | Cross-platform app naming | [App Namer Commands]({{ '/commands/namer/' | relative_url }}) |
 | [`bundler`]({{ '/commands/bundler/' | relative_url }}) | Bundle ID management for all platforms | [Bundle ID Commands]({{ '/commands/bundler/' | relative_url }}) |
+| [`build`]({{ '/commands/build/' | relative_url }}) | Build Flutter applications with comprehensive configuration | [Build Commands]({{ '/commands/build/' | relative_url }}) |
 
 ## Quick Examples
 
@@ -96,6 +97,21 @@ fdawg bundler set --universal com.company.app
 fdawg bundler set --platform android --bundle-id com.company.android
 ```
 
+### Build Management
+```bash
+# Set up build configuration
+fdawg build setup
+
+# Build for specific platforms
+fdawg build run --platforms android,ios
+
+# Build with environment
+fdawg build run --platforms all --env production
+
+# Show build plan without executing
+fdawg build run --platforms android --dry-run
+```
+
 ### Web Interface
 ```bash
 # Start web server on default port (8080)
@@ -150,6 +166,11 @@ Most commands support these global options:
 - `set` - Set bundle IDs (universal or platform-specific)
 - `validate` - Validate bundle ID format
 
+### Build Commands (`build`)
+- `setup` - Interactive build configuration wizard
+- `run` - Execute builds for specified platforms
+- `status` - Show build status and available artifacts
+
 ## Error Handling
 
 FDAWG includes comprehensive error handling:
@@ -175,4 +196,5 @@ Choose a command category below to explore detailed documentation and examples:
 - [🌍 Localization Commands]({{ '/commands/localization/' | relative_url }}) - Translation management
 - [🏷️ App Namer Commands]({{ '/commands/namer/' | relative_url }}) - Cross-platform app naming
 - [🆔 Bundle ID Commands]({{ '/commands/bundler/' | relative_url }}) - Bundle identifier management
+- [🔨 Build Commands]({{ '/commands/build/' | relative_url }}) - Build management and artifact organization
 - [🌐 Server Commands]({{ '/commands/server/' | relative_url }}) - Web interface and validation

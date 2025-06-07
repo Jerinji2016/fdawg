@@ -6,6 +6,10 @@ description: "FDAWG - Flutter Development Assistant with Go"
 
 # FDAWG - Flutter Development Assistant with Go
 
+<div align="center">
+  <img src="{{ '/assets/images/fdawg_logo.png' | relative_url }}" alt="FDAWG Logo" width="200" height="200">
+</div>
+
 Welcome to the comprehensive documentation for FDAWG, a powerful CLI tool and web interface designed to streamline Flutter development workflows.
 
 ## What is FDAWG?
@@ -35,6 +39,8 @@ FDAWG is a comprehensive Flutter project management tool that provides:
 - [Asset Commands](commands/assets/) - Handle project assets
 - [Localization Commands](commands/localization/) - Translation management
 - [App Namer Commands](commands/namer/) - Cross-platform app naming
+- [Bundle ID Commands](commands/bundler/) - Bundle identifier management
+- [Build Commands](commands/build/) - Comprehensive build system with multi-platform support
 - [Server Commands](commands/server/) - Web interface and project validation
 
 ### 🌐 Web Interface
@@ -70,6 +76,15 @@ fdawg lang insert app.welcome
 # App naming
 fdawg namer set --value "My App"
 fdawg namer get --platforms android,ios
+
+# Bundle ID management
+fdawg bundler set --universal com.company.app
+fdawg bundler get
+
+# Build management
+fdawg build setup
+fdawg build run --platforms android,ios
+fdawg build status
 ```
 
 ### Web Interface
@@ -85,6 +100,8 @@ The web interface includes:
 - Drag-and-drop asset management
 - Translation management with Google Translate integration
 - Cross-platform app naming with live preview
+- Bundle ID management with validation
+- Comprehensive build management with real-time progress
 
 ## Support
 

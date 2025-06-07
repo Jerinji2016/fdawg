@@ -3,6 +3,14 @@
 <head>
     <title>{{.Project.PubspecInfo.Name}} - Flutter Project</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+    <link rel="manifest" href="/static/images/site.webmanifest">
+    <link rel="shortcut icon" href="/static/images/favicon.ico">
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -70,16 +78,10 @@
                             <span>Bundle IDs</span>
                         </a>
                     </li>
-                    <li class="nav-item {{if eq .ActivePage "fastlane"}}active{{end}}">
-                        <a href="/fastlane" title="Fastlane" data-tooltip="Fastlane">
-                            <i class="fas fa-rocket"></i>
-                            <span>Fastlane</span>
-                        </a>
-                    </li>
-                    <li class="nav-item {{if eq .ActivePage "run-configs"}}active{{end}}">
-                        <a href="/run-configs" title="Run Configurations" data-tooltip="Run Configurations">
-                            <i class="fas fa-play-circle"></i>
-                            <span>Run Configs</span>
+                    <li class="nav-item {{if eq .ActivePage "build"}}active{{end}}">
+                        <a href="/build" title="Build Manager" data-tooltip="Build Manager">
+                            <i class="fas fa-hammer"></i>
+                            <span>Build</span>
                         </a>
                     </li>
                 </ul>
@@ -111,6 +113,9 @@
     {{end}}
     {{if eq .ActivePage "bundler"}}
     <script src="/static/js/bundler.js"></script>
+    {{end}}
+    {{if eq .ActivePage "build"}}
+    <script src="/static/js/build.js"></script>
     {{end}}
 </body>
 </html>
