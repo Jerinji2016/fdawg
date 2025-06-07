@@ -101,8 +101,8 @@ test:
 # Documentation commands
 .PHONY: docs-install
 docs-install:
-	@echo "Installing documentation dependencies..."
-	@cd docs && bundle install
+	@echo "Installing documentation dependencies with local vendor setup..."
+	@cd docs && bundle config set --local path 'vendor/bundle' && bundle install
 
 .PHONY: docs-build
 docs-build:
@@ -111,7 +111,7 @@ docs-build:
 
 .PHONY: docs-serve
 docs-serve:
-	@echo "Serving documentation at http://localhost:4000..."
+	@echo "Serving documentation at http://localhost:4000/fdawg/..."
 	@cd docs && bundle exec jekyll serve --incremental
 
 .PHONY: docs-clean
