@@ -1,7 +1,9 @@
 package build
 
 import (
+	"archive/zip"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -357,12 +359,64 @@ func (bm *BuildManager) collectWebArtifacts() ([]*BuildArtifact, error) {
 
 // createWebArchive creates a zip archive of the web build
 func (bm *BuildManager) createWebArchive(sourceDir, zipPath string) error {
-	// Simple implementation using system zip command
-	// TODO: Implement proper zip creation in Go
-	cmd := exec.Command("zip", "-r", zipPath, ".")
-	cmd.Dir = sourceDir
+	// Cross-platform zip creation using Go's archive/zip package
+	return bm.createZipArchive(sourceDir, zipPath)
+}
 
-	return cmd.Run()
+// createZipArchive creates a zip archive using Go's archive/zip package
+func (bm *BuildManager) createZipArchive(sourceDir, zipPath string) error {
+	// Create the zip file
+	zipFile, err := os.Create(zipPath)
+	if err != nil {
+		return fmt.Errorf("failed to create zip file: %w", err)
+	}
+	defer zipFile.Close()
+
+	// Create a new zip writer
+	zipWriter := zip.NewWriter(zipFile)
+	defer zipWriter.Close()
+
+	// Walk through the source directory and add files to the zip
+	return filepath.Walk(sourceDir, func(filePath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Skip directories
+		if info.IsDir() {
+			return nil
+		}
+
+		// Get the relative path from the source directory
+		relPath, err := filepath.Rel(sourceDir, filePath)
+		if err != nil {
+			return err
+		}
+
+		// Create a file header
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+		header.Name = filepath.ToSlash(relPath) // Use forward slashes for zip paths
+
+		// Create the file in the zip
+		writer, err := zipWriter.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+
+		// Open the source file
+		file, err := os.Open(filePath)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		// Copy the file content to the zip
+		_, err = io.Copy(writer, file)
+		return err
+	})
 }
 
 // buildMacOSWithOptions builds for macOS platform with options
