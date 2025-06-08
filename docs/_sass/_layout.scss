@@ -438,6 +438,12 @@ body.sidebar-open {
     width: calc(100% - 280px);
   }
 
+  // Adjust for TOC on larger screens
+  @media (min-width: 1200px) {
+    margin-right: 250px;
+    width: calc(100% - 530px); // 280px left sidebar + 250px right TOC
+  }
+
   .content-wrapper {
     max-width: 900px;
     margin: 0 auto;
@@ -449,6 +455,11 @@ body.sidebar-open {
 
     @media (max-width: 768px) {
       padding: $spacing-lg $spacing-md;
+    }
+
+    // Adjust max-width when TOC is present
+    @media (min-width: 1200px) {
+      max-width: 800px;
     }
   }
 
@@ -467,6 +478,106 @@ body.sidebar-open {
   }
 }
 
+// Table of Contents Sidebar
+.toc-sidebar {
+  position: fixed;
+  top: 60px; // Below header
+  right: 0;
+  width: 250px;
+  height: calc(100vh - 60px);
+  background-color: $secondary-bg;
+  border-left: 1px solid $border-color;
+  padding: $spacing-lg;
+  overflow-y: auto;
+  z-index: 100;
+  display: none;
+
+  @media (min-width: 1200px) {
+    display: block;
+  }
+
+  .toc-header {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: $spacing-md;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .toc-nav {
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      li {
+        margin: 0;
+
+        a {
+          display: block;
+          padding: $spacing-xs $spacing-sm;
+          color: $text-muted;
+          text-decoration: none;
+          font-size: 0.875rem;
+          line-height: 1.4;
+          border-radius: 4px;
+          transition: all 0.2s ease;
+          border-left: 2px solid transparent;
+
+          &:hover {
+            color: $text-secondary;
+            background-color: rgba(255, 255, 255, 0.05);
+            text-decoration: none;
+          }
+
+          &.active {
+            color: $accent-blue;
+            background-color: rgba(31, 111, 235, 0.1);
+            border-left-color: $accent-blue;
+            font-weight: 500;
+          }
+        }
+
+        // Nested headings (h3, h4, etc.)
+        &.toc-h3 a {
+          padding-left: $spacing-md;
+          font-size: 0.8125rem;
+        }
+
+        &.toc-h4 a {
+          padding-left: $spacing-lg;
+          font-size: 0.8125rem;
+        }
+
+        &.toc-h5 a,
+        &.toc-h6 a {
+          padding-left: $spacing-xl;
+          font-size: 0.75rem;
+        }
+      }
+    }
+  }
+
+  // Custom scrollbar for TOC
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $border-color;
+    border-radius: 2px;
+
+    &:hover {
+      background: #484f58;
+    }
+  }
+}
+
 // Site Footer
 .site-footer {
   background-color: $secondary-bg;
@@ -480,6 +591,12 @@ body.sidebar-open {
     width: calc(100% - 280px);
   }
 
+  // Adjust for TOC on larger screens
+  @media (min-width: 1200px) {
+    margin-right: 250px;
+    width: calc(100% - 530px); // 280px left sidebar + 250px right TOC
+  }
+
   .footer-content {
     text-align: center;
     color: $text-muted;
@@ -489,6 +606,11 @@ body.sidebar-open {
 
     @media (min-width: 769px) {
       padding: 0 $spacing-xxl;
+    }
+
+    // Adjust max-width when TOC is present
+    @media (min-width: 1200px) {
+      max-width: 800px;
     }
 
     p {

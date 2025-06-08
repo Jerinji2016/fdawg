@@ -8,16 +8,8 @@ permalink: /commands/build/
 ---
 
 # Build Management
-{: .no_toc }
 
 Comprehensive build system for Flutter applications with pre-build setup, artifact organization, and multi-platform support.
-{: .fs-6 .fw-300 }
-
-## Table of contents
-{: .no_toc .text-delta }
-
-1. TOC
-{:toc}
 
 ---
 
