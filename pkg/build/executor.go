@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/Jerinji2016/fdawg/pkg/utils"
@@ -45,8 +46,15 @@ func (ce *CommandExecutor) ExecuteStep(step BuildStep) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	// Create command
-	cmd := exec.CommandContext(ctx, "sh", "-c", step.Command)
+	// Create command with cross-platform shell support
+	var cmd *exec.Cmd
+	if runtime.GOOS == "windows" {
+		// Use cmd.exe on Windows
+		cmd = exec.CommandContext(ctx, "cmd", "/c", step.Command)
+	} else {
+		// Use sh on Unix-like systems (Linux, macOS, etc.)
+		cmd = exec.CommandContext(ctx, "sh", "-c", step.Command)
+	}
 	cmd.Dir = ce.resolveWorkingDir(step.WorkingDir)
 	cmd.Env = ce.buildEnvironment(step.Environment)
 
