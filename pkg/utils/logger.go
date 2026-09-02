@@ -14,24 +14,42 @@ const (
 	ColorBlue   = "\033[34m"
 )
 
+var colorEnabled = isColorSupported()
+
 // Error prints a message in red
 func Error(format string, a ...interface{}) {
-	fmt.Printf(ColorRed+"ERROR: "+format+ColorReset+"\n", a...)
+	if colorEnabled {
+		fmt.Printf(ColorRed+"ERROR: "+format+ColorReset+"\n", a...)
+	} else {
+		fmt.Printf("ERROR: "+format+"\n", a...)
+	}
 }
 
 // Success prints a message in green
 func Success(format string, a ...interface{}) {
-	fmt.Printf(ColorGreen+format+ColorReset+"\n", a...)
+	if colorEnabled {
+		fmt.Printf(ColorGreen+format+ColorReset+"\n", a...)
+	} else {
+		fmt.Printf(format+"\n", a...)
+	}
 }
 
 // Warning prints a message in yellow
 func Warning(format string, a ...interface{}) {
-	fmt.Printf(ColorYellow+"WARNING: "+format+ColorReset+"\n", a...)
+	if colorEnabled {
+		fmt.Printf(ColorYellow+"WARNING: "+format+ColorReset+"\n", a...)
+	} else {
+		fmt.Printf("WARNING: "+format+"\n", a...)
+	}
 }
 
 // Info prints a message in blue
 func Info(format string, a ...interface{}) {
-	fmt.Printf(ColorBlue+"INFO: "+format+ColorReset+"\n", a...)
+	if colorEnabled {
+		fmt.Printf(ColorBlue+"INFO: "+format+ColorReset+"\n", a...)
+	} else {
+		fmt.Printf("INFO: "+format+"\n", a...)
+	}
 }
 
 // Log prints a regular message
@@ -52,31 +70,51 @@ func NewLogger(prefix string) *Logger {
 // Error logs an error message
 func (l *Logger) Error(format string, a ...interface{}) {
 	timestamp := time.Now().Format("15:04:05")
-	fmt.Printf("[%s] %s%s ERROR: %s%s\n", timestamp, ColorRed, l.prefix, fmt.Sprintf(format, a...), ColorReset)
+	if colorEnabled {
+		fmt.Printf("[%s] %s%s ERROR: %s%s\n", timestamp, ColorRed, l.prefix, fmt.Sprintf(format, a...), ColorReset)
+	} else {
+		fmt.Printf("[%s] %s ERROR: %s\n", timestamp, l.prefix, fmt.Sprintf(format, a...))
+	}
 }
 
 // Success logs a success message
 func (l *Logger) Success(format string, a ...interface{}) {
 	timestamp := time.Now().Format("15:04:05")
-	fmt.Printf("[%s] %s%s SUCCESS: %s%s\n", timestamp, ColorGreen, l.prefix, fmt.Sprintf(format, a...), ColorReset)
+	if colorEnabled {
+		fmt.Printf("[%s] %s%s SUCCESS: %s%s\n", timestamp, ColorGreen, l.prefix, fmt.Sprintf(format, a...), ColorReset)
+	} else {
+		fmt.Printf("[%s] %s SUCCESS: %s\n", timestamp, l.prefix, fmt.Sprintf(format, a...))
+	}
 }
 
 // Warning logs a warning message
 func (l *Logger) Warning(format string, a ...interface{}) {
 	timestamp := time.Now().Format("15:04:05")
-	fmt.Printf("[%s] %s%s WARNING: %s%s\n", timestamp, ColorYellow, l.prefix, fmt.Sprintf(format, a...), ColorReset)
+	if colorEnabled {
+		fmt.Printf("[%s] %s%s WARNING: %s%s\n", timestamp, ColorYellow, l.prefix, fmt.Sprintf(format, a...), ColorReset)
+	} else {
+		fmt.Printf("[%s] %s WARNING: %s\n", timestamp, l.prefix, fmt.Sprintf(format, a...))
+	}
 }
 
 // Info logs an info message
 func (l *Logger) Info(format string, a ...interface{}) {
 	timestamp := time.Now().Format("15:04:05")
-	fmt.Printf("[%s] %s%s INFO: %s%s\n", timestamp, ColorBlue, l.prefix, fmt.Sprintf(format, a...), ColorReset)
+	if colorEnabled {
+		fmt.Printf("[%s] %s%s INFO: %s%s\n", timestamp, ColorBlue, l.prefix, fmt.Sprintf(format, a...), ColorReset)
+	} else {
+		fmt.Printf("[%s] %s INFO: %s\n", timestamp, l.prefix, fmt.Sprintf(format, a...))
+	}
 }
 
 // Debug logs a debug message
 func (l *Logger) Debug(format string, a ...interface{}) {
 	timestamp := time.Now().Format("15:04:05")
-	fmt.Printf("[%s] %s DEBUG: %s%s\n", timestamp, l.prefix, fmt.Sprintf(format, a...), ColorReset)
+	if colorEnabled {
+		fmt.Printf("[%s] %s DEBUG: %s%s\n", timestamp, l.prefix, fmt.Sprintf(format, a...), ColorReset)
+	} else {
+		fmt.Printf("[%s] %s DEBUG: %s\n", timestamp, l.prefix, fmt.Sprintf(format, a...))
+	}
 }
 
 // FormatFileSize formats a file size in bytes to human readable format
